@@ -5,53 +5,78 @@ class AttendanceController {
   // Check in an employee
   async checkIn(req, res) {
     try {
-      const { employeeId, companyId: requestCompanyId } = req.body;
-      let companyId = req.user.company?._id || req.user.companyId || req.user.company;
+      const { employeeId, location } = req.body;
+      let companyId =
+        req.user.company?._id || req.user.companyId || req.user.company;
 
       // For super admin, allow specifying company ID in request body
-      if (req.user.role === 'super_admin' && requestCompanyId) {
-        companyId = requestCompanyId;
+      if (req.user.role === "super_admin" && req.body.companyId) {
+        companyId = req.body.companyId;
       }
 
       if (!employeeId) {
         return res.status(400).json({
           success: false,
-          message: 'Employee ID is required'
+          message: "Employee ID is required",
         });
       }
 
       if (!companyId) {
         return res.status(400).json({
           success: false,
-          message: 'Company ID is required. For super admin, please include companyId in request body.'
+          message:
+            "Company ID is required. For super admin, please include companyId in request body.",
         });
       }
 
       // Validate that the employee belongs to the same company
-      const Employee = require('../models/employee.model');
-      const employee = await Employee.findOne({ 
-        _id: employeeId, 
-        company: companyId 
+      const Employee = require("../models/employee.model");
+      const employee = await Employee.findOne({
+        _id: employeeId,
+        company: companyId,
       });
 
       if (!employee) {
         return res.status(400).json({
           success: false,
-          message: 'Employee not found or does not belong to the specified company'
+          message:
+            "Employee not found or does not belong to the specified company",
         });
       }
 
-      const attendance = await attendanceService.checkIn(employeeId, companyId);
-      
+      // Validate location data if provided
+      let checkInLocation = null;
+      if (location) {
+        if (!location.latitude || !location.longitude) {
+          return res.status(400).json({
+            success: false,
+            message: "Location must include latitude and longitude",
+          });
+        }
+
+        checkInLocation = {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          address: location.address || null,
+          accuracy: location.accuracy || null,
+        };
+      }
+
+      const attendance = await attendanceService.checkIn(
+        employeeId,
+        companyId,
+        checkInLocation
+      );
+
       res.status(201).json({
         success: true,
-        message: 'Check-in successful',
-        data: attendance
+        message: "Check-in successful",
+        data: attendance,
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        message: error.message
+        message: error.message,
       });
     }
   }
@@ -59,53 +84,78 @@ class AttendanceController {
   // Check out an employee
   async checkOut(req, res) {
     try {
-      const { employeeId, companyId: requestCompanyId } = req.body;
-      let companyId = req.user.company?._id || req.user.companyId || req.user.company;
+      const { employeeId, location } = req.body;
+      let companyId =
+        req.user.company?._id || req.user.companyId || req.user.company;
 
       // For super admin, allow specifying company ID in request body
-      if (req.user.role === 'super_admin' && requestCompanyId) {
-        companyId = requestCompanyId;
+      if (req.user.role === "super_admin" && req.body.companyId) {
+        companyId = req.body.companyId;
       }
 
       if (!employeeId) {
         return res.status(400).json({
           success: false,
-          message: 'Employee ID is required'
+          message: "Employee ID is required",
         });
       }
 
       if (!companyId) {
         return res.status(400).json({
           success: false,
-          message: 'Company ID is required. For super admin, please include companyId in request body.'
+          message:
+            "Company ID is required. For super admin, please include companyId in request body.",
         });
       }
 
       // Validate that the employee belongs to the same company
-      const Employee = require('../models/employee.model');
-      const employee = await Employee.findOne({ 
-        _id: employeeId, 
-        company: companyId 
+      const Employee = require("../models/employee.model");
+      const employee = await Employee.findOne({
+        _id: employeeId,
+        company: companyId,
       });
 
       if (!employee) {
         return res.status(400).json({
           success: false,
-          message: 'Employee not found or does not belong to the specified company'
+          message:
+            "Employee not found or does not belong to the specified company",
         });
       }
 
-      const attendance = await attendanceService.checkOut(employeeId, companyId);
-      
+      // Validate location data if provided
+      let checkOutLocation = null;
+      if (location) {
+        if (!location.latitude || !location.longitude) {
+          return res.status(400).json({
+            success: false,
+            message: "Location must include latitude and longitude",
+          });
+        }
+
+        checkOutLocation = {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          address: location.address || null,
+          accuracy: location.accuracy || null,
+        };
+      }
+
+      const attendance = await attendanceService.checkOut(
+        employeeId,
+        companyId,
+        checkOutLocation
+      );
+
       res.status(200).json({
         success: true,
-        message: 'Check-out successful',
-        data: attendance
+        message: "Check-out successful",
+        data: attendance,
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        message: error.message
+        message: error.message,
       });
     }
   }
@@ -141,43 +191,39 @@ class AttendanceController {
     }
   }
 
-  // Get company attendance for a date range
+  // Get company attendance records
   async getCompanyAttendance(req, res) {
     try {
-      const companyId =
-        req.user.company?._id || req.user.companyId || req.user.company;
-      const { startDate, endDate } = req.query;
-      const filters = req.query;
+      const { startDate, endDate, employeeId, status, department } = req.query;
+      let companyId = req.user.company?._id || req.user.companyId || req.user.company;
 
-      if (!startDate || !endDate) {
-        return res.status(400).json({
-          success: false,
-          message: "Start date and end date are required",
-        });
+      // For super admin, allow specifying company ID in query
+      if (req.user.role === 'super_admin' && req.query.companyId) {
+        companyId = req.query.companyId;
       }
 
       if (!companyId) {
         return res.status(400).json({
           success: false,
-          message: "Company ID not found in user context",
+          message: 'Company ID is required'
         });
       }
 
-      const attendanceRecords = await attendanceService.getCompanyAttendance(
+      const attendance = await attendanceService.getCompanyAttendance(
         companyId,
         startDate,
         endDate,
-        filters
+        { employeeId, status, department }
       );
-
+      
       res.status(200).json({
         success: true,
-        data: attendanceRecords,
+        data: attendance
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        message: error.message,
+        message: error.message
       });
     }
   }

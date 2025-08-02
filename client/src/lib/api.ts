@@ -125,6 +125,48 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // Attendance endpoints
+  async checkIn(employeeId: string, location?: any) {
+    const requestBody: any = { employeeId };
+    if (location) {
+      requestBody.location = location;
+    }
+    
+    return this.request('/attendance/check-in', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+    });
+  }
+
+  async checkOut(employeeId: string, location?: any) {
+    const requestBody: any = { employeeId };
+    if (location) {
+      requestBody.location = location;
+    }
+    
+    return this.request('/attendance/check-out', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+    });
+  }
+
+  async getTodaysAttendance(employeeId: string) {
+    return this.request(`/attendance/today/${employeeId}`);
+  }
+
+  async getAttendanceSummary(startDate: string, endDate: string) {
+    return this.request(`/attendance/summary?startDate=${startDate}&endDate=${endDate}`);
+  }
+
+  async getCompanyAttendance(startDate: string, endDate: string, filters?: any) {
+    const queryParams = new URLSearchParams({
+      startDate,
+      endDate,
+      ...filters
+    });
+    return this.request(`/attendance/company?${queryParams}`);
+  }
 }
 
 export const apiClient = new ApiClient(); 

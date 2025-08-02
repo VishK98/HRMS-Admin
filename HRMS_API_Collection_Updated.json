@@ -719,7 +719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"employeeId\": \"{{employee_id}}\"\n}",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"location\": {\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060,\n    \"address\": \"123 Main St, New York, NY 10001\",\n    \"accuracy\": 10\n  }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -737,7 +737,7 @@
 								"check-in"
 							]
 						},
-						"description": "Employee check in (requires authentication)"
+						"description": "Employee check in with location tracking (requires authentication). Location is optional but recommended for attendance verification."
 					},
 					"response": []
 				},
@@ -758,7 +758,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"employeeId\": \"{{employee_id}}\"\n}",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"location\": {\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060,\n    \"address\": \"123 Main St, New York, NY 10001\",\n    \"accuracy\": 10\n  }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -776,7 +776,7 @@
 								"check-out"
 							]
 						},
-						"description": "Employee check out (requires authentication)"
+						"description": "Employee check out with location tracking (requires authentication). Location is optional but recommended for attendance verification."
 					},
 					"response": []
 				},

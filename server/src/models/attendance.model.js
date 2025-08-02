@@ -19,6 +19,42 @@ const attendanceSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    checkInLocation: {
+      latitude: {
+        type: Number,
+        required: false,
+      },
+      longitude: {
+        type: Number,
+        required: false,
+      },
+      address: {
+        type: String,
+        required: false,
+      },
+      accuracy: {
+        type: Number,
+        required: false,
+      },
+    },
+    checkOutLocation: {
+      latitude: {
+        type: Number,
+        required: false,
+      },
+      longitude: {
+        type: Number,
+        required: false,
+      },
+      address: {
+        type: String,
+        required: false,
+      },
+      accuracy: {
+        type: Number,
+        required: false,
+      },
+    },
     status: {
       type: String,
       enum: ["present", "absent", "late", "half_day"],

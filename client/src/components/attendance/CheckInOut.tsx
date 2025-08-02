@@ -24,11 +24,13 @@ interface AttendanceRecord {
     latitude: number;
     longitude: number;
     address?: string;
+    accuracy?: number;
   };
   checkOutLocation?: {
     latitude: number;
     longitude: number;
     address?: string;
+    accuracy?: number;
   };
 }
 
@@ -585,16 +587,34 @@ export const CheckInOut = () => {
                             <td className="p-3 font-medium">Check-in Location</td>
                             <td className="p-3">
                               <div className="text-sm">
-                                <div>Lat: {attendance.checkInLocation.latitude.toFixed(6)}</div>
-                                <div>Lng: {attendance.checkInLocation.longitude.toFixed(6)}</div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <MapPin className="w-4 h-4 text-primary" />
+                                  <span className="font-medium">GPS Coordinates</span>
+                                </div>
+                                <div className="bg-muted p-2 rounded text-xs font-mono">
+                                  Lat: {attendance.checkInLocation.latitude.toFixed(6)}
+                                  <br />
+                                  Lng: {attendance.checkInLocation.longitude.toFixed(6)}
+                                </div>
                                 {attendance.checkInLocation.address && (
-                                  <div className="text-muted-foreground mt-1">
-                                    {attendance.checkInLocation.address}
+                                  <div className="mt-2">
+                                    <div className="font-medium text-xs">Address:</div>
+                                    <div className="text-muted-foreground text-xs mt-1">
+                                      {attendance.checkInLocation.address}
+                                    </div>
+                                  </div>
+                                )}
+                                {attendance.checkInLocation.accuracy && (
+                                  <div className="mt-2">
+                                    <div className="font-medium text-xs">Accuracy:</div>
+                                    <div className="text-muted-foreground text-xs">
+                                      ±{Math.round(attendance.checkInLocation.accuracy)} meters
+                                    </div>
                                   </div>
                                 )}
                               </div>
                             </td>
-                            <td className="p-3 text-muted-foreground">GPS coordinates and address</td>
+                            <td className="p-3 text-muted-foreground">GPS coordinates and address where employee checked in</td>
                           </tr>
                         )}
                         
@@ -603,16 +623,54 @@ export const CheckInOut = () => {
                             <td className="p-3 font-medium">Check-out Location</td>
                             <td className="p-3">
                               <div className="text-sm">
-                                <div>Lat: {attendance.checkOutLocation.latitude.toFixed(6)}</div>
-                                <div>Lng: {attendance.checkOutLocation.longitude.toFixed(6)}</div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <MapPin className="w-4 h-4 text-primary" />
+                                  <span className="font-medium">GPS Coordinates</span>
+                                </div>
+                                <div className="bg-muted p-2 rounded text-xs font-mono">
+                                  Lat: {attendance.checkOutLocation.latitude.toFixed(6)}
+                                  <br />
+                                  Lng: {attendance.checkOutLocation.longitude.toFixed(6)}
+                                </div>
                                 {attendance.checkOutLocation.address && (
-                                  <div className="text-muted-foreground mt-1">
-                                    {attendance.checkOutLocation.address}
+                                  <div className="mt-2">
+                                    <div className="font-medium text-xs">Address:</div>
+                                    <div className="text-muted-foreground text-xs mt-1">
+                                      {attendance.checkOutLocation.address}
+                                    </div>
+                                  </div>
+                                )}
+                                {attendance.checkOutLocation.accuracy && (
+                                  <div className="mt-2">
+                                    <div className="font-medium text-xs">Accuracy:</div>
+                                    <div className="text-muted-foreground text-xs">
+                                      ±{Math.round(attendance.checkOutLocation.accuracy)} meters
+                                    </div>
                                   </div>
                                 )}
                               </div>
                             </td>
-                            <td className="p-3 text-muted-foreground">GPS coordinates and address</td>
+                            <td className="p-3 text-muted-foreground">GPS coordinates and address where employee checked out</td>
+                          </tr>
+                        )}
+                        
+                        {!attendance.checkInLocation && (
+                          <tr className="border-t">
+                            <td className="p-3 font-medium">Check-in Location</td>
+                            <td className="p-3">
+                              <span className="text-muted-foreground text-sm">No location data available</span>
+                            </td>
+                            <td className="p-3 text-muted-foreground">Location tracking not enabled for this record</td>
+                          </tr>
+                        )}
+                        
+                        {!attendance.checkOutLocation && attendance.checkOut && (
+                          <tr className="border-t">
+                            <td className="p-3 font-medium">Check-out Location</td>
+                            <td className="p-3">
+                              <span className="text-muted-foreground text-sm">No location data available</span>
+                            </td>
+                            <td className="p-3 text-muted-foreground">Location tracking not enabled for this record</td>
                           </tr>
                         )}
                         

@@ -1,9 +1,9 @@
-const Attendance = require('../models/attendance.model');
-const Employee = require('../models/employee.model');
+const Attendance = require("../models/attendance.model");
+const Employee = require("../models/employee.model");
 
 class AttendanceService {
   // Check in an employee
-  async checkIn(employeeId, companyId) {
+  async checkIn(employeeId, companyId, location = null) {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -12,11 +12,11 @@ class AttendanceService {
       let attendance = await Attendance.findOne({
         employee: employeeId,
         date: today,
-        company: companyId
+        company: companyId,
       });
 
       if (attendance && attendance.checkIn) {
-        throw new Error('Employee already checked in today');
+        throw new Error("Employee already checked in today");
       }
 
       const checkInTime = new Date();
@@ -28,11 +28,15 @@ class AttendanceService {
           date: today,
           checkIn: checkInTime,
           company: companyId,
-          status: 'present'
+          status: "present",
+          checkInLocation: location,
         });
       } else {
         // Update existing record
         attendance.checkIn = checkInTime;
+        if (location) {
+          attendance.checkInLocation = location;
+        }
       }
 
       await attendance.save();
@@ -43,7 +47,7 @@ class AttendanceService {
   }
 
   // Check out an employee
-  async checkOut(employeeId, companyId) {
+  async checkOut(employeeId, companyId, location = null) {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -52,28 +56,35 @@ class AttendanceService {
       const attendance = await Attendance.findOne({
         employee: employeeId,
         date: today,
-        company: companyId
+        company: companyId,
       });
 
       if (!attendance) {
-        throw new Error('No check-in record found for today');
+        throw new Error("No check-in record found for today");
       }
 
       if (attendance.checkOut) {
-        throw new Error('Employee already checked out today');
+        throw new Error("Employee already checked out today");
       }
 
       const checkOutTime = new Date();
       attendance.checkOut = checkOutTime;
 
+      // Save check-out location if provided
+      if (location) {
+        attendance.checkOutLocation = location;
+      }
+
       // Calculate working hours
       if (attendance.checkIn) {
-        const workingHours = (checkOutTime - attendance.checkIn) / (1000 * 60 * 60); // in hours
+        const workingHours =
+          (checkOutTime - attendance.checkIn) / (1000 * 60 * 60); // in hours
         attendance.workingHours = parseFloat(workingHours.toFixed(2));
-        
+
         // Calculate overtime (assuming 8 hours workday)
         const overtime = workingHours - 8;
-        attendance.overtime = overtime > 0 ? parseFloat(overtime.toFixed(2)) : 0;
+        attendance.overtime =
+          overtime > 0 ? parseFloat(overtime.toFixed(2)) : 0;
       }
 
       await attendance.save();
@@ -90,8 +101,8 @@ class AttendanceService {
         employee: employeeId,
         date: {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
+          $lte: new Date(endDate),
+        },
       }).sort({ date: 1 });
 
       return attendanceRecords;
@@ -100,31 +111,46 @@ class AttendanceService {
     }
   }
 
-  // Get company attendance for a specific date range
+  // Get company attendance for a date range
   async getCompanyAttendance(companyId, startDate, endDate, filters = {}) {
     try {
       const query = {
         company: companyId,
         date: {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
-        }
+          $lte: new Date(endDate),
+        },
       };
 
-      // Apply filters
+      // Apply additional filters
       if (filters.employeeId) {
         query.employee = filters.employeeId;
       }
-
       if (filters.status) {
         query.status = filters.status;
       }
+      if (filters.department) {
+        // This would require a join with employee data
+        // For now, we'll filter after fetching
+      }
 
       const attendanceRecords = await Attendance.find(query)
-        .populate('employee', 'firstName lastName employeeId department designation')
+        .populate(
+          "employee",
+          "firstName lastName employeeId department designation"
+        )
         .sort({ date: -1, employee: 1 });
 
-      return attendanceRecords;
+      // Apply department filter if specified
+      let filteredRecords = attendanceRecords;
+      if (filters.department) {
+        filteredRecords = attendanceRecords.filter(record => 
+          record.employee.department && 
+          record.employee.department.toLowerCase().includes(filters.department.toLowerCase())
+        );
+      }
+
+      return filteredRecords;
     } catch (error) {
       throw error;
     }
@@ -139,16 +165,16 @@ class AttendanceService {
             company: companyId,
             date: {
               $gte: new Date(startDate),
-              $lte: new Date(endDate)
-            }
-          }
+              $lte: new Date(endDate),
+            },
+          },
         },
         {
           $group: {
             _id: "$status",
-            count: { $sum: 1 }
-          }
-        }
+            count: { $sum: 1 },
+          },
+        },
       ]);
 
       // Get total working hours
@@ -158,22 +184,22 @@ class AttendanceService {
             company: companyId,
             date: {
               $gte: new Date(startDate),
-              $lte: new Date(endDate)
-            }
-          }
+              $lte: new Date(endDate),
+            },
+          },
         },
         {
           $group: {
             _id: null,
             totalWorkingHours: { $sum: "$workingHours" },
-            totalOvertime: { $sum: "$overtime" }
-          }
-        }
+            totalOvertime: { $sum: "$overtime" },
+          },
+        },
       ]);
 
       return {
         statusSummary: summary,
-        totals: totalHours[0] || { totalWorkingHours: 0, totalOvertime: 0 }
+        totals: totalHours[0] || { totalWorkingHours: 0, totalOvertime: 0 },
       };
     } catch (error) {
       throw error;
@@ -189,7 +215,7 @@ class AttendanceService {
       const attendance = await Attendance.findOne({
         employee: employeeId,
         date: today,
-        company: companyId
+        company: companyId,
       });
 
       return attendance;
@@ -208,7 +234,7 @@ class AttendanceService {
       );
 
       if (!attendance) {
-        throw new Error('Attendance record not found');
+        throw new Error("Attendance record not found");
       }
 
       return attendance;
@@ -223,10 +249,10 @@ class AttendanceService {
       const attendance = await Attendance.findByIdAndDelete(attendanceId);
 
       if (!attendance) {
-        throw new Error('Attendance record not found');
+        throw new Error("Attendance record not found");
       }
 
-      return { message: 'Attendance record deleted successfully' };
+      return { message: "Attendance record deleted successfully" };
     } catch (error) {
       throw error;
     }

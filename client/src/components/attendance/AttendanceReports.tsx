@@ -5,601 +5,469 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Calendar, Search, Download, Filter, BarChart3, PieChart, 
-  Table as TableIcon, CalendarDays, FileText
+  Calendar, Download, Filter, Search, 
+  MapPin, Clock, Users, TrendingUp,
+  FileText, BarChart3, PieChart, Settings
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
-import { Employee } from "@/types/employee";
-import { RegularizationRequest } from "@/types/regularization";
+import { AttendanceRecord } from "@/types/attendance";
+import { AttendanceReportGenerator, ReportOptions } from "@/lib/reportGenerator";
 
-interface AttendanceRecord {
-  _id: string;
-  employee: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    employeeId: string;
-    department: string;
-    designation: string;
-  };
-  date: string;
-  checkIn: string;
-  checkOut: string | null;
-  status: string;
-  workingHours: number;
-  overtime: number;
+interface ReportFilters {
+  startDate: string;
+  endDate: string;
+  department?: string;
+  status?: string;
+  includeLocation: boolean;
+  includeDistance: boolean;
 }
 
 export const AttendanceReports = () => {
   const { user } = useAuth();
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [reportType, setReportType] = useState<"daily" | "monthly" | "custom">("daily");
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
-  const [regularizationRequests, setRegularizationRequests] = useState<RegularizationRequest[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [selectedEmployee, setSelectedEmployee] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [filteredRecords, setFilteredRecords] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<"table" | "calendar">("table");
-  const [showRegularizationTab, setShowRegularizationTab] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<ReportFilters>({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+    includeLocation: true,
+    includeDistance: true
+  });
+  const [showReportOptions, setShowReportOptions] = useState(false);
 
-  // Set default dates
   useEffect(() => {
-    const today = new Date();
-    const formattedToday = today.toISOString().split("T")[0];
-    setStartDate(formattedToday);
-    setEndDate(formattedToday);
-    
     if (user?.company?._id) {
-      fetchEmployees();
+      fetchAttendanceRecords();
     }
-  }, [user]);
+  }, [user, filters]);
 
-  const fetchEmployees = async () => {
+  useEffect(() => {
+    filterRecords();
+  }, [attendanceRecords, searchTerm]);
+
+  const fetchAttendanceRecords = async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      const response = await apiClient.request<{ employees: Employee[] }>(
-        `/employees/company/${user!.company!._id}`
+      const response = await apiClient.getCompanyAttendance(
+        filters.startDate,
+        filters.endDate,
+        {
+          department: filters.department,
+          status: filters.status
+        }
       );
-      
+
       if (response.success) {
-        setEmployees(response.data!.employees);
-      }
-    } catch (err) {
-      setError("Failed to fetch employees");
-      console.error("Error fetching employees:", err);
-    }
-  };
-
-  const fetchAttendanceReports = async () => {
-    if (!startDate || !endDate) {
-      setError("Please select both start and end dates");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      let url = `/attendance/company?startDate=${startDate}&endDate=${endDate}`;
-      
-      if (selectedEmployee) {
-        url += `&employeeId=${selectedEmployee}`;
-      }
-      
-      if (statusFilter !== "all") {
-        url += `&status=${statusFilter}`;
-      }
-
-      const response = await apiClient.request<AttendanceRecord[]>(url);
-      
-      if (response.success) {
-        setAttendanceRecords(response.data!);
+        setAttendanceRecords(response.data || []);
       } else {
-        setError(response.message || "Failed to fetch attendance reports");
+        setError(response.message || "Failed to fetch attendance records");
       }
-    } catch (err) {
-      setError("Failed to fetch attendance reports");
-      console.error("Error fetching attendance reports:", err);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch attendance records");
+      console.error("Error fetching attendance records:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchRegularizationRequests = async () => {
-    if (!startDate || !endDate) {
-      setError("Please select both start and end dates");
+  const filterRecords = () => {
+    let filtered = attendanceRecords;
+
+    if (searchTerm) {
+      filtered = filtered.filter(record => 
+        `${record.employee.firstName} ${record.employee.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        record.employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        record.employee.department?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredRecords(filtered);
+  };
+
+  const generateReport = (format: 'csv' | 'pdf' | 'excel') => {
+    if (filteredRecords.length === 0) {
+      setError("No records to generate report from");
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      let url = `/regularization/requests/company?startDate=${startDate}&endDate=${endDate}`;
-      
-      if (selectedEmployee) {
-        url += `&employeeId=${selectedEmployee}`;
+    const options: ReportOptions = {
+      includeLocation: filters.includeLocation,
+      includeDistance: filters.includeDistance,
+      format,
+      dateRange: {
+        startDate: filters.startDate,
+        endDate: filters.endDate
+      },
+      filters: {
+        department: filters.department,
+        status: filters.status
       }
-      
-      if (statusFilter !== "all") {
-        url += `&status=${statusFilter}`;
-      }
+    };
 
-      const response = await apiClient.request<RegularizationRequest[]>(url);
-      
-      if (response.success) {
-        setRegularizationRequests(response.data!);
-      } else {
-        setError(response.message || "Failed to fetch regularization requests");
-      }
-    } catch (err) {
-      setError("Failed to fetch regularization requests");
-      console.error("Error fetching regularization requests:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDateChange = (type: "start" | "end", value: string) => {
-    if (type === "start") {
-      setStartDate(value);
-    } else {
-      setEndDate(value);
-    }
-  };
-
-  const handleReportTypeChange = (type: "daily" | "monthly" | "custom") => {
-    setReportType(type);
-    
-    const today = new Date();
-    
-    if (type === "daily") {
-      const formattedDate = today.toISOString().split("T")[0];
-      setStartDate(formattedDate);
-      setEndDate(formattedDate);
-    } else if (type === "monthly") {
-      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      setStartDate(firstDay.toISOString().split("T")[0]);
-      setEndDate(lastDay.toISOString().split("T")[0]);
-    }
+    const reportGenerator = new AttendanceReportGenerator(filteredRecords, options);
+    reportGenerator.downloadReport();
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "present":
-        return <Badge className="bg-success">Present</Badge>;
-      case "absent":
-        return <Badge variant="destructive">Absent</Badge>;
-      case "late":
-        return <Badge className="bg-warning">Late</Badge>;
-      case "half_day":
-        return <Badge className="bg-info">Half Day</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+    const statusConfig = {
+      present: { color: "bg-green-100 text-green-800", label: "Present" },
+      absent: { color: "bg-red-100 text-red-800", label: "Absent" },
+      late: { color: "bg-yellow-100 text-yellow-800", label: "Late" },
+      half_day: { color: "bg-orange-100 text-orange-800", label: "Half Day" },
+      on_leave: { color: "bg-blue-100 text-blue-800", label: "On Leave" }
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.present;
+    return <Badge className={config.color}>{config.label}</Badge>;
   };
 
-  const getRegularizationStatusBadge = (status: string) => {
-    switch (status) {
-      case "approved":
-        return <Badge className="bg-success">Approved</Badge>;
-      case "rejected":
-        return <Badge variant="destructive">Rejected</Badge>;
-      case "pending":
-        return <Badge className="bg-warning">Pending</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+  const formatTime = (timeString: string | null) => {
+    if (!timeString) return "N/A";
+    return new Date(timeString).toLocaleTimeString();
   };
 
-  const exportToCSV = () => {
-    // Create CSV content
-    let csvContent = "Date,Employee Name,Employee ID,Department,Check In,Check Out,Status,Working Hours,Overtime\n";
-    
-    attendanceRecords.forEach(record => {
-      csvContent += `${record.date},${record.employee.firstName} ${record.employee.lastName},${record.employee.employeeId},${record.employee.department || ""},${record.checkIn ? new Date(record.checkIn).toLocaleTimeString() : ""},${record.checkOut ? new Date(record.checkOut).toLocaleTimeString() : ""},${record.status},${record.workingHours},${record.overtime}\n`;
-    });
-    
-    // Create download link
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "attendance_report.csv");
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
-  const exportRegularizationToCSV = () => {
-    // Create CSV content
-    let csvContent = "Date,Employee Name,Employee ID,Department,Reason,Status,Requested At,Approved At,Approved By\n";
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  };
+
+  const getLocationDistance = (record: AttendanceRecord) => {
+    if (!record.checkInLocation || !record.checkOutLocation) return "N/A";
     
-    regularizationRequests.forEach(request => {
-      csvContent += `${request.date},${request.employee.firstName} ${request.employee.lastName},${request.employee.employeeId},${request.employee.department || ""},"${request.reason}",${request.status},${new Date(request.requestedAt).toLocaleString()},${request.approvedAt ? new Date(request.approvedAt).toLocaleString() : ""},${request.approvedBy?.name || ""}\n`;
-    });
+    const distance = calculateDistance(
+      record.checkInLocation.latitude,
+      record.checkInLocation.longitude,
+      record.checkOutLocation.latitude,
+      record.checkOutLocation.longitude
+    );
     
-    // Create download link
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "regularization_requests_report.csv");
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    return `${(distance / 1000).toFixed(2)} km`;
   };
 
   return (
     <div className="space-y-6">
-      {/* Report Filters */}
+      {/* Report Header */}
       <Card>
         <CardHeader>
-          <CardTitle>Attendance Reports</CardTitle>
-          <CardDescription>Generate and view attendance reports</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Report Type */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label className="text-sm font-medium">Report Type</Label>
-              <div className="flex mt-1">
-                <Button
-                  variant={reportType === "daily" ? "default" : "outline"}
-                  className="rounded-r-none"
-                  onClick={() => handleReportTypeChange("daily")}
-                >
-                  Daily
-                </Button>
-                <Button
-                  variant={reportType === "monthly" ? "default" : "outline"}
-                  className="rounded-none"
-                  onClick={() => handleReportTypeChange("monthly")}
-                >
-                  Monthly
-                </Button>
-                <Button
-                  variant={reportType === "custom" ? "default" : "outline"}
-                  className="rounded-l-none"
-                  onClick={() => handleReportTypeChange("custom")}
-                >
-                  Custom
-                </Button>
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              <CardTitle>Attendance Reports</CardTitle>
             </div>
-            
-            {/* Date Range */}
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="startDate" className="text-sm font-medium">Start Date</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => handleDateChange("start", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="endDate" className="text-sm font-medium">End Date</Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => handleDateChange("end", e.target.value)}
-                />
-              </div>
-            </div>
-            
-            {/* Generate Button */}
-            <div className="flex items-end">
-              <Button 
-                onClick={showRegularizationTab ? fetchRegularizationRequests : fetchAttendanceReports} 
-                disabled={loading}
-                className="w-full"
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowReportOptions(!showReportOptions)}
+                className="flex items-center gap-2"
               >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                ) : (
-                  <>
-                    <Search className="w-4 h-4 mr-2" />
-                    Generate Report
-                  </>
-                )}
+                <Settings className="w-4 h-4" />
+                Report Options
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateReport('csv')}
+                className="flex items-center gap-2"
+              >
+                <FileText className="w-4 h-4" />
+                Export CSV
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateReport('pdf')}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export PDF
               </Button>
             </div>
           </div>
-          
-          {/* Additional Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CardDescription>
+            Generate comprehensive attendance reports with location tracking data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Report Options */}
+          {showReportOptions && (
+            <div className="mb-6 p-4 bg-muted rounded-lg">
+              <h3 className="font-medium mb-3">Report Options</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="includeLocation"
+                    checked={filters.includeLocation}
+                    onChange={(e) => setFilters({ ...filters, includeLocation: e.target.checked })}
+                    className="rounded"
+                  />
+                  <Label htmlFor="includeLocation">Include Location Data</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="includeDistance"
+                    checked={filters.includeDistance}
+                    onChange={(e) => setFilters({ ...filters, includeDistance: e.target.checked })}
+                    className="rounded"
+                  />
+                  <Label htmlFor="includeDistance">Include Distance Calculation</Label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div>
-              <Label htmlFor="employeeFilter" className="text-sm font-medium">Employee</Label>
-              <select
-                id="employeeFilter"
-                value={selectedEmployee}
-                onChange={(e) => setSelectedEmployee(e.target.value)}
-                className="w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md"
-              >
-                <option value="">All Employees</option>
-                {employees.map(employee => (
-                  <option key={employee._id} value={employee._id}>
-                    {employee.firstName} {employee.lastName} ({employee.employeeId})
-                  </option>
-                ))}
-              </select>
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={filters.startDate}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              />
             </div>
-            
             <div>
-              <Label htmlFor="statusFilter" className="text-sm font-medium">Status</Label>
-              <select
-                id="statusFilter"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md"
-              >
-                <option value="all">All Statuses</option>
-                {showRegularizationTab ? (
-                  <>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="present">Present</option>
-                    <option value="absent">Absent</option>
-                    <option value="late">Late</option>
-                    <option value="half_day">Half Day</option>
-                  </>
-                )}
-              </select>
+              <Label htmlFor="endDate">End Date</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={filters.endDate}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              />
             </div>
-            
-            <div className="flex items-end gap-2">
-              <Button 
-                variant={showRegularizationTab ? "default" : "outline"} 
-                onClick={() => setShowRegularizationTab(!showRegularizationTab)}
-                className="w-full"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                {showRegularizationTab ? "Attendance Reports" : "Regularization Requests"}
-              </Button>
+            <div>
+              <Label htmlFor="department">Department</Label>
+              <Input
+                id="department"
+                placeholder="All Departments"
+                value={filters.department || ""}
+                onChange={(e) => setFilters({ ...filters, department: e.target.value })}
+              />
             </div>
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Input
+                id="status"
+                placeholder="All Status"
+                value={filters.status || ""}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              />
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-6">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search employees..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
+          {/* Summary Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-700">Total Records</span>
+                </div>
+                <div className="mt-2 text-2xl font-bold text-blue-800">
+                  {filteredRecords.length}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-700">Present Today</span>
+                </div>
+                <div className="mt-2 text-2xl font-bold text-green-800">
+                  {filteredRecords.filter(r => r.status === 'present').length}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-yellow-600" />
+                  <span className="text-sm font-medium text-yellow-700">Avg Working Hours</span>
+                </div>
+                <div className="mt-2 text-2xl font-bold text-yellow-800">
+                  {filteredRecords.length > 0 
+                    ? (filteredRecords.reduce((sum, r) => sum + r.workingHours, 0) / filteredRecords.length).toFixed(1)
+                    : '0.0'
+                  }h
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-purple-50 border-purple-200">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-purple-600" />
+                  <span className="text-sm font-medium text-purple-700">Location Tracked</span>
+                </div>
+                <div className="mt-2 text-2xl font-bold text-purple-800">
+                  {filteredRecords.filter(r => r.checkInLocation || r.checkOutLocation).length}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>
 
-      {/* Report View Toggle */}
-      {!showRegularizationTab && attendanceRecords.length > 0 && (
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            <Button
-              variant={activeView === "table" ? "default" : "outline"}
-              onClick={() => setActiveView("table")}
-              className="gap-2"
-            >
-              <TableIcon className="w-4 h-4" />
-              Table View
-            </Button>
-            <Button
-              variant={activeView === "calendar" ? "default" : "outline"}
-              onClick={() => setActiveView("calendar")}
-              className="gap-2"
-            >
-              <CalendarDays className="w-4 h-4" />
-              Calendar View
-            </Button>
-          </div>
-          
-          <div className="text-sm text-muted-foreground">
-            Showing {attendanceRecords.length} records
-          </div>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="p-4 bg-destructive/10 text-destructive rounded-md">
-          {error}
-        </div>
-      )}
-
-      {/* Report Content */}
-      {showRegularizationTab ? (
-        /* Regularization Requests View */
-        <Card>
-          <CardHeader>
-            <CardTitle>Regularization Requests</CardTitle>
-            <CardDescription>View and manage attendance regularization requests</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-end mb-4">
-              <Button 
-                variant="outline" 
-                onClick={exportRegularizationToCSV}
-                disabled={regularizationRequests.length === 0}
-                className="gap-2"
-              >
-                <Download className="w-4 h-4" />
-                Export CSV
-              </Button>
+      {/* Attendance Records Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Daily Attendance Records</CardTitle>
+          <CardDescription>
+            Detailed attendance records with location tracking data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md">
+              {error}
             </div>
-            
-            {regularizationRequests.length > 0 ? (
-              <div className="rounded-md border overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted">
-                      <tr>
-                        <th className="p-3 text-left font-medium">Date</th>
-                        <th className="p-3 text-left font-medium">Employee</th>
-                        <th className="p-3 text-left font-medium">Employee ID</th>
-                        <th className="p-3 text-left font-medium">Department</th>
-                        <th className="p-3 text-left font-medium">Reason</th>
-                        <th className="p-3 text-left font-medium">Status</th>
-                        <th className="p-3 text-left font-medium">Requested At</th>
-                        <th className="p-3 text-left font-medium">Approved By</th>
+          )}
+
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-2 text-muted-foreground">Loading attendance records...</p>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-md border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="p-3 text-left font-medium">Employee</th>
+                      <th className="p-3 text-left font-medium">Date</th>
+                      <th className="p-3 text-left font-medium">Status</th>
+                      <th className="p-3 text-left font-medium">Check-in</th>
+                      <th className="p-3 text-left font-medium">Check-out</th>
+                      <th className="p-3 text-left font-medium">Working Hours</th>
+                      <th className="p-3 text-left font-medium">Overtime</th>
+                      <th className="p-3 text-left font-medium">Location Data</th>
+                      <th className="p-3 text-left font-medium">Distance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredRecords.map((record) => (
+                      <tr key={record._id} className="border-t">
+                        <td className="p-3">
+                          <div>
+                            <div className="font-medium">
+                              {record.employee.firstName} {record.employee.lastName}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {record.employee.employeeId}
+                            </div>
+                            {record.employee.department && (
+                              <div className="text-xs text-muted-foreground">
+                                {record.employee.department}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          {formatDate(record.date)}
+                        </td>
+                        <td className="p-3">
+                          {getStatusBadge(record.status)}
+                        </td>
+                        <td className="p-3">
+                          <div>
+                            <div className="font-medium">{formatTime(record.checkIn)}</div>
+                            {record.checkInLocation && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                <MapPin className="w-3 h-3 inline mr-1" />
+                                {record.checkInLocation.address || `${record.checkInLocation.latitude.toFixed(4)}, ${record.checkInLocation.longitude.toFixed(4)}`}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <div>
+                            <div className="font-medium">{formatTime(record.checkOut)}</div>
+                            {record.checkOutLocation && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                <MapPin className="w-3 h-3 inline mr-1" />
+                                {record.checkOutLocation.address || `${record.checkOutLocation.latitude.toFixed(4)}, ${record.checkOutLocation.longitude.toFixed(4)}`}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3 font-medium">
+                          {record.workingHours > 0 ? `${record.workingHours.toFixed(2)}h` : "N/A"}
+                        </td>
+                        <td className="p-3 font-medium">
+                          {record.overtime > 0 ? `${record.overtime.toFixed(2)}h` : "0h"}
+                        </td>
+                        <td className="p-3">
+                          <div className="text-xs">
+                            {record.checkInLocation && record.checkOutLocation ? (
+                              <Badge variant="default" className="text-xs">Complete</Badge>
+                            ) : record.checkInLocation || record.checkOutLocation ? (
+                              <Badge variant="secondary" className="text-xs">Partial</Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-xs">None</Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3 font-medium">
+                          {getLocationDistance(record)}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {regularizationRequests.map((request) => (
-                        <tr key={request._id} className="border-t hover:bg-muted/50">
-                          <td className="p-3">{new Date(request.date).toLocaleDateString()}</td>
-                          <td className="p-3">{request.employee.firstName} {request.employee.lastName}</td>
-                          <td className="p-3">{request.employee.employeeId}</td>
-                          <td className="p-3">{request.employee.department || "N/A"}</td>
-                          <td className="p-3">{request.reason}</td>
-                          <td className="p-3">{getRegularizationStatusBadge(request.status)}</td>
-                          <td className="p-3">{new Date(request.requestedAt).toLocaleDateString()}</td>
-                          <td className="p-3">{request.approvedBy?.name || "N/A"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : !loading && !error ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="text-center">
-                  <FileText className="w-12 h-12 mx-auto text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-medium">No Regularization Requests</h3>
-                  <p className="mt-2 text-muted-foreground">
-                    No regularization requests found for the selected date range.
-                  </p>
-                </div>
+            </div>
+          )}
+
+          {!loading && filteredRecords.length === 0 && (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-center">
+                <FileText className="w-12 h-12 mx-auto text-muted-foreground" />
+                <p className="mt-2 text-muted-foreground">No attendance records found</p>
+                <p className="text-sm text-muted-foreground">Try adjusting your filters or date range</p>
               </div>
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : attendanceRecords.length > 0 ? (
-        activeView === "table" ? (
-          /* Table View */
-          <Card>
-            <CardHeader>
-              <CardTitle>Attendance Records</CardTitle>
-              <CardDescription>Detailed attendance data</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-end mb-4">
-                <Button 
-                  variant="outline" 
-                  onClick={exportToCSV}
-                  disabled={attendanceRecords.length === 0}
-                  className="gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Export CSV
-                </Button>
-              </div>
-              
-              <div className="rounded-md border overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted">
-                      <tr>
-                        <th className="p-3 text-left font-medium">Date</th>
-                        <th className="p-3 text-left font-medium">Employee</th>
-                        <th className="p-3 text-left font-medium">Employee ID</th>
-                        <th className="p-3 text-left font-medium">Department</th>
-                        <th className="p-3 text-left font-medium">Check In</th>
-                        <th className="p-3 text-left font-medium">Check Out</th>
-                        <th className="p-3 text-left font-medium">Status</th>
-                        <th className="p-3 text-left font-medium">Working Hours</th>
-                        <th className="p-3 text-left font-medium">Overtime</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {attendanceRecords.map((record) => (
-                        <tr key={record._id} className="border-t hover:bg-muted/50">
-                          <td className="p-3">{new Date(record.date).toLocaleDateString()}</td>
-                          <td className="p-3">{record.employee.firstName} {record.employee.lastName}</td>
-                          <td className="p-3">{record.employee.employeeId}</td>
-                          <td className="p-3">{record.employee.department || "N/A"}</td>
-                          <td className="p-3">
-                            {record.checkIn ? new Date(record.checkIn).toLocaleTimeString() : "N/A"}
-                          </td>
-                          <td className="p-3">
-                            {record.checkOut ? new Date(record.checkOut).toLocaleTimeString() : "N/A"}
-                          </td>
-                          <td className="p-3">{getStatusBadge(record.status)}</td>
-                          <td className="p-3">{record.workingHours.toFixed(2)}h</td>
-                          <td className="p-3">{record.overtime.toFixed(2)}h</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          /* Calendar View */
-          <Card>
-            <CardHeader>
-              <CardTitle>Calendar View</CardTitle>
-              <CardDescription>Attendance data in calendar format</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {attendanceRecords.map((record) => (
-                  <Card key={record._id} className="overflow-hidden">
-                    <CardHeader className="bg-muted p-3">
-                      <CardTitle className="text-sm font-medium">
-                        {new Date(record.date).toLocaleDateString()}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-3">
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">Employee</span>
-                          <span className="text-sm font-medium">
-                            {record.employee.firstName} {record.employee.lastName}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">Status</span>
-                          <span className="text-sm">{getStatusBadge(record.status)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">Check In</span>
-                          <span className="text-sm">
-                            {record.checkIn ? new Date(record.checkIn).toLocaleTimeString() : "N/A"}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">Check Out</span>
-                          <span className="text-sm">
-                            {record.checkOut ? new Date(record.checkOut).toLocaleTimeString() : "N/A"}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-muted-foreground">Working Hours</span>
-                          <span className="text-sm">{record.workingHours.toFixed(2)}h</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )
-      ) : !loading && !error ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Calendar className="w-12 h-12 mx-auto text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-medium">No Attendance Data</h3>
-            <p className="mt-2 text-muted-foreground">
-              Select a date range and click "Generate Report" to view attendance data.
-            </p>
-          </CardContent>
-        </Card>
-      ) : null}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
