@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,89 +16,168 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const employees = [
-  {
-    id: "EMP001",
-    name: "John Doe",
-    email: "john.doe@company.com",
-    phone: "+1 234 567 8900",
-    department: "Engineering",
-    designation: "Senior Developer",
-    status: "active",
-    joinDate: "2023-01-15",
-    salary: "$75,000"
-  },
-  {
-    id: "EMP002", 
-    name: "Sarah Wilson",
-    email: "sarah.wilson@company.com",
-    phone: "+1 234 567 8901",
-    department: "Marketing",
-    designation: "Marketing Manager",
-    status: "active",
-    joinDate: "2023-03-20",
-    salary: "$65,000"
-  },
-  {
-    id: "EMP003",
-    name: "Mike Johnson", 
-    email: "mike.johnson@company.com",
-    phone: "+1 234 567 8902",
-    department: "Engineering",
-    designation: "DevOps Engineer",
-    status: "active",
-    joinDate: "2023-02-10",
-    salary: "$70,000"
-  },
-  {
-    id: "EMP004",
-    name: "Emma Davis",
-    email: "emma.davis@company.com", 
-    phone: "+1 234 567 8903",
-    department: "HR",
-    designation: "HR Specialist",
-    status: "on_leave",
-    joinDate: "2022-11-05",
-    salary: "$55,000"
-  },
-  {
-    id: "EMP005",
-    name: "Alex Chen",
-    email: "alex.chen@company.com",
-    phone: "+1 234 567 8904", 
-    department: "Finance",
-    designation: "Financial Analyst",
-    status: "active",
-    joinDate: "2023-04-12",
-    salary: "$60,000"
-  }
-];
+import { EmployeeModal } from "./EmployeeModal";
+import { Employee } from "@/types/employee";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/lib/api";
 
 export const EmployeeManagement = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"view" | "edit" | "delete">("view");
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
-  const filteredEmployees = employees.filter(emp => {
-    const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         emp.department.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || emp.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Fetch employees from API
+  useEffect(() => {
+    if (user?.company?._id) {
+      fetchEmployees();
+    }
+  }, [user]);
+
+  // Filter employees when search term or status filter changes
+  useEffect(() => {
+    filterEmployees();
+  }, [employees, searchTerm, statusFilter]);
+
+  const fetchEmployees = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Fetch employees from the API
+      const response = await apiClient.request<{ employees: Employee[] }>(`/employees/company/${user!.company!._id}`);
+      
+      if (response.success) {
+        setEmployees(response.data!.employees);
+      } else {
+        setError(response.message || "Failed to fetch employees");
+      }
+    } catch (err) {
+      setError("Failed to fetch employees");
+      console.error("Error fetching employees:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterEmployees = () => {
+    const filtered = employees.filter(emp => {
+      const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
+      const matchesSearch = fullName.includes(searchTerm.toLowerCase()) ||
+                           emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           emp.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           emp.employeeId.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "all" || emp.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+    
+    setFilteredEmployees(filtered);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
         return <Badge className="bg-success text-success-foreground">Active</Badge>;
-      case "on_leave":
-        return <Badge className="bg-warning text-warning-foreground">On Leave</Badge>;
       case "inactive":
-        return <Badge variant="secondary">Inactive</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Inactive</Badge>;
+      case "terminated":
+        return <Badge className="bg-destructive text-destructive-foreground">Terminated</Badge>;
+      case "resigned":
+        return <Badge variant="secondary">Resigned</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  const handleViewDetails = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalMode("view");
+    setModalOpen(true);
+  };
+
+  const handleEditEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalMode("edit");
+    setModalOpen(true);
+  };
+
+  const handleDeleteEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalMode("delete");
+    setModalOpen(true);
+  };
+
+  const handleSaveEmployee = async (updatedEmployee: Employee) => {
+    try {
+      // Call the API to save changes
+      const response = await apiClient.request<Employee>(`/employees/${updatedEmployee._id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedEmployee)
+      });
+      
+      if (response.success) {
+        // Update the employee in the state
+        setEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response.data! : emp));
+        setFilteredEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response.data! : emp));
+        // Close modal after save
+        setModalOpen(false);
+      } else {
+        setError(response.message || "Failed to update employee");
+      }
+    } catch (err) {
+      setError("Failed to update employee");
+      console.error("Error updating employee:", err);
+    }
+  };
+
+  const handleDeleteConfirm = async (employeeId: string) => {
+    try {
+      // Call the API to delete the employee
+      const response = await apiClient.request(`/employees/${employeeId}/deactivate`, {
+        method: 'PUT'
+      });
+      
+      if (response.success) {
+        // Remove the employee from the state
+        setEmployees(prev => prev.filter(emp => emp._id !== employeeId));
+        setFilteredEmployees(prev => prev.filter(emp => emp._id !== employeeId));
+        // Close modal after delete
+        setModalOpen(false);
+      } else {
+        setError(response.message || "Failed to delete employee");
+      }
+    } catch (err) {
+      setError("Failed to delete employee");
+      console.error("Error deleting employee:", err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-destructive">{error}</p>
+          <Button onClick={fetchEmployees} className="mt-2">Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -151,11 +230,14 @@ export const EmployeeManagement = () => {
                 <DropdownMenuItem onClick={() => setStatusFilter("active")}>
                   Active
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("on_leave")}>
-                  On Leave
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>
                   Inactive
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("terminated")}>
+                  Terminated
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("resigned")}>
+                  Resigned
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -177,11 +259,11 @@ export const EmployeeManagement = () => {
               </TableHeader>
               <TableBody>
                 {filteredEmployees.map((employee) => (
-                  <TableRow key={employee.id}>
+                  <TableRow key={employee._id}>
                     <TableCell>
                       <div className="space-y-1">
-                        <p className="font-medium">{employee.name}</p>
-                        <p className="text-sm text-muted-foreground">{employee.id}</p>
+                        <p className="font-medium">{employee.firstName} {employee.lastName}</p>
+                        <p className="text-sm text-muted-foreground">{employee.employeeId}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -206,10 +288,10 @@ export const EmployeeManagement = () => {
                       {getStatusBadge(employee.status)}
                     </TableCell>
                     <TableCell>
-                      {new Date(employee.joinDate).toLocaleDateString()}
+                      {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}
                     </TableCell>
                     <TableCell className="font-medium">
-                      {employee.salary}
+                      {employee.salary?.basic ? `$${employee.salary.basic.toLocaleString()}` : "N/A"}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -219,15 +301,24 @@ export const EmployeeManagement = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="gap-2">
+                          <DropdownMenuItem 
+                            className="gap-2" 
+                            onClick={() => handleViewDetails(employee)}
+                          >
                             <Eye className="w-4 h-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
+                          <DropdownMenuItem 
+                            className="gap-2" 
+                            onClick={() => handleEditEmployee(employee)}
+                          >
                             <Edit className="w-4 h-4" />
                             Edit Employee
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 text-destructive">
+                          <DropdownMenuItem 
+                            className="gap-2 text-destructive" 
+                            onClick={() => handleDeleteEmployee(employee)}
+                          >
                             <Trash2 className="w-4 h-4" />
                             Delete Employee
                           </DropdownMenuItem>
@@ -247,6 +338,17 @@ export const EmployeeManagement = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Employee Modal */}
+      <EmployeeModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        mode={modalMode}
+        employee={selectedEmployee}
+        onSave={handleSaveEmployee}
+        onDelete={handleDeleteConfirm}
+        onCancel={() => setModalOpen(false)}
+      />
     </div>
   );
 };
