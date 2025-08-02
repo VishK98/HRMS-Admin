@@ -7,6 +7,8 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/user.routes");
 const employeeRoutes = require("./routes/employee.routes");
+const attendanceRoutes = require("./routes/attendance.routes");
+const regularizationRoutes = require("./routes/regularization.routes");
 
 // Debug: Log route loading
 console.log("Loading routes...");
@@ -49,6 +51,8 @@ app.get("/health", (req, res) => {
 // API Routes
 app.use("/api/auth", userRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/regularization", regularizationRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

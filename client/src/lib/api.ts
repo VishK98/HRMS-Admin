@@ -84,6 +84,47 @@ class ApiClient {
   async getUsersByCompany(companyId: string) {
     return this.request(`/auth/companies/${companyId}/users`);
   }
+
+  // Regularization requests
+  async createRegularizationRequest(requestData: any) {
+    return this.request('/regularization/requests', {
+      method: 'POST',
+      body: JSON.stringify(requestData),
+    });
+  }
+
+  async getEmployeeRegularizationRequests(employeeId: string, startDate: string, endDate: string) {
+    return this.request(`/regularization/requests/employee/${employeeId}?startDate=${startDate}&endDate=${endDate}`);
+  }
+
+  async getCompanyRegularizationRequests(startDate: string, endDate: string, filters?: any) {
+    let url = `/regularization/requests/company?startDate=${startDate}&endDate=${endDate}`;
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          url += `&${key}=${filters[key]}`;
+        }
+      });
+    }
+    return this.request(url);
+  }
+
+  async getRegularizationRequestById(requestId: string) {
+    return this.request(`/regularization/requests/${requestId}`);
+  }
+
+  async updateRegularizationRequestStatus(requestId: string, status: 'approved' | 'rejected') {
+    return this.request(`/regularization/requests/${requestId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  async deleteRegularizationRequest(requestId: string) {
+    return this.request(`/regularization/requests/${requestId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiClient = new ApiClient(); 
