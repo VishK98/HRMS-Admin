@@ -9,11 +9,13 @@ const userRoutes = require("./routes/user.routes");
 const employeeRoutes = require("./routes/employee.routes");
 const attendanceRoutes = require("./routes/attendance.routes");
 const regularizationRoutes = require("./routes/regularization.routes");
+const leaveRoutes = require("./routes/leave.routes");
 
 // Debug: Log route loading
 console.log("Loading routes...");
 console.log("User routes loaded:", !!userRoutes);
 console.log("Employee routes loaded:", !!employeeRoutes);
+console.log("Leave routes loaded:", !!leaveRoutes);
 
 const app = express();
 
@@ -53,6 +55,7 @@ app.use("/api/auth", userRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/regularization", regularizationRoutes);
+app.use("/api/leave", leaveRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

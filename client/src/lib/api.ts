@@ -163,9 +163,76 @@ class ApiClient {
     const queryParams = new URLSearchParams({
       startDate,
       endDate,
-      ...filters
+      ...(filters?.department && { department: filters.department }),
+      ...(filters?.status && { status: filters.status }),
     });
-    return this.request(`/attendance/company?${queryParams}`);
+    return this.request(`/attendance/company?${queryParams.toString()}`);
+  }
+
+  // Leave Management endpoints
+  async createLeaveRequest(leaveData: any) {
+    return this.request('/leave/requests', {
+      method: 'POST',
+      body: JSON.stringify(leaveData),
+    });
+  }
+
+  async getLeaveRequests(filters?: any) {
+    const queryParams = new URLSearchParams();
+    if (filters?.status) queryParams.append('status', filters.status);
+    if (filters?.leaveType) queryParams.append('leaveType', filters.leaveType);
+    if (filters?.startDate) queryParams.append('startDate', filters.startDate);
+    if (filters?.endDate) queryParams.append('endDate', filters.endDate);
+    if (filters?.employeeId) queryParams.append('employeeId', filters.employeeId);
+
+    return this.request(`/leave/requests?${queryParams.toString()}`);
+  }
+
+  async getLeaveRequestById(leaveId: string) {
+    return this.request(`/leave/requests/${leaveId}`);
+  }
+
+  async updateLeaveStatus(leaveId: string, status: 'approved' | 'rejected' | 'cancelled', comments?: string) {
+    return this.request(`/leave/requests/${leaveId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, comments }),
+    });
+  }
+
+  async updateManagerAction(leaveId: string, action: 'pending' | 'approved' | 'rejected', comment?: string) {
+    return this.request(`/leave/requests/${leaveId}/manager-action`, {
+      method: 'PUT',
+      body: JSON.stringify({ action, comment }),
+    });
+  }
+
+  async updateLeaveRequest(leaveId: string, updateData: any) {
+    return this.request(`/leave/requests/${leaveId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+    });
+  }
+
+  async deleteLeaveRequest(leaveId: string) {
+    return this.request(`/leave/requests/${leaveId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getEmployeeLeaveRequests(employeeId: string, startDate?: string, endDate?: string) {
+    const queryParams = new URLSearchParams();
+    if (startDate) queryParams.append('startDate', startDate);
+    if (endDate) queryParams.append('endDate', endDate);
+
+    return this.request(`/leave/requests/employee/${employeeId}?${queryParams.toString()}`);
+  }
+
+  async getLeaveSummary(startDate?: string, endDate?: string) {
+    const queryParams = new URLSearchParams();
+    if (startDate) queryParams.append('startDate', startDate);
+    if (endDate) queryParams.append('endDate', endDate);
+
+    return this.request(`/leave/summary?${queryParams.toString()}`);
   }
 }
 

@@ -952,6 +952,697 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Leave Management",
+			"item": [
+				{
+					"name": "Create Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"leaveType\": \"paid\",\n  \"startDate\": \"2025-08-05\",\n  \"endDate\": \"2025-08-07\",\n  \"reason\": \"Family vacation\",\n  \"days\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests"
+							]
+						},
+						"description": "Create a new leave request for an employee. Leave types: paid, casual, short, sick, halfday. For halfday, include halfDayType: 'first' or 'second'. **Validation**: System prevents overlapping leave requests for the same employee on the same dates. Only approved, pending, and cancelled leaves are considered for overlap checking."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Half Day Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"leaveType\": \"halfday\",\n  \"halfDayType\": \"first\",\n  \"startDate\": \"2025-08-05\",\n  \"endDate\": \"2025-08-05\",\n  \"reason\": \"Medical appointment\",\n  \"days\": 0.5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests"
+							]
+						},
+						"description": "Create a half day leave request. halfDayType can be 'first' or 'second'"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Sick Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"leaveType\": \"sick\",\n  \"startDate\": \"2025-08-05\",\n  \"endDate\": \"2025-08-06\",\n  \"reason\": \"Not feeling well, need rest\",\n  \"days\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests"
+							]
+						},
+						"description": "Create a sick leave request"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Casual Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"leaveType\": \"casual\",\n  \"startDate\": \"2025-08-05\",\n  \"endDate\": \"2025-08-05\",\n  \"reason\": \"Personal work\",\n  \"days\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests"
+							]
+						},
+						"description": "Create a casual leave request"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Short Leave Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"{{employee_id}}\",\n  \"leaveType\": \"short\",\n  \"startDate\": \"2025-08-05\",\n  \"endDate\": \"2025-08-05\",\n  \"reason\": \"Quick errand\",\n  \"days\": 0.5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests"
+							]
+						},
+						"description": "Create a short leave request (typically half day)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Leave Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests?status=pending&leaveType=Annual Leave&startDate=2025-08-01&endDate=2025-08-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending",
+									"description": "Filter by status (pending, approved, rejected, cancelled)"
+								},
+								{
+									"key": "leaveType",
+									"value": "paid",
+									"description": "Filter by leave type (paid, casual, short, sick, halfday)"
+								},
+								{
+									"key": "startDate",
+									"value": "2025-08-01",
+									"description": "Filter by start date"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31",
+									"description": "Filter by end date"
+								}
+							]
+						},
+						"description": "Get all leave requests with optional filtering"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leave Request by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}"
+							]
+						},
+						"description": "Get a specific leave request by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"approved\",\n  \"comments\": \"Approved for family vacation\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}",
+								"status"
+							]
+						},
+						"description": "Approve a leave request (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"rejected\",\n  \"comments\": \"Insufficient notice period\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}",
+								"status"
+							]
+						},
+						"description": "Reject a leave request (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Manager Action",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"action\": \"approved\",\n  \"comment\": \"Approved by manager\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}/manager-action",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}",
+								"manager-action"
+							]
+						},
+						"description": "Update manager action on leave request (for mobile app). Action can be 'pending', 'approved', or 'rejected'"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Leave Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/employee/{{employee_id}}?startDate=2025-08-01&endDate=2025-08-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"employee",
+								"{{employee_id}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01",
+									"description": "Start date for filtering"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31",
+									"description": "End date for filtering"
+								}
+							]
+						},
+						"description": "Get all leave requests for a specific employee"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Company Leave Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/company?startDate=2025-08-01&endDate=2025-08-31&status=pending&leaveType=Annual Leave",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"company"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01",
+									"description": "Start date for filtering"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31",
+									"description": "End date for filtering"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"description": "Filter by status"
+								},
+								{
+									"key": "leaveType",
+									"value": "paid",
+									"description": "Filter by leave type (paid, casual, short, sick, halfday)"
+								}
+							]
+						},
+						"description": "Get all leave requests for the company with filtering"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leave Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/summary?startDate=2025-08-01&endDate=2025-08-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"summary"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01",
+									"description": "Start date for summary"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31",
+									"description": "End date for summary"
+								}
+							]
+						},
+						"description": "Get leave summary statistics for the company"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leave Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/reports?startDate=2025-08-01&endDate=2025-08-31&status=approved&leaveType=Annual Leave&includeDetails=true&includeComments=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"reports"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-08-01",
+									"description": "Start date for reports"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-08-31",
+									"description": "End date for reports"
+								},
+								{
+									"key": "status",
+									"value": "approved",
+									"description": "Filter by status"
+								},
+								{
+									"key": "leaveType",
+									"value": "paid",
+									"description": "Filter by leave type (paid, casual, short, sick, halfday)"
+								},
+								{
+									"key": "includeDetails",
+									"value": "true",
+									"description": "Include detailed information"
+								},
+								{
+									"key": "includeComments",
+									"value": "true",
+									"description": "Include comments in report"
+								}
+							]
+						},
+						"description": "Get detailed leave reports with filtering options"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"leaveType\": \"sick\",\n  \"startDate\": \"2025-08-05\",\n  \"endDate\": \"2025-08-06\",\n  \"reason\": \"Medical appointment\",\n  \"days\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}"
+							]
+						},
+						"description": "Update a leave request (Employee can update pending requests). **Validation**: System prevents overlapping leave requests when updating dates. Only approved, pending, and cancelled leaves are considered for overlap checking."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Leave Request",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"cancelled\",\n  \"comments\": \"Cancelled by employee\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}",
+								"status"
+							]
+						},
+						"description": "Cancel a leave request (Employee can cancel pending requests)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Leave Request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/leave/requests/{{leave_request_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"leave",
+								"requests",
+								"{{leave_request_id}}"
+							]
+						},
+						"description": "Delete a leave request (Admin only)"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -1002,6 +1693,11 @@
 		},
 		{
 			"key": "attendance_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "leave_request_id",
 			"value": "",
 			"type": "string"
 		}
