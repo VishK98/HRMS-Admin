@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type UserRole = 'super_admin' | 'admin';
 
 export interface User {
+  company_name: ReactNode;
   _id: string;
   email: string;
   name: string;

@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Search, Filter, Calendar, User, 
   CheckCircle, XCircle, Clock, AlertCircle,
-  Plus, FileText, Download, Settings, RefreshCw, Eye, X
+  Plus, FileText, Download, Settings, RefreshCw, Eye, X, MoreHorizontal
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
@@ -490,38 +496,40 @@ export const LeaveRequests = () => {
                               {formatDate(request.submittedDate)}
                             </td>
                             <td className="p-4">
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleView(request)}
-                                  className="gap-1 px-3 py-2 text-xs h-8"
-                                >
-                                  <Eye className="w-3 h-3" />
-                                  View
-                                </Button>
-                                {request.status === 'pending' && (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      onClick={() => handleApprove(request._id)}
-                                      className="bg-green-600 hover:bg-green-700 px-3 py-2 text-xs h-8"
-                                    >
-                                      <CheckCircle className="w-3 h-3 mr-1" />
-                                      Approve
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      onClick={() => handleReject(request._id)}
-                                      className="px-3 py-2 text-xs h-8"
-                                    >
-                                      <XCircle className="w-3 h-3 mr-1" />
-                                      Reject
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem 
+                                    className="gap-2" 
+                                    onClick={() => handleView(request)}
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                    View Details
+                                  </DropdownMenuItem>
+                                  {request.status === 'pending' && (
+                                    <>
+                                      <DropdownMenuItem 
+                                        className="gap-2 text-green-600" 
+                                        onClick={() => handleApprove(request._id)}
+                                      >
+                                        <CheckCircle className="w-4 h-4" />
+                                        Approve Request
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem 
+                                        className="gap-2 text-destructive" 
+                                        onClick={() => handleReject(request._id)}
+                                      >
+                                        <XCircle className="w-4 h-4" />
+                                        Reject Request
+                                      </DropdownMenuItem>
+                                    </>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                               {request.status === 'approved' && request.managerAction === 'approved' && (
                                 <div className="mt-2">
                                   <div className="bg-green-50 border border-green-200 rounded-md p-2">

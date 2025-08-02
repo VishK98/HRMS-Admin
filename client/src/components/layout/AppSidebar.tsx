@@ -1,9 +1,19 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  Building2, Users, Calendar, Clock, DollarSign, Settings,
-  BarChart3, UserCheck, FileText, Target, LogOut, Menu,
-  Home, Briefcase, Shield, Award
+  Building2,
+  Users,
+  Calendar,
+  Clock,
+  IndianRupee,
+  Settings,
+  BarChart3,
+  LogOut,
+  Home,
+  Moon ,
+  Plane ,
+  SatelliteDish,
+  Shield,
 } from "lucide-react";
 import {
   Sidebar,
@@ -25,7 +35,7 @@ const superAdminItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Companies", url: "/companies", icon: Building2 },
   { title: "User Management", url: "/users", icon: Users },
-  { title: "Billing & Plans", url: "/billing", icon: DollarSign },
+  { title: "Billing & Plans", url: "/billing", icon: IndianRupee },
   { title: "System Settings", url: "/system-settings", icon: Settings },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
 ];
@@ -34,11 +44,11 @@ const adminItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Employees", url: "/employees", icon: Users },
   { title: "Attendance", url: "/attendance", icon: Clock },
-  { title: "Leave Management", url: "/leave", icon: Calendar },
-  { title: "Payroll", url: "/payroll", icon: DollarSign },
-  { title: "Departments", url: "/departments", icon: Briefcase },
-  { title: "Designations", url: "/designations", icon: Award },
-  { title: "Company Settings", url: "/company-settings", icon: Settings },
+  { title: "Leave", url: "/leave", icon: Plane   },
+  { title: "Payroll", url: "/payroll", icon: IndianRupee },
+  { title: "Calendar", url: "/designations", icon: Calendar },
+  { title: "Broadcast", url: "/departments", icon: SatelliteDish },
+  { title: "Settings", url: "/company-settings", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -46,13 +56,13 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
-  const collapsed = state === 'collapsed';
+  const collapsed = state === "collapsed";
 
-  const items = user?.role === 'super_admin' ? superAdminItems : adminItems;
+  const items = user?.role === "super_admin" ? superAdminItems : adminItems;
 
   const isActive = (path: string) => {
-    if (path === '/') {
-      return currentPath === '/';
+    if (path === "/") {
+      return currentPath === "/";
     }
     return currentPath.startsWith(path);
   };
@@ -60,8 +70,8 @@ export function AppSidebar() {
   const getNavCls = (active: boolean) =>
     cn(
       "w-full justify-start transition-all duration-200",
-      active 
-        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm" 
+      active
+        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
     );
 
@@ -81,9 +91,13 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div>
-              <h2 className="text-lg font-bold text-sidebar-foreground">HRMS</h2>
+              <h2 className="text-lg font-bold text-sidebar-foreground">
+                HRMS
+              </h2>
               <p className="text-xs text-sidebar-foreground/70">
-                {user?.role === 'super_admin' ? 'Super Admin' : user?.company_name}
+                {user?.role === "super_admin"
+                  ? "Super Admin"
+                  : user?.company_name}
               </p>
             </div>
           )}
@@ -92,20 +106,22 @@ export function AppSidebar() {
         {/* Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/70">
-            {!collapsed && (user?.role === 'super_admin' ? 'Platform Management' : 'HR Management')}
+            {/* {!collapsed && (user?.role === 'super_admin' ? 'Platform Management' : 'HR Management')} */}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === '/'}
+                    <NavLink
+                      to={item.url}
+                      end={item.url === "/"}
                       className={getNavCls(isActive(item.url))}
                     >
                       <item.icon className="w-5 h-5" />
-                      {!collapsed && <span className="font-medium">{item.title}</span>}
+                      {!collapsed && (
+                        <span className="font-medium">{item.title}</span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -118,8 +134,12 @@ export function AppSidebar() {
         <div className="mt-auto p-4 border-t border-sidebar-border">
           {!collapsed && (
             <div className="mb-3">
-              <p className="text-sm font-medium text-sidebar-foreground">{user?.name}</p>
-              <p className="text-xs text-sidebar-foreground/70">{user?.email}</p>
+              <p className="text-sm font-medium text-sidebar-foreground">
+                {user?.name}
+              </p>
+              <p className="text-xs text-sidebar-foreground/70">
+                {user?.email}
+              </p>
             </div>
           )}
           <Button
