@@ -3,10 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Search, Filter, Calendar, User, 
   CheckCircle, XCircle, Clock, AlertCircle,
-  Plus, FileText, Download, Settings, RefreshCw
+  Plus, FileText, Download, Settings, RefreshCw, Eye
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
@@ -22,6 +23,8 @@ export const LeaveRequests = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [leaveTypeFilter, setLeaveTypeFilter] = useState<string>("");
+  const [selectedLeave, setSelectedLeave] = useState<LeaveRequest | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   // Fetch leave requests from API
   const fetchLeaveRequests = async () => {
@@ -124,8 +127,17 @@ export const LeaveRequests = () => {
     );
   };
 
+  const handleView = (request: LeaveRequest) => {
+    setSelectedLeave(request);
+    setIsViewModalOpen(true);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
   };
 
   if (loading) {
@@ -335,28 +347,39 @@ export const LeaveRequests = () => {
                         {formatDate(request.submittedDate)}
                       </td>
                       <td className="p-3">
-                        {request.status === 'pending' && (
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => handleApprove(request._id)}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleReject(request._id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Reject
-                            </Button>
-                          </div>
-                        )}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleView(request)}
+                            className="gap-1"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View
+                          </Button>
+                          {request.status === 'pending' && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => handleApprove(request._id)}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-1" />
+                                Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleReject(request._id)}
+                              >
+                                <XCircle className="w-4 h-4 mr-1" />
+                                Reject
+                              </Button>
+                            </>
+                          )}
+                        </div>
                         {request.status !== 'pending' && (
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-muted-foreground mt-2">
                             {request.approvedBy?.name && `By ${request.approvedBy.name}`}
                             {request.approvedDate && (
                               <div>{formatDate(request.approvedDate)}</div>
@@ -382,6 +405,176 @@ export const LeaveRequests = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* View Leave Details Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Leave Request Details
+            </DialogTitle>
+            <DialogDescription>
+              Complete information about the leave request
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedLeave && (
+            <div className="space-y-6">
+              {/* Employee Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary">Employee Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Employee Name</label>
+                    <p className="text-sm">{selectedLeave.employee?.firstName} {selectedLeave.employee?.lastName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Employee ID</label>
+                    <p className="text-sm">{selectedLeave.employee?.employeeId}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Department</label>
+                    <p className="text-sm">{selectedLeave.employee?.department || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Designation</label>
+                    <p className="text-sm">{selectedLeave.employee?.designation || 'Not specified'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leave Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary">Leave Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Leave Type</label>
+                    <div className="mt-1">
+                      {getLeaveTypeBadge(selectedLeave.leaveType)}
+                      {selectedLeave.halfDayType && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {selectedLeave.halfDayType === 'first' ? '1st Half' : '2nd Half'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Status</label>
+                    <div className="mt-1">
+                      {getStatusBadge(selectedLeave.status)}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Start Date</label>
+                    <p className="text-sm">{formatDate(selectedLeave.startDate)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">End Date</label>
+                    <p className="text-sm">{formatDate(selectedLeave.endDate)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Total Days</label>
+                    <p className="text-sm font-medium">{selectedLeave.days} {selectedLeave.days === 1 ? 'day' : 'days'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Submitted Date</label>
+                    <p className="text-sm">{formatDateTime(selectedLeave.submittedDate)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reason */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary">Reason</h3>
+                <div className="bg-muted p-4 rounded-md">
+                  <p className="text-sm">{selectedLeave.reason}</p>
+                </div>
+              </div>
+
+              {/* Manager Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary">Manager Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Reporting Manager</label>
+                    <p className="text-sm">
+                      {selectedLeave.reportingManager 
+                        ? `${selectedLeave.reportingManager.firstName} ${selectedLeave.reportingManager.lastName}`
+                        : 'Not assigned'
+                      }
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Manager Action</label>
+                    <div className="mt-1">
+                      {getManagerActionBadge(selectedLeave.managerAction)}
+                    </div>
+                  </div>
+                  {selectedLeave.managerActionDate && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Manager Action Date</label>
+                      <p className="text-sm">{formatDateTime(selectedLeave.managerActionDate)}</p>
+                    </div>
+                  )}
+                  {selectedLeave.managerComment && (
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-muted-foreground">Manager Comment</label>
+                      <div className="bg-muted p-3 rounded-md mt-1">
+                        <p className="text-sm">{selectedLeave.managerComment}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Approval Information */}
+              {(selectedLeave.approvedBy || selectedLeave.approvedDate || selectedLeave.comments) && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-primary">Approval Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedLeave.approvedBy && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Approved By</label>
+                        <p className="text-sm">{selectedLeave.approvedBy.name}</p>
+                      </div>
+                    )}
+                    {selectedLeave.approvedDate && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Approval Date</label>
+                        <p className="text-sm">{formatDateTime(selectedLeave.approvedDate)}</p>
+                      </div>
+                    )}
+                    {selectedLeave.comments && (
+                      <div className="md:col-span-2">
+                        <label className="text-sm font-medium text-muted-foreground">Comments</label>
+                        <div className="bg-muted p-3 rounded-md mt-1">
+                          <p className="text-sm">{selectedLeave.comments}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* System Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary">System Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Created At</label>
+                    <p className="text-sm">{formatDateTime(selectedLeave.createdAt)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Last Updated</label>
+                    <p className="text-sm">{formatDateTime(selectedLeave.updatedAt)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }; 
