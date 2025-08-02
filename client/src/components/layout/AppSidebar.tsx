@@ -34,7 +34,7 @@ const adminItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Employees", url: "/employees", icon: Users },
   { title: "Attendance", url: "/attendance", icon: Clock },
-  { title: "Leave Management", url: "/leaves", icon: Calendar },
+  { title: "Leave Management", url: "/leave", icon: Calendar },
   { title: "Payroll", url: "/payroll", icon: DollarSign },
   { title: "Departments", url: "/departments", icon: Briefcase },
   { title: "Designations", url: "/designations", icon: Award },
