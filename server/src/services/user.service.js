@@ -20,7 +20,12 @@ class UserService {
       user.lastLogin = new Date();
       await user.save();
 
-      const token = generateToken(user._id, user.role);
+      const token = generateToken({
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        company: user.company?._id
+      });
       
       return {
         user: user.toJSON(),

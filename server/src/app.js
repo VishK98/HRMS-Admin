@@ -6,6 +6,12 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/user.routes");
+const employeeRoutes = require("./routes/employee.routes");
+
+// Debug: Log route loading
+console.log("Loading routes...");
+console.log("User routes loaded:", !!userRoutes);
+console.log("Employee routes loaded:", !!employeeRoutes);
 
 const app = express();
 
@@ -42,6 +48,7 @@ app.get("/health", (req, res) => {
 
 // API Routes
 app.use("/api/auth", userRoutes);
+app.use("/api/employees", employeeRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

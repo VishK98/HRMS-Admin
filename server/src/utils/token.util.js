@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-const generateToken = (userId, role) => {
+const generateToken = (payload) => {
   return jwt.sign(
     { 
-      userId, 
-      role,
+      ...payload,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
     },
