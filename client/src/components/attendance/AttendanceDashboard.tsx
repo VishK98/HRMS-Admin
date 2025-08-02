@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { 
-  Calendar, Clock, CheckCircle, XCircle, User, Users, 
+  Calendar, Clock, User, Users, 
   FileText, Clock as ClockIcon, AlertCircle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,28 +20,12 @@ interface AttendanceSummary {
   };
 }
 
-interface TodaysAttendance {
-  _id: string;
-  checkIn: string;
-  checkOut: string | null;
-  status: string;
-  workingHours: number;
-  overtime: number;
-}
-
 export const AttendanceDashboard = () => {
   const { user } = useAuth();
   const [summary, setSummary] = useState<AttendanceSummary | null>(null);
-  const [todaysAttendance, setTodaysAttendance] = useState<TodaysAttendance | null>(null);
   const [regularizationRequests, setRegularizationRequests] = useState<RegularizationRequest[]>([]);
-  const [showRequestForm, setShowRequestForm] = useState(false);
-  const [requestDate, setRequestDate] = useState("");
-  const [requestReason, setRequestReason] = useState("");
   const [loading, setLoading] = useState(true);
-  const [requestLoading, setRequestLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [requestError, setRequestError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -102,7 +82,64 @@ export const AttendanceDashboard = () => {
           status: "pending",
           requestedAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          reportingManager: {
+            _id: "mgr1",
+            firstName: "Sarah",
+            lastName: "Johnson",
+            employeeId: "MGR001"
+          },
+          managerAction: "pending", // pending, approved, rejected
+          managerActionDate: null,
+          managerComment: null
+        },
+        {
+          _id: "2",
+          employee: {
+            _id: "emp2",
+            firstName: "Mike",
+            lastName: "Wilson",
+            employeeId: "EMP002"
+          },
+          date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+          reason: "Medical appointment",
+          status: "approved",
+          requestedAt: new Date(Date.now() - 86400000).toISOString(),
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 43200000).toISOString(),
+          reportingManager: {
+            _id: "mgr1",
+            firstName: "Sarah",
+            lastName: "Johnson",
+            employeeId: "MGR001"
+          },
+          managerAction: "approved",
+          managerActionDate: new Date(Date.now() - 43200000).toISOString(),
+          managerComment: "Approved - Valid medical reason"
+        },
+        {
+          _id: "3",
+          employee: {
+            _id: "emp3",
+            firstName: "Lisa",
+            lastName: "Brown",
+            employeeId: "EMP003"
+          },
+          date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+          reason: "Personal emergency",
+          status: "rejected",
+          requestedAt: new Date(Date.now() - 172800000).toISOString(),
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString(),
+          reportingManager: {
+            _id: "mgr2",
+            firstName: "David",
+            lastName: "Smith",
+            employeeId: "MGR002"
+          },
+          managerAction: "rejected",
+          managerActionDate: new Date(Date.now() - 86400000).toISOString(),
+          managerComment: "Rejected - No supporting documents provided"
         }
       ];
       setRegularizationRequests(mockRequests);
@@ -111,48 +148,23 @@ export const AttendanceDashboard = () => {
     }
   };
 
-  const handleSubmitRequest = async () => {
-    if (!requestDate || !requestReason) {
-      setRequestError("Please fill in all required fields");
-      return;
-    }
-
-    setRequestLoading(true);
-    setRequestError(null);
-    setSuccess(null);
-
-    try {
-      // Submit regularization request to backend
-      const requestData = {
-        employeeId: user?._id, // Assuming admin can submit for themselves
-        date: requestDate,
-        reason: requestReason
-      };
-
-      const response = await apiClient.createRegularizationRequest(requestData);
-
-      if (response.success) {
-        setSuccess("Request submitted successfully!");
-        setRequestDate("");
-        setRequestReason("");
-        setShowRequestForm(false);
-        // Refresh requests list
-        fetchRegularizationRequests();
-      } else {
-        setRequestError(response.message || "Failed to submit request");
-      }
-    } catch (err) {
-      setRequestError("Failed to submit request");
-      console.error("Error submitting request:", err);
-    } finally {
-      setRequestLoading(false);
-    }
-  };
-
   const getStatusCount = (status: string) => {
     if (!summary) return 0;
     const statusItem = summary.statusSummary.find(item => item._id === status);
     return statusItem ? statusItem.count : 0;
+  };
+
+  const getManagerActionBadge = (action: string) => {
+    switch (action) {
+      case "approved":
+        return <Badge className="bg-success">Approved</Badge>;
+      case "rejected":
+        return <Badge variant="destructive">Rejected</Badge>;
+      case "pending":
+        return <Badge className="bg-warning">Pending</Badge>;
+      default:
+        return <Badge variant="outline">Not Reviewed</Badge>;
+    }
   };
 
   if (loading) {
@@ -176,51 +188,8 @@ export const AttendanceDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Today's Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Today's Status</CardTitle>
-          <CardDescription>Your attendance status for today</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {todaysAttendance?.checkIn ? (
-                <CheckCircle className="w-10 h-10 text-success" />
-              ) : (
-                <XCircle className="w-10 h-10 text-muted-foreground" />
-              )}
-              <div>
-                <h3 className="text-xl font-bold">
-                  {todaysAttendance?.checkIn ? "Checked In" : "Not Checked In"}
-                </h3>
-                {todaysAttendance?.checkIn && (
-                  <p className="text-muted-foreground">
-                    Checked in at {new Date(todaysAttendance.checkIn).toLocaleTimeString()}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="text-right">
-              {todaysAttendance?.checkOut ? (
-                <Badge className="bg-success">Checked Out</Badge>
-              ) : todaysAttendance?.checkIn ? (
-                <Badge className="bg-warning">In Progress</Badge>
-              ) : (
-                <Badge variant="destructive">Not Checked In</Badge>
-              )}
-              {todaysAttendance?.workingHours > 0 && (
-                <p className="mt-2 text-sm">
-                  Working Hours: {todaysAttendance.workingHours.toFixed(2)}h
-                </p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Monthly Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Present</CardTitle>
@@ -260,71 +229,28 @@ export const AttendanceDashboard = () => {
             <p className="text-xs text-muted-foreground">Employees</p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Short Leave</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{getStatusCount("short_leave")}</div>
+            <p className="text-xs text-muted-foreground">Employees</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Attendance Regularization Requests */}
       <Card>
         <CardHeader>
           <CardTitle>Attendance Regularization Requests</CardTitle>
-          <CardDescription>Manage and view attendance regularization requests</CardDescription>
+          <CardDescription>View attendance regularization requests and manager actions (manager actions are handled via mobile app)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Recent Requests</h3>
-            <Button onClick={() => setShowRequestForm(!showRequestForm)}>
-              <FileText className="w-4 h-4 mr-2" />
-              {showRequestForm ? "Cancel" : "New Request"}
-            </Button>
           </div>
-
-          {showRequestForm && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>New Regularization Request</CardTitle>
-                <CardDescription>Submit a request for attendance regularization</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {requestError && (
-                  <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md">
-                    {requestError}
-                  </div>
-                )}
-                {success && (
-                  <div className="mb-4 p-3 bg-success/10 text-success rounded-md">
-                    {success}
-                  </div>
-                )}
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="requestDate">Date</Label>
-                    <Input
-                      id="requestDate"
-                      type="date"
-                      value={requestDate}
-                      onChange={(e) => setRequestDate(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="requestReason">Reason</Label>
-                    <Textarea
-                      id="requestReason"
-                      value={requestReason}
-                      onChange={(e) => setRequestReason(e.target.value)}
-                      placeholder="Enter reason for regularization request"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setShowRequestForm(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSubmitRequest} disabled={requestLoading}>
-                      {requestLoading ? "Submitting..." : "Submit Request"}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {regularizationRequests.length > 0 ? (
             <div className="rounded-md border overflow-hidden">
@@ -333,8 +259,11 @@ export const AttendanceDashboard = () => {
                   <thead className="bg-muted">
                     <tr>
                       <th className="p-3 text-left font-medium">Date</th>
+                      <th className="p-3 text-left font-medium">Employee</th>
                       <th className="p-3 text-left font-medium">Reason</th>
-                      <th className="p-3 text-left font-medium">Status</th>
+                      <th className="p-3 text-left font-medium">Reporting Manager</th>
+                      <th className="p-3 text-left font-medium">Manager Action</th>
+                      <th className="p-3 text-left font-medium">Manager Comment</th>
                       <th className="p-3 text-left font-medium">Requested At</th>
                     </tr>
                   </thead>
@@ -342,16 +271,31 @@ export const AttendanceDashboard = () => {
                     {regularizationRequests.map((request) => (
                       <tr key={request._id} className="border-t hover:bg-muted/50">
                         <td className="p-3">{new Date(request.date).toLocaleDateString()}</td>
+                        <td className="p-3">
+                          {request.employee.firstName} {request.employee.lastName}
+                          <br />
+                          <span className="text-xs text-muted-foreground">{request.employee.employeeId}</span>
+                        </td>
                         <td className="p-3">{request.reason}</td>
                         <td className="p-3">
-                          <Badge 
-                            variant={
-                              request.status === "approved" ? "default" :
-                              request.status === "rejected" ? "destructive" : "secondary"
-                            }
-                          >
-                            {request.status}
-                          </Badge>
+                          {request.reportingManager?.firstName} {request.reportingManager?.lastName}
+                          <br />
+                          <span className="text-xs text-muted-foreground">{request.reportingManager?.employeeId}</span>
+                        </td>
+                        <td className="p-3">
+                          {getManagerActionBadge(request.managerAction || "pending")}
+                          {request.managerActionDate && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {new Date(request.managerActionDate).toLocaleDateString()}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-3">
+                          {request.managerComment ? (
+                            <span className="text-sm">{request.managerComment}</span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">No comment</span>
+                          )}
                         </td>
                         <td className="p-3">{new Date(request.requestedAt).toLocaleDateString()}</td>
                       </tr>
@@ -365,9 +309,6 @@ export const AttendanceDashboard = () => {
               <div className="text-center">
                 <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground" />
                 <p className="mt-2 text-muted-foreground">No regularization requests found</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Submit a new request using the "New Request" button
-                </p>
               </div>
             </div>
           )}

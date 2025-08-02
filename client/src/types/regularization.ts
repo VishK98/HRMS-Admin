@@ -18,6 +18,15 @@ export interface RegularizationRequest {
     name: string;
     email: string;
   };
+  reportingManager?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    employeeId: string;
+  };
+  managerAction?: "pending" | "approved" | "rejected";
+  managerActionDate?: string;
+  managerComment?: string;
   createdAt: string;
   updatedAt: string;
 }
