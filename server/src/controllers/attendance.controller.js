@@ -197,30 +197,55 @@ class AttendanceController {
       const { startDate, endDate, employeeId, status, department } = req.query;
       let companyId = req.user.company?._id || req.user.companyId || req.user.company;
 
+      console.log('=== getCompanyAttendance DEBUG ===');
+      console.log('Query params:', req.query);
+      console.log('User:', req.user);
+      console.log('Company ID:', companyId);
+      console.log('Start Date:', startDate);
+      console.log('End Date:', endDate);
+
       // For super admin, allow specifying company ID in query
       if (req.user.role === 'super_admin' && req.query.companyId) {
         companyId = req.query.companyId;
       }
 
       if (!companyId) {
+        console.log('ERROR: No company ID found');
         return res.status(400).json({
           success: false,
           message: 'Company ID is required'
         });
       }
 
+      // Clean up filters - remove undefined values
+      const filters = {};
+      if (employeeId && employeeId !== 'undefined') filters.employeeId = employeeId;
+      if (status && status !== 'undefined') filters.status = status;
+      if (department && department !== 'undefined') filters.department = department;
+
+      console.log('Calling attendanceService.getCompanyAttendance with:', {
+        companyId,
+        startDate,
+        endDate,
+        filters
+      });
+
       const attendance = await attendanceService.getCompanyAttendance(
         companyId,
         startDate,
         endDate,
-        { employeeId, status, department }
+        filters
       );
+      
+      console.log('Service returned:', attendance);
+      console.log('Records count:', attendance.length);
       
       res.status(200).json({
         success: true,
         data: attendance
       });
     } catch (error) {
+      console.error('ERROR in getCompanyAttendance:', error);
       res.status(400).json({
         success: false,
         message: error.message

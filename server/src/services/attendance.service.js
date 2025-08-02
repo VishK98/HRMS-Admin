@@ -1,5 +1,6 @@
 const Attendance = require("../models/attendance.model");
 const Employee = require("../models/employee.model");
+const mongoose = require("mongoose");
 
 class AttendanceService {
   // Check in an employee
@@ -111,28 +112,65 @@ class AttendanceService {
     }
   }
 
-  // Get company attendance for a date range
+  // Get company attendance for a specific date range
   async getCompanyAttendance(companyId, startDate, endDate, filters = {}) {
     try {
+      console.log("getCompanyAttendance called with:", {
+        companyId,
+        startDate,
+        endDate,
+        filters,
+      });
+
+      // Convert companyId to ObjectId if it's a string
+      const companyObjectId = mongoose.Types.ObjectId.isValid(companyId)
+        ? new mongoose.Types.ObjectId(companyId)
+        : companyId;
+
+      console.log("Company ObjectId:", companyObjectId);
+
+      // Convert dates to start and end of day
+      const startDateTime = new Date(startDate);
+      startDateTime.setHours(0, 0, 0, 0);
+
+      const endDateTime = new Date(endDate);
+      endDateTime.setHours(23, 59, 59, 999);
+
+      console.log("Date range:", { startDateTime, endDateTime });
+
       const query = {
-        company: companyId,
-        date: {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        },
+        company: companyObjectId,
+        $or: [
+          // Match by date field (work date)
+          {
+            date: {
+              $gte: startDateTime,
+              $lte: endDateTime,
+            },
+          },
+          // Also match by checkIn date (in case date field is wrong)
+          {
+            checkIn: {
+              $gte: startDateTime,
+              $lte: endDateTime,
+            },
+          },
+        ],
       };
+
+      console.log("Query:", JSON.stringify(query, null, 2));
 
       // Apply additional filters
       if (filters.employeeId) {
-        query.employee = filters.employeeId;
+        query.employee = mongoose.Types.ObjectId.isValid(filters.employeeId)
+          ? new mongoose.Types.ObjectId(filters.employeeId)
+          : filters.employeeId;
       }
       if (filters.status) {
         query.status = filters.status;
       }
-      if (filters.department) {
-        // This would require a join with employee data
-        // For now, we'll filter after fetching
-      }
+
+      console.log("Final query:", JSON.stringify(query, null, 2));
 
       const attendanceRecords = await Attendance.find(query)
         .populate(
@@ -141,17 +179,33 @@ class AttendanceService {
         )
         .sort({ date: -1, employee: 1 });
 
+      console.log(`Found ${attendanceRecords.length} records`);
+      console.log(
+        "Records:",
+        attendanceRecords.map((r) => ({
+          id: r._id,
+          employee: r.employee,
+          date: r.date,
+          checkIn: r.checkIn,
+          status: r.status,
+        }))
+      );
+
       // Apply department filter if specified
       let filteredRecords = attendanceRecords;
       if (filters.department) {
-        filteredRecords = attendanceRecords.filter(record => 
-          record.employee.department && 
-          record.employee.department.toLowerCase().includes(filters.department.toLowerCase())
+        filteredRecords = attendanceRecords.filter(
+          (record) =>
+            record.employee.department &&
+            record.employee.department
+              .toLowerCase()
+              .includes(filters.department.toLowerCase())
         );
       }
 
       return filteredRecords;
     } catch (error) {
+      console.error("Error in getCompanyAttendance:", error);
       throw error;
     }
   }

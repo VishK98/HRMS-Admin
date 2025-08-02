@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Calendar, Download, Filter, Search, 
   MapPin, Clock, Users, TrendingUp,
-  FileText, BarChart3, PieChart, Settings
+  FileText, BarChart3, PieChart, Settings,
+  Loader2, AlertCircle, CheckCircle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
@@ -28,48 +29,75 @@ export const AttendanceReports = () => {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [filteredRecords, setFilteredRecords] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<ReportFilters>({
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
+    startDate: "2025-08-02",
+    endDate: "2025-08-02",
     includeLocation: true,
     includeDistance: true
   });
   const [showReportOptions, setShowReportOptions] = useState(false);
 
+  // Fetch data when component mounts or filters change
   useEffect(() => {
     if (user?.company?._id) {
+      console.log("User company ID:", user.company._id);
       fetchAttendanceRecords();
     }
-  }, [user, filters]);
+  }, [user, filters.startDate, filters.endDate, filters.department, filters.status]);
 
+  // Filter records when search term changes
   useEffect(() => {
+    console.log("Filtering records. Total records:", attendanceRecords.length, "Search term:", searchTerm);
     filterRecords();
   }, [attendanceRecords, searchTerm]);
 
   const fetchAttendanceRecords = async () => {
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
+      console.log("=== DEBUG: Fetching Attendance Records ===");
+      console.log("User:", user);
+      console.log("Company ID:", user?.company?._id);
+      console.log("Filters:", filters);
+      
+      // Clean up filters - only send defined values
+      const apiFilters: any = {};
+      if (filters.department && filters.department.trim()) {
+        apiFilters.department = filters.department;
+      }
+      if (filters.status && filters.status.trim()) {
+        apiFilters.status = filters.status;
+      }
+      
       const response = await apiClient.getCompanyAttendance(
         filters.startDate,
         filters.endDate,
-        {
-          department: filters.department,
-          status: filters.status
-        }
+        apiFilters
       );
+
+      console.log("=== API Response ===");
+      console.log("Response:", response);
+      console.log("Success:", response.success);
+      console.log("Data length:", response.data?.length || 0);
+      console.log("Data:", response.data);
 
       if (response.success) {
         setAttendanceRecords(response.data || []);
+        setSuccess(`Successfully loaded ${response.data?.length || 0} attendance records`);
       } else {
         setError(response.message || "Failed to fetch attendance records");
       }
     } catch (err: any) {
+      console.error("=== ERROR: Fetching Attendance Records ===");
+      console.error("Error:", err);
+      console.error("Error message:", err.message);
       setError(err.message || "Failed to fetch attendance records");
-      console.error("Error fetching attendance records:", err);
     } finally {
       setLoading(false);
     }
@@ -78,39 +106,61 @@ export const AttendanceReports = () => {
   const filterRecords = () => {
     let filtered = attendanceRecords;
 
-    if (searchTerm) {
-      filtered = filtered.filter(record => 
-        `${record.employee.firstName} ${record.employee.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.employee.department?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(record => {
+        const employeeName = `${record.employee?.firstName || ''} ${record.employee?.lastName || ''}`.toLowerCase();
+        const employeeId = (record.employee?.employeeId || '').toLowerCase();
+        const department = (record.employee?.department || '').toLowerCase();
+        
+        return employeeName.includes(searchLower) || 
+               employeeId.includes(searchLower) || 
+               department.includes(searchLower);
+      });
     }
 
     setFilteredRecords(filtered);
   };
 
-  const generateReport = (format: 'csv' | 'pdf' | 'excel') => {
+  const generateReport = async (format: 'csv' | 'pdf' | 'excel') => {
     if (filteredRecords.length === 0) {
       setError("No records to generate report from");
       return;
     }
 
-    const options: ReportOptions = {
-      includeLocation: filters.includeLocation,
-      includeDistance: filters.includeDistance,
-      format,
-      dateRange: {
-        startDate: filters.startDate,
-        endDate: filters.endDate
-      },
-      filters: {
-        department: filters.department,
-        status: filters.status
-      }
-    };
+    setExportLoading(true);
+    setError(null);
+    setSuccess(null);
 
-    const reportGenerator = new AttendanceReportGenerator(filteredRecords, options);
-    reportGenerator.downloadReport();
+    try {
+      const options: ReportOptions = {
+        includeLocation: filters.includeLocation,
+        includeDistance: filters.includeDistance,
+        format,
+        dateRange: {
+          startDate: filters.startDate,
+          endDate: filters.endDate
+        },
+        filters: {
+          department: filters.department,
+          status: filters.status
+        }
+      };
+
+      const reportGenerator = new AttendanceReportGenerator(filteredRecords, options);
+      reportGenerator.downloadReport();
+      
+      setSuccess(`${format.toUpperCase()} report generated successfully with ${filteredRecords.length} records`);
+    } catch (err: any) {
+      console.error("Error generating report:", err);
+      setError(`Failed to generate ${format.toUpperCase()} report: ${err.message}`);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const refreshData = () => {
+    fetchAttendanceRecords();
   };
 
   const getStatusBadge = (status: string) => {
@@ -163,6 +213,35 @@ export const AttendanceReports = () => {
     return `${(distance / 1000).toFixed(2)} km`;
   };
 
+  const getSummaryStats = () => {
+    const totalRecords = filteredRecords.length;
+    const presentCount = filteredRecords.filter(r => r.status === 'present').length;
+    const absentCount = filteredRecords.filter(r => r.status === 'absent').length;
+    const lateCount = filteredRecords.filter(r => r.status === 'late').length;
+    const halfDayCount = filteredRecords.filter(r => r.status === 'half_day').length;
+    const onLeaveCount = filteredRecords.filter(r => r.status === 'on_leave').length;
+    
+    const totalWorkingHours = filteredRecords.reduce((sum, r) => sum + r.workingHours, 0);
+    const avgWorkingHours = totalRecords > 0 ? totalWorkingHours / totalRecords : 0;
+    
+    const locationTrackedCount = filteredRecords.filter(r => 
+      r.checkInLocation || r.checkOutLocation
+    ).length;
+
+    return {
+      totalRecords,
+      presentCount,
+      absentCount,
+      lateCount,
+      halfDayCount,
+      onLeaveCount,
+      avgWorkingHours,
+      locationTrackedCount
+    };
+  };
+
+  const stats = getSummaryStats();
+
   return (
     <div className="space-y-6">
       {/* Report Header */}
@@ -177,6 +256,20 @@ export const AttendanceReports = () => {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={refreshData}
+                disabled={loading}
+                className="flex items-center gap-2"
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Calendar className="w-4 h-4" />
+                )}
+                {loading ? "Loading..." : "Refresh"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowReportOptions(!showReportOptions)}
                 className="flex items-center gap-2"
               >
@@ -187,19 +280,29 @@ export const AttendanceReports = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => generateReport('csv')}
+                disabled={exportLoading || filteredRecords.length === 0}
                 className="flex items-center gap-2"
               >
-                <FileText className="w-4 h-4" />
-                Export CSV
+                {exportLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <FileText className="w-4 h-4" />
+                )}
+                {exportLoading ? "Exporting..." : "Export CSV"}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => generateReport('pdf')}
+                disabled={exportLoading || filteredRecords.length === 0}
                 className="flex items-center gap-2"
               >
-                <Download className="w-4 h-4" />
-                Export PDF
+                {exportLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                {exportLoading ? "Exporting..." : "Export PDF"}
               </Button>
             </div>
           </div>
@@ -208,6 +311,32 @@ export const AttendanceReports = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Search Bar - Moved to top */}
+          <div className="relative mb-6">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search employees by name, ID, or department..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
+          {/* Error/Success Messages */}
+          {error && (
+            <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-md flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              {success}
+            </div>
+          )}
+
           {/* Report Options */}
           {showReportOptions && (
             <div className="mb-6 p-4 bg-muted rounded-lg">
@@ -277,17 +406,6 @@ export const AttendanceReports = () => {
             </div>
           </div>
 
-          {/* Search */}
-          <div className="relative mb-6">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search employees..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <Card className="bg-blue-50 border-blue-200">
@@ -297,7 +415,7 @@ export const AttendanceReports = () => {
                   <span className="text-sm font-medium text-blue-700">Total Records</span>
                 </div>
                 <div className="mt-2 text-2xl font-bold text-blue-800">
-                  {filteredRecords.length}
+                  {stats.totalRecords}
                 </div>
               </CardContent>
             </Card>
@@ -306,10 +424,10 @@ export const AttendanceReports = () => {
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">Present Today</span>
+                  <span className="text-sm font-medium text-green-700">Present</span>
                 </div>
                 <div className="mt-2 text-2xl font-bold text-green-800">
-                  {filteredRecords.filter(r => r.status === 'present').length}
+                  {stats.presentCount}
                 </div>
               </CardContent>
             </Card>
@@ -321,10 +439,7 @@ export const AttendanceReports = () => {
                   <span className="text-sm font-medium text-yellow-700">Avg Working Hours</span>
                 </div>
                 <div className="mt-2 text-2xl font-bold text-yellow-800">
-                  {filteredRecords.length > 0 
-                    ? (filteredRecords.reduce((sum, r) => sum + r.workingHours, 0) / filteredRecords.length).toFixed(1)
-                    : '0.0'
-                  }h
+                  {stats.avgWorkingHours.toFixed(1)}h
                 </div>
               </CardContent>
             </Card>
@@ -336,7 +451,7 @@ export const AttendanceReports = () => {
                   <span className="text-sm font-medium text-purple-700">Location Tracked</span>
                 </div>
                 <div className="mt-2 text-2xl font-bold text-purple-800">
-                  {filteredRecords.filter(r => r.checkInLocation || r.checkOutLocation).length}
+                  {stats.locationTrackedCount}
                 </div>
               </CardContent>
             </Card>
@@ -347,22 +462,21 @@ export const AttendanceReports = () => {
       {/* Attendance Records Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Daily Attendance Records</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Daily Attendance Records</CardTitle>
+            <div className="text-sm text-muted-foreground">
+              Showing {filteredRecords.length} of {attendanceRecords.length} records
+            </div>
+          </div>
           <CardDescription>
             Detailed attendance records with location tracking data
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && (
-            <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md">
-              {error}
-            </div>
-          )}
-
           {loading ? (
             <div className="flex items-center justify-center h-32">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
                 <p className="mt-2 text-muted-foreground">Loading attendance records...</p>
               </div>
             </div>
@@ -385,7 +499,7 @@ export const AttendanceReports = () => {
                   </thead>
                   <tbody>
                     {filteredRecords.map((record) => (
-                      <tr key={record._id} className="border-t">
+                      <tr key={record._id} className="border-t hover:bg-muted/50">
                         <td className="p-3">
                           <div>
                             <div className="font-medium">
