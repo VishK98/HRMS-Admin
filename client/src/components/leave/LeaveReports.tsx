@@ -470,9 +470,9 @@ export const LeaveReports = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex items-center justify-center h-32">
+            <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="mt-2 text-muted-foreground">Loading leave reports...</p>
               </div>
             </div>

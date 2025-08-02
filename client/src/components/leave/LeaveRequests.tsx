@@ -3,20 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { 
   Search, Filter, Calendar, User, 
   CheckCircle, XCircle, Clock, AlertCircle,
-  Plus, FileText, Download, Settings, RefreshCw, Eye
+  Plus, FileText, Download, Settings, RefreshCw, Eye, X
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { LeaveRequest } from "@/types/leave";
+import { useToast } from "@/hooks/use-toast";
 
 // Remove the local interface since we're importing from types/leave
 
 export const LeaveRequests = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,6 +27,8 @@ export const LeaveRequests = () => {
   const [leaveTypeFilter, setLeaveTypeFilter] = useState<string>("");
   const [selectedLeave, setSelectedLeave] = useState<LeaveRequest | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Fixed at 5 items per page
 
   // Fetch leave requests from API
   const fetchLeaveRequests = async () => {
@@ -52,12 +56,33 @@ export const LeaveRequests = () => {
 
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(request => 
-        request.employee?.firstName?.toLowerCase().includes(searchLower) ||
-        request.employee?.lastName?.toLowerCase().includes(searchLower) ||
-        request.employee?.employeeId?.toLowerCase().includes(searchLower) ||
-        request.leaveType.toLowerCase().includes(searchLower)
-      );
+      console.log("Searching for:", searchLower);
+      console.log("Available requests:", leaveRequests.length);
+      
+      filtered = filtered.filter(request => {
+        const employeeName = `${request.employee?.firstName || ''} ${request.employee?.lastName || ''}`.toLowerCase();
+        const employeeId = (request.employee?.employeeId || '').toLowerCase();
+        const leaveType = (request.leaveType || '').toLowerCase();
+        const reason = (request.reason || '').toLowerCase();
+        
+        // Check if any part of the search term matches
+        const searchTerms = searchLower.split(' ').filter(term => term.length > 0);
+        
+        const matches = searchTerms.some(term => 
+          employeeName.includes(term) ||
+          employeeId.includes(term) ||
+          leaveType.includes(term) ||
+          reason.includes(term)
+        );
+        
+        if (matches) {
+          console.log("Match found:", employeeName, leaveType, reason);
+        }
+        
+        return matches;
+      });
+      
+      console.log("Filtered results:", filtered.length);
     }
 
     if (statusFilter) {
@@ -69,6 +94,7 @@ export const LeaveRequests = () => {
     }
 
     setFilteredRequests(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [leaveRequests, searchTerm, statusFilter, leaveTypeFilter]);
 
   const getStatusBadge = (status: string) => {
@@ -108,28 +134,68 @@ export const LeaveRequests = () => {
   };
 
   const handleApprove = (requestId: string) => {
+    // Find the leave request to check manager status
+    const leaveRequest = leaveRequests.find(request => request._id === requestId);
+    
+    if (leaveRequest?.managerAction === 'pending') {
+      toast({
+        title: "Manager Approval Required",
+        description: "Please wait for the manager to approve this leave request first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLeaveRequests(prev => 
       prev.map(request => 
-        request.id === requestId 
+        request._id === requestId 
           ? { ...request, status: 'approved' as const, approvedBy: user?.name, approvedDate: new Date().toISOString() }
           : request
       )
     );
+
+    toast({
+      title: "Leave Request Approved",
+      description: "The leave request has been successfully approved.",
+    });
   };
 
   const handleReject = (requestId: string) => {
+    // Find the leave request to check manager status
+    const leaveRequest = leaveRequests.find(request => request._id === requestId);
+    
+    if (leaveRequest?.managerAction === 'pending') {
+      toast({
+        title: "Manager Approval Required",
+        description: "Please wait for the manager to approve this leave request first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLeaveRequests(prev => 
       prev.map(request => 
-        request.id === requestId 
+        request._id === requestId 
           ? { ...request, status: 'rejected' as const, approvedBy: user?.name, approvedDate: new Date().toISOString() }
           : request
       )
     );
+
+    toast({
+      title: "Leave Request Rejected",
+      description: "The leave request has been rejected.",
+      variant: "destructive",
+    });
   };
 
   const handleView = (request: LeaveRequest) => {
     setSelectedLeave(request);
     setIsViewModalOpen(true);
+    
+    // Auto-close modal after 3 seconds
+    setTimeout(() => {
+      setIsViewModalOpen(false);
+    }, 3000);
   };
 
   const formatDate = (dateString: string) => {
@@ -138,6 +204,16 @@ export const LeaveRequests = () => {
 
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentRequests = filteredRequests.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   if (loading) {
@@ -183,46 +259,98 @@ export const LeaveRequests = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Search and Filters */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search by employee name, ID, or leave type..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-              <select
-                value={leaveTypeFilter}
-                onChange={(e) => setLeaveTypeFilter(e.target.value)}
-                className="px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="">All Types</option>
-                <option value="paid">Paid Leave</option>
-                <option value="casual">Casual Leave</option>
-                <option value="short">Short Leave</option>
-                <option value="sick">Sick Leave</option>
-                <option value="halfday">Half Day</option>
-              </select>
-            </div>
-          </div>
+                                {/* Enhanced Search and Filters */}
+           <div className="space-y-4 mb-6">
+             {/* Search Bar */}
+             <div className="relative">
+               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+               <Input
+                 placeholder="Search by employee name, ID, leave type, or reason..."
+                 value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 className="pl-9 pr-4 h-10"
+               />
+               {searchTerm && (
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   onClick={() => setSearchTerm("")}
+                   className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                 >
+                   <X className="w-4 h-4" />
+                 </Button>
+               )}
+             </div>
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+             {/* Search Results Summary - Moved here */}
+             {searchTerm.trim() && (
+               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                 <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                     <Search className="w-4 h-4 text-blue-600" />
+                     <span className="text-sm font-medium text-blue-800">
+                       Search Results for "{searchTerm}"
+                     </span>
+                   </div>
+                   <Badge variant="secondary" className="text-xs">
+                     {filteredRequests.length} result{filteredRequests.length !== 1 ? 's' : ''}
+                   </Badge>
+                 </div>
+                 {filteredRequests.length > 0 && (
+                   <div className="mt-2 text-xs text-blue-700">
+                     Showing {startIndex + 1} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} results
+                   </div>
+                 )}
+               </div>
+             )}
+             
+             {/* Filters */}
+             <div className="flex flex-wrap gap-3">
+               <div className="flex items-center gap-2">
+                 <Filter className="w-4 h-4 text-muted-foreground" />
+                 <span className="text-sm font-medium text-muted-foreground">Filters:</span>
+               </div>
+               <select
+                 value={statusFilter}
+                 onChange={(e) => setStatusFilter(e.target.value)}
+                 className="px-3 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 transition-colors"
+               >
+                 <option value="">All Status</option>
+                 <option value="pending">Pending</option>
+                 <option value="approved">Approved</option>
+                 <option value="rejected">Rejected</option>
+                 <option value="cancelled">Cancelled</option>
+               </select>
+               <select
+                 value={leaveTypeFilter}
+                 onChange={(e) => setLeaveTypeFilter(e.target.value)}
+                 className="px-3 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 transition-colors"
+               >
+                 <option value="">All Types</option>
+                 <option value="paid">Paid Leave</option>
+                 <option value="casual">Casual Leave</option>
+                 <option value="short">Short Leave</option>
+                 <option value="sick">Sick Leave</option>
+                 <option value="halfday">Half Day</option>
+               </select>
+               {(statusFilter || leaveTypeFilter) && (
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => {
+                     setStatusFilter("");
+                     setLeaveTypeFilter("");
+                   }}
+                   className="text-xs"
+                 >
+                   Clear Filters
+                 </Button>
+               )}
+             </div>
+           </div>
+
+           {/* Summary Stats */}
+           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <Card className="bg-blue-50 border-blue-200">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
@@ -274,135 +402,231 @@ export const LeaveRequests = () => {
         </CardContent>
       </Card>
 
-      {/* Leave Requests Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Leave Requests List</CardTitle>
-          <CardDescription>
-            Review and manage employee leave requests
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="p-3 text-left font-medium">Employee</th>
-                    <th className="p-3 text-left font-medium">Leave Type</th>
-                    <th className="p-3 text-left font-medium">Date Range</th>
-                    <th className="p-3 text-left font-medium">Days</th>
-                    <th className="p-3 text-left font-medium">Status</th>
-                    <th className="p-3 text-left font-medium">Manager Action</th>
-                    <th className="p-3 text-left font-medium">Submitted</th>
-                    <th className="p-3 text-left font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRequests.map((request) => (
-                    <tr key={request._id} className="border-t hover:bg-muted/50">
-                      <td className="p-3">
-                        <div>
-                          <div className="font-medium">
-                            {request.employee?.firstName} {request.employee?.lastName}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {request.employee?.employeeId}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        {getLeaveTypeBadge(request.leaveType)}
-                        {request.halfDayType && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {request.halfDayType === 'first' ? '1st Half' : '2nd Half'}
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-3">
-                        <div className="text-sm">
-                          {formatDate(request.startDate)} - {formatDate(request.endDate)}
-                        </div>
-                      </td>
-                      <td className="p-3 font-medium">
-                        {request.days} {request.days === 1 ? 'day' : 'days'}
-                      </td>
-                      <td className="p-3">
-                        {getStatusBadge(request.status)}
-                      </td>
-                      <td className="p-3">
-                        {getManagerActionBadge(request.managerAction)}
-                        {request.reportingManager && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {request.reportingManager.firstName} {request.reportingManager.lastName}
-                          </div>
-                        )}
-                        {request.managerActionDate && (
-                          <div className="text-xs text-muted-foreground">
-                            {formatDate(request.managerActionDate)}
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-3 text-sm text-muted-foreground">
-                        {formatDate(request.submittedDate)}
-                      </td>
-                      <td className="p-3">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleView(request)}
-                            className="gap-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            View
-                          </Button>
-                          {request.status === 'pending' && (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() => handleApprove(request._id)}
-                                className="bg-green-600 hover:bg-green-700"
-                              >
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleReject(request._id)}
-                              >
-                                <XCircle className="w-4 h-4 mr-1" />
-                                Reject
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                        {request.status !== 'pending' && (
-                          <div className="text-xs text-muted-foreground mt-2">
-                            {request.approvedBy?.name && `By ${request.approvedBy.name}`}
-                            {request.approvedDate && (
-                              <div>{formatDate(request.approvedDate)}</div>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                 {/* Leave Requests Table */}
+           <Card>
+             <CardHeader>
+               <div className="flex items-center justify-between">
+                 <div>
+                   <CardTitle>Leave Requests List</CardTitle>
+                   <CardDescription>
+                     Review and manage employee leave requests
+                   </CardDescription>
+                 </div>
+                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                   <span>Total: {filteredRequests.length}</span>
+                   <span>•</span>
+                   <span>Page {currentPage} of {totalPages}</span>
+                 </div>
+               </div>
+             </CardHeader>
+                           <CardContent>
+                <div className="rounded-lg border overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b">
+                        <tr>
+                          <th className="p-4 text-left font-semibold text-gray-700">Employee</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Leave Type</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Date Range</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Days</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Status</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Manager Action</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Submitted</th>
+                          <th className="p-4 text-left font-semibold text-gray-700">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentRequests.map((request) => (
+                          <tr key={request._id} className="border-t hover:bg-gray-50 transition-colors duration-200">
+                            <td className="p-4">
+                              <div>
+                                <div className="font-semibold text-gray-900">
+                                  {request.employee?.firstName} {request.employee?.lastName}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  ID: {request.employee?.employeeId}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="space-y-1">
+                                {getLeaveTypeBadge(request.leaveType)}
+                                {request.halfDayType && (
+                                  <div className="text-xs text-gray-500">
+                                    {request.halfDayType === 'first' ? '1st Half' : '2nd Half'}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="font-semibold text-gray-900">
+                                {request.days} {request.days === 1 ? 'day' : 'days'}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              {getStatusBadge(request.status)}
+                            </td>
+                            <td className="p-4">
+                              <div className="space-y-1">
+                                {getManagerActionBadge(request.managerAction)}
+                                {request.reportingManager && (
+                                  <div className="text-xs text-gray-500">
+                                    {request.reportingManager.firstName} {request.reportingManager.lastName}
+                                  </div>
+                                )}
+                                {request.managerActionDate && (
+                                  <div className="text-xs text-gray-500">
+                                    {formatDate(request.managerActionDate)}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="p-4 text-sm text-gray-500">
+                              {formatDate(request.submittedDate)}
+                            </td>
+                            <td className="p-4">
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleView(request)}
+                                  className="gap-1 px-3 py-2 text-xs h-8"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  View
+                                </Button>
+                                {request.status === 'pending' && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleApprove(request._id)}
+                                      className="bg-green-600 hover:bg-green-700 px-3 py-2 text-xs h-8"
+                                    >
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      Approve
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={() => handleReject(request._id)}
+                                      className="px-3 py-2 text-xs h-8"
+                                    >
+                                      <XCircle className="w-3 h-3 mr-1" />
+                                      Reject
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                              {request.status === 'approved' && request.managerAction === 'approved' && (
+                                <div className="mt-2">
+                                  <div className="bg-green-50 border border-green-200 rounded-md p-2">
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="w-4 h-4 text-green-600" />
+                                      <span className="text-xs font-medium text-green-800">
+                                        Completely Approved
+                                      </span>
+                                    </div>
+                                    <div className="text-xs text-green-700 mt-1">
+                                      {request.approvedBy?.name && `By ${request.approvedBy.name}`}
+                                      {request.approvedDate && (
+                                        <div>{formatDate(request.approvedDate)}</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {request.status !== 'pending' && request.status !== 'approved' && (
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {request.approvedBy?.name && `By ${request.approvedBy.name}`}
+                                  {request.approvedDate && (
+                                    <div>{formatDate(request.approvedDate)}</div>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
-          {filteredRequests.length === 0 && (
-            <div className="flex items-center justify-center h-32">
-              <div className="text-center">
-                <FileText className="w-12 h-12 mx-auto text-muted-foreground" />
-                <p className="mt-2 text-muted-foreground">No leave requests found</p>
-                <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
-              </div>
-            </div>
-          )}
+                     {filteredRequests.length === 0 && (
+             <div className="flex items-center justify-center h-48">
+               <div className="text-center">
+                 <FileText className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                 <h3 className="text-lg font-medium text-gray-900 mb-2">
+                   {searchTerm.trim() ? 'No matching leave requests' : 'No leave requests found'}
+                 </h3>
+                 <p className="text-sm text-gray-500 mb-4">
+                   {searchTerm.trim() 
+                     ? `No results found for "${searchTerm}". Try adjusting your search terms.`
+                     : 'There are no leave requests to display at the moment.'
+                   }
+                 </p>
+                 {searchTerm.trim() && (
+                   <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={() => setSearchTerm("")}
+                     className="gap-2"
+                   >
+                     <X className="w-4 h-4" />
+                     Clear Search
+                   </Button>
+                 )}
+               </div>
+             </div>
+           )}
+
+           {/* Enhanced Pagination */}
+           {filteredRequests.length > 0 && (
+             <div className="flex items-center justify-between mt-6 p-4 bg-gray-50 rounded-lg border">
+               <div className="text-sm text-gray-600">
+                 Showing <span className="font-semibold">{startIndex + 1}</span> to{' '}
+                 <span className="font-semibold">{Math.min(endIndex, filteredRequests.length)}</span> of{' '}
+                 <span className="font-semibold">{filteredRequests.length}</span> results
+               </div>
+               <div className="flex items-center gap-2">
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => handlePageChange(currentPage - 1)}
+                   disabled={currentPage === 1}
+                   className="px-3 py-2"
+                 >
+                   Previous
+                 </Button>
+                 <div className="flex items-center gap-1">
+                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                     <Button
+                       key={page}
+                       variant={currentPage === page ? "default" : "outline"}
+                       size="sm"
+                       onClick={() => handlePageChange(page)}
+                       className="px-3 py-2 w-10 h-10"
+                     >
+                       {page}
+                     </Button>
+                   ))}
+                 </div>
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => handlePageChange(currentPage + 1)}
+                   disabled={currentPage === totalPages}
+                   className="px-3 py-2"
+                 >
+                   Next
+                 </Button>
+               </div>
+             </div>
+           )}
         </CardContent>
       </Card>
 
@@ -410,10 +634,16 @@ export const LeaveRequests = () => {
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="w-5 h-5" />
-              Leave Request Details
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5" />
+                Leave Request Details
+              </DialogTitle>
+              <DialogClose className="h-6 w-6 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
+            </div>
             <DialogDescription>
               Complete information about the leave request
             </DialogDescription>
