@@ -82,20 +82,20 @@ export const HolidayManagement = () => {
 
   const getStatusBadge = (isActive: boolean) => {
     return isActive ? 
-      <Badge className="bg-success text-success-foreground">Active</Badge> :
-      <Badge className="bg-destructive text-destructive-foreground">Inactive</Badge>;
+      <Badge className="bg-[#843C6D]/10 text-[#843C6D] border border-[#843C6D]/20">Active</Badge> :
+      <Badge className="bg-gray-100 text-gray-800 border border-gray-200">Inactive</Badge>;
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case "public":
-        return <Badge variant="default">Public Holiday</Badge>;
+        return <Badge className="bg-[#843C6D]/10 text-[#843C6D] border border-[#843C6D]/20">Public Holiday</Badge>;
       case "company":
-        return <Badge variant="secondary">Company Holiday</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border border-green-200">Company Holiday</Badge>;
       case "optional":
-        return <Badge variant="outline">Optional Holiday</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200">Optional Holiday</Badge>;
       default:
-        return <Badge variant="outline">{type}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border border-gray-200">{type}</Badge>;
     }
   };
 
@@ -212,7 +212,7 @@ export const HolidayManagement = () => {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
                   <Filter className="w-4 h-4" />
                   Status: {statusFilter === "all" ? "All" : statusFilter}
                 </Button>
@@ -231,7 +231,7 @@ export const HolidayManagement = () => {
             </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
                   <Calendar className="w-4 h-4" />
                   Type: {typeFilter === "all" ? "All" : typeFilter}
                 </Button>

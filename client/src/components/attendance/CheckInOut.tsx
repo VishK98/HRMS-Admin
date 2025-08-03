@@ -243,20 +243,20 @@ export const CheckInOut = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Total Employees */}
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                <Card className="bg-gradient-to-br from-[#843C6D]/5 to-[#843C6D]/10 border-[#843C6D]/20">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="flex items-center gap-2">
-                          <Users className="w-5 h-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-700">Total Employees</span>
+                          <Users className="w-5 h-5 text-[#843C6D]" />
+                          <span className="text-sm font-medium text-[#843C6D]">Total Employees</span>
                         </div>
-                        <div className="mt-2 text-2xl font-bold text-blue-800">
+                        <div className="mt-2 text-2xl font-bold text-[#843C6D]">
                           {attendanceSummary?.totalEmployees || 0}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-blue-600">Active</div>
+                        <div className="text-xs text-[#843C6D]">Active</div>
                       </div>
                     </div>
                   </CardContent>

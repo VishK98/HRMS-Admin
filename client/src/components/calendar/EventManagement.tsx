@@ -68,7 +68,7 @@ export const EventManagement = () => {
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case "meeting":
-        return "bg-blue-100 text-blue-800";
+        return "bg-[#843C6D]/10 text-[#843C6D]";
       case "holiday":
         return "bg-red-100 text-red-800";
       case "review":

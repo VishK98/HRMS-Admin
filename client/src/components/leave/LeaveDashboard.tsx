@@ -69,7 +69,7 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeBadge = (leaveType: string) => {
     const colors: Record<string, string> = {
-      paid: "bg-blue-100 text-blue-800",
+      paid: "bg-[#843C6D]/10 text-[#843C6D]",
       casual: "bg-green-100 text-green-800",
       short: "bg-yellow-100 text-yellow-800",
       sick: "bg-red-100 text-red-800",
@@ -85,7 +85,7 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeColor = (leaveType: string) => {
     const colors: Record<string, string> = {
-      paid: "bg-blue-500",
+      paid: "bg-[#843C6D]",
       casual: "bg-green-500",
       short: "bg-yellow-500",
       sick: "bg-red-500",
@@ -97,7 +97,7 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeBackground = (leaveType: string) => {
     const backgrounds: Record<string, string> = {
-      paid: "bg-blue-50",
+      paid: "bg-[#843C6D]/5",
       casual: "bg-green-50",
       short: "bg-yellow-50",
       sick: "bg-red-50",
@@ -109,7 +109,7 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeHover = (leaveType: string) => {
     const hovers: Record<string, string> = {
-      paid: "hover:bg-blue-100",
+      paid: "hover:bg-[#843C6D]/10",
       casual: "hover:bg-green-100",
       short: "hover:bg-yellow-100",
       sick: "hover:bg-red-100",
@@ -135,7 +135,7 @@ export const LeaveDashboard = () => {
 
   const getAvatarColor = (name: string) => {
     const colors = [
-      { bg: 'bg-blue-500/20', text: 'text-blue-700' },
+      { bg: 'bg-[#843C6D]/20', text: 'text-[#843C6D]' },
       { bg: 'bg-green-500/20', text: 'text-green-700' },
       { bg: 'bg-purple-500/20', text: 'text-purple-700' },
       { bg: 'bg-red-500/20', text: 'text-red-700' },
@@ -240,8 +240,8 @@ export const LeaveDashboard = () => {
          <Card>
            <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-[#843C6D]/10 rounded-lg">
+                <BarChart3 className="w-5 h-5 text-[#843C6D]" />
               </div>
               <div>
                 <CardTitle className="text-lg font-semibold text-gray-900">Leave Distribution</CardTitle>

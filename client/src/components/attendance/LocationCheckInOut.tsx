@@ -158,11 +158,11 @@ export const LocationCheckInOut = () => {
 
           {/* Current Location Display */}
           {currentLocation && (
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-[#843C6D]/5 border-[#843C6D]/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Map className="w-4 h-4 text-blue-600" />
-                  <span className="font-medium text-blue-700">Current Location</span>
+                  <Map className="w-4 h-4 text-[#843C6D]" />
+                  <span className="font-medium text-[#843C6D]">Current Location</span>
                 </div>
                 <div className="text-sm space-y-1">
                   <div>

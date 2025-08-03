@@ -91,7 +91,7 @@ export const PayrollDashboard = () => {
       case "payroll_processed":
         return <CheckCircle className="w-4 h-4 text-green-600" />;
       case "salary_updated":
-        return <TrendingUp className="w-4 h-4 text-blue-600" />;
+        return <TrendingUp className="w-4 h-4 text-[#843C6D]" />;
       case "bonus_paid":
         return <IndianRupee className="w-4 h-4 text-purple-600" />;
       case "payroll_pending":

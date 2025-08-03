@@ -245,7 +245,7 @@ export const LeaveReports = () => {
                 size="sm"
                 onClick={refreshData}
                 disabled={loading}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -258,7 +258,7 @@ export const LeaveReports = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowReportOptions(!showReportOptions)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 Report Options
@@ -268,7 +268,7 @@ export const LeaveReports = () => {
                 size="sm"
                 onClick={() => generateReport('csv')}
                 disabled={exportLoading || filteredReports.length === 0}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 {exportLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -282,7 +282,7 @@ export const LeaveReports = () => {
                 size="sm"
                 onClick={() => generateReport('pdf')}
                 disabled={exportLoading || filteredReports.length === 0}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 {exportLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -404,13 +404,13 @@ export const LeaveReports = () => {
 
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-[#843C6D]/5 border-[#843C6D]/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-700">Total Reports</span>
+                  <Users className="w-5 h-5 text-[#843C6D]" />
+                  <span className="text-sm font-medium text-[#843C6D]">Total Reports</span>
                 </div>
-                <div className="mt-2 text-2xl font-bold text-blue-800">
+                <div className="mt-2 text-2xl font-bold text-[#843C6D]">
                   {stats.totalReports}
                 </div>
               </CardContent>

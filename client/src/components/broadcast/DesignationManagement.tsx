@@ -81,8 +81,8 @@ export const DesignationManagement = () => {
 
   const getStatusBadge = (isActive: boolean) => {
     return isActive ? 
-      <Badge className="bg-success text-success-foreground">Active</Badge> :
-      <Badge className="bg-destructive text-destructive-foreground">Inactive</Badge>;
+      <Badge className="bg-[#843C6D]/10 text-[#843C6D] border border-[#843C6D]/20">Active</Badge> :
+      <Badge className="bg-gray-100 text-gray-800 border border-gray-200">Inactive</Badge>;
   };
 
   const handleViewDetails = (designation: Designation) => {
@@ -208,7 +208,7 @@ export const DesignationManagement = () => {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
                   <Filter className="w-4 h-4" />
                   Status: {statusFilter === "all" ? "All" : statusFilter}
                 </Button>

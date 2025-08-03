@@ -75,7 +75,7 @@ export const CalendarView = () => {
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case "meeting":
-        return "bg-blue-100 text-blue-800";
+        return "bg-[#843C6D]/10 text-[#843C6D]";
       case "holiday":
         return "bg-red-100 text-red-800";
       case "review":
@@ -129,8 +129,8 @@ export const CalendarView = () => {
           <div
             key={dayCounter}
             className={`h-24 border border-gray-200 p-1 cursor-pointer hover:bg-gray-50 transition-colors ${
-              isToday ? 'bg-blue-50 border-blue-300' : ''
-            } ${isSelected ? 'bg-blue-100 border-blue-400' : ''}`}
+              isToday ? 'bg-[#843C6D]/5 border-[#843C6D]/30' : ''
+} ${isSelected ? 'bg-[#843C6D]/10 border-[#843C6D]/40' : ''}`}
             onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), dayCounter))}
           >
             <div className="text-sm font-medium mb-1">{dayCounter}</div>
@@ -191,17 +191,17 @@ export const CalendarView = () => {
       {/* Calendar Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm" onClick={goToToday}>
+          <Button variant="outline" size="sm" onClick={goToToday} className="hover:bg-[#843C6D] hover:text-white transition-colors">
             Today
           </Button>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={goToPreviousMonth}>
+            <Button variant="outline" size="sm" onClick={goToPreviousMonth} className="hover:bg-[#843C6D] hover:text-white transition-colors">
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <h2 className="text-xl font-semibold">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
-            <Button variant="outline" size="sm" onClick={goToNextMonth}>
+            <Button variant="outline" size="sm" onClick={goToNextMonth} className="hover:bg-[#843C6D] hover:text-white transition-colors">
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>

@@ -211,11 +211,11 @@ export const SalaryManagement = () => {
                 <SelectValue placeholder="Filter by department" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="Engineering">Engineering</SelectItem>
-                <SelectItem value="Marketing">Marketing</SelectItem>
-                <SelectItem value="Sales">Sales</SelectItem>
-                <SelectItem value="Human Resources">Human Resources</SelectItem>
+                <SelectItem value="all" className="hover:bg-[#843C6D] hover:text-white transition-colors">All Departments</SelectItem>
+                <SelectItem value="Engineering" className="hover:bg-[#843C6D] hover:text-white transition-colors">Engineering</SelectItem>
+                <SelectItem value="Marketing" className="hover:bg-[#843C6D] hover:text-white transition-colors">Marketing</SelectItem>
+                <SelectItem value="Sales" className="hover:bg-[#843C6D] hover:text-white transition-colors">Sales</SelectItem>
+                <SelectItem value="Human Resources" className="hover:bg-[#843C6D] hover:text-white transition-colors">Human Resources</SelectItem>
               </SelectContent>
             </Select>
             <Button className="gap-2">
@@ -261,10 +261,15 @@ export const SalaryManagement = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditSalary(employee)}
+                          className="hover:bg-[#843C6D] hover:text-white transition-colors"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="hover:bg-[#843C6D] hover:text-white transition-colors"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

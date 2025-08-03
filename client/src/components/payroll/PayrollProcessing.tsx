@@ -147,7 +147,7 @@ export const PayrollProcessing = () => {
       case "completed":
         return "bg-green-100 text-green-800";
       case "processing":
-        return "bg-blue-100 text-blue-800";
+        return "bg-[#843C6D]/10 text-[#843C6D]";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "failed":
@@ -162,7 +162,7 @@ export const PayrollProcessing = () => {
       case "completed":
         return <CheckCircle className="w-4 h-4 text-green-600" />;
       case "processing":
-        return <Clock className="w-4 h-4 text-blue-600" />;
+        return <Clock className="w-4 h-4 text-[#843C6D]" />;
       case "pending":
         return <AlertCircle className="w-4 h-4 text-yellow-600" />;
       case "failed":
@@ -356,16 +356,25 @@ export const PayrollProcessing = () => {
                             size="sm"
                             onClick={() => handleStartProcessing(run)}
                             disabled={isProcessing}
+                            className="hover:bg-[#843C6D] hover:text-white transition-colors"
                           >
                             <Play className="h-4 w-4" />
                           </Button>
                         )}
                         {run.status === "completed" && (
                           <>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="hover:bg-[#843C6D] hover:text-white transition-colors"
+                            >
                               <Download className="h-4 w-4" />
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="hover:bg-[#843C6D] hover:text-white transition-colors"
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
                           </>

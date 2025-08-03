@@ -128,7 +128,7 @@ export const PayrollReports = () => {
   const getReportTypeIcon = (type: string) => {
     switch (type) {
       case "monthly":
-        return <Calendar className="w-4 h-4 text-blue-600" />;
+        return <Calendar className="w-4 h-4 text-[#843C6D]" />;
       case "quarterly":
         return <BarChart3 className="w-4 h-4 text-purple-600" />;
       case "annual":
@@ -218,10 +218,10 @@ export const PayrollReports = () => {
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="monthly">Monthly Report</SelectItem>
-                  <SelectItem value="quarterly">Quarterly Report</SelectItem>
-                  <SelectItem value="annual">Annual Report</SelectItem>
-                  <SelectItem value="custom">Custom Report</SelectItem>
+                  <SelectItem value="monthly" className="hover:bg-[#843C6D] hover:text-white transition-colors">Monthly Report</SelectItem>
+                  <SelectItem value="quarterly" className="hover:bg-[#843C6D] hover:text-white transition-colors">Quarterly Report</SelectItem>
+                  <SelectItem value="annual" className="hover:bg-[#843C6D] hover:text-white transition-colors">Annual Report</SelectItem>
+                  <SelectItem value="custom" className="hover:bg-[#843C6D] hover:text-white transition-colors">Custom Report</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -293,10 +293,10 @@ export const PayrollReports = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="hover:bg-[#843C6D] hover:text-white transition-colors">
                           <Download className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="hover:bg-[#843C6D] hover:text-white transition-colors">
                           <Eye className="h-4 w-4" />
                         </Button>
                       </div>
@@ -319,19 +319,19 @@ export const PayrollReports = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <Calendar className="w-4 h-4 mr-2" />
               This Month's Payroll
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <BarChart3 className="w-4 h-4 mr-2" />
               Last Quarter Summary
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <TrendingUp className="w-4 h-4 mr-2" />
               Annual Payroll Summary
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <Users className="w-4 h-4 mr-2" />
               Employee Salary Report
             </Button>
@@ -346,19 +346,19 @@ export const PayrollReports = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Export as PDF
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Export as Excel
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <Download className="w-4 h-4 mr-2" />
               Export as CSV
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start hover:bg-[#843C6D] hover:text-white transition-colors">
               <PieChart className="w-4 h-4 mr-2" />
               Generate Charts
             </Button>

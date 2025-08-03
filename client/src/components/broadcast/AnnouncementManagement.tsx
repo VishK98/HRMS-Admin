@@ -82,37 +82,37 @@ export const AnnouncementManagement = () => {
 
   const getStatusBadge = (isActive: boolean) => {
     return isActive ? 
-      <Badge className="bg-success text-success-foreground">Active</Badge> :
-      <Badge className="bg-destructive text-destructive-foreground">Inactive</Badge>;
+      <Badge className="bg-[#843C6D]/10 text-[#843C6D] border border-[#843C6D]/20">Active</Badge> :
+      <Badge className="bg-gray-100 text-gray-800 border border-gray-200">Inactive</Badge>;
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case "general":
-        return <Badge variant="default">General</Badge>;
+        return <Badge className="bg-[#843C6D]/10 text-[#843C6D] border border-[#843C6D]/20">General</Badge>;
       case "important":
-        return <Badge variant="destructive">Important</Badge>;
+        return <Badge className="bg-orange-100 text-orange-800 border border-orange-200">Important</Badge>;
       case "urgent":
-        return <Badge className="bg-red-600 text-white">Urgent</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border border-red-200">Urgent</Badge>;
       case "info":
-        return <Badge variant="secondary">Info</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border border-blue-200">Info</Badge>;
       default:
-        return <Badge variant="outline">{type}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border border-gray-200">{type}</Badge>;
     }
   };
 
   const getTargetAudienceBadge = (targetAudience: string) => {
     switch (targetAudience) {
       case "all":
-        return <Badge variant="default">All Employees</Badge>;
+        return <Badge className="bg-[#843C6D]/10 text-[#843C6D] border border-[#843C6D]/20">All Employees</Badge>;
       case "department":
-        return <Badge variant="secondary">Department</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border border-green-200">Department</Badge>;
       case "designation":
-        return <Badge variant="outline">Designation</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800 border border-purple-200">Designation</Badge>;
       case "specific":
-        return <Badge variant="outline">Specific</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200">Specific</Badge>;
       default:
-        return <Badge variant="outline">{targetAudience}</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border border-gray-200">{targetAudience}</Badge>;
     }
   };
 
@@ -229,7 +229,7 @@ export const AnnouncementManagement = () => {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
                   <Filter className="w-4 h-4" />
                   Status: {statusFilter === "all" ? "All" : statusFilter}
                 </Button>
@@ -248,7 +248,7 @@ export const AnnouncementManagement = () => {
             </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
                   <Megaphone className="w-4 h-4" />
                   Type: {typeFilter === "all" ? "All" : typeFilter}
                 </Button>

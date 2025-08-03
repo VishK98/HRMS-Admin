@@ -546,7 +546,7 @@ export const DataSettings = () => {
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-blue-500" />
+                <Clock className="h-5 w-5 text-[#843C6D]" />
                 <span>Last Backup</span>
               </div>
               <Badge variant="outline">2 hours ago</Badge>

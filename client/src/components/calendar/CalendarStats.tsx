@@ -102,7 +102,7 @@ export const CalendarStats = () => {
       case "event_created":
         return <CalendarDays className="w-4 h-4 text-green-600" />;
       case "event_updated":
-        return <Calendar className="w-4 h-4 text-blue-600" />;
+        return <Calendar className="w-4 h-4 text-[#843C6D]" />;
       case "event_cancelled":
         return <XCircle className="w-4 h-4 text-red-600" />;
       case "event_completed":

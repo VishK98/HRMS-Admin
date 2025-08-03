@@ -128,7 +128,7 @@ export const LeaveRequests = () => {
 
   const getLeaveTypeBadge = (leaveType: string) => {
     const typeConfig = {
-      paid: { color: "bg-blue-100 text-blue-800", label: "Paid" },
+      paid: { color: "bg-[#843C6D]/10 text-[#843C6D]", label: "Paid" },
       casual: { color: "bg-purple-100 text-purple-800", label: "Casual" },
       short: { color: "bg-orange-100 text-orange-800", label: "Short" },
       sick: { color: "bg-red-100 text-red-800", label: "Sick" },
@@ -254,7 +254,7 @@ export const LeaveRequests = () => {
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
                 <Download className="w-4 h-4" />
                 Export
               </Button>
@@ -290,11 +290,11 @@ export const LeaveRequests = () => {
 
              {/* Search Results Summary - Moved here */}
              {searchTerm.trim() && (
-               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+               <div className="p-3 bg-[#843C6D]/5 border border-[#843C6D]/20 rounded-lg">
                  <div className="flex items-center justify-between">
                    <div className="flex items-center gap-2">
-                     <Search className="w-4 h-4 text-blue-600" />
-                     <span className="text-sm font-medium text-blue-800">
+                     <Search className="w-4 h-4 text-[#843C6D]" />
+                     <span className="text-sm font-medium text-[#843C6D]">
                        Search Results for "{searchTerm}"
                      </span>
                    </div>
@@ -303,7 +303,7 @@ export const LeaveRequests = () => {
                    </Badge>
                  </div>
                  {filteredRequests.length > 0 && (
-                   <div className="mt-2 text-xs text-blue-700">
+                   <div className="mt-2 text-xs text-[#843C6D]">
                      Showing {startIndex + 1} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} results
                    </div>
                  )}
@@ -357,13 +357,13 @@ export const LeaveRequests = () => {
 
            {/* Summary Stats */}
            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-[#843C6D]/5 border-[#843C6D]/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-700">Total Requests</span>
+                  <Clock className="w-5 h-5 text-[#843C6D]" />
+                  <span className="text-sm font-medium text-[#843C6D]">Total Requests</span>
                 </div>
-                <div className="mt-2 text-2xl font-bold text-blue-800">
+                <div className="mt-2 text-2xl font-bold text-[#843C6D]">
                   {filteredRequests.length}
                 </div>
               </CardContent>

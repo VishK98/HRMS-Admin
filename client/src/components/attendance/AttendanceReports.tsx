@@ -169,7 +169,7 @@ export const AttendanceReports = () => {
       absent: { color: "bg-red-100 text-red-800", label: "Absent" },
       late: { color: "bg-yellow-100 text-yellow-800", label: "Late" },
       half_day: { color: "bg-orange-100 text-orange-800", label: "Half Day" },
-      on_leave: { color: "bg-blue-100 text-blue-800", label: "On Leave" }
+      on_leave: { color: "bg-[#843C6D]/10 text-[#843C6D]", label: "On Leave" }
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.present;
@@ -258,7 +258,7 @@ export const AttendanceReports = () => {
                 size="sm"
                 onClick={refreshData}
                 disabled={loading}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -271,7 +271,7 @@ export const AttendanceReports = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowReportOptions(!showReportOptions)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 Report Options
@@ -281,7 +281,7 @@ export const AttendanceReports = () => {
                 size="sm"
                 onClick={() => generateReport('csv')}
                 disabled={exportLoading || filteredRecords.length === 0}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 {exportLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -295,7 +295,7 @@ export const AttendanceReports = () => {
                 size="sm"
                 onClick={() => generateReport('pdf')}
                 disabled={exportLoading || filteredRecords.length === 0}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
               >
                 {exportLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -408,13 +408,13 @@ export const AttendanceReports = () => {
 
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-[#843C6D]/5 border-[#843C6D]/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-700">Total Records</span>
+                  <Users className="w-5 h-5 text-[#843C6D]" />
+                  <span className="text-sm font-medium text-[#843C6D]">Total Records</span>
                 </div>
-                <div className="mt-2 text-2xl font-bold text-blue-800">
+                <div className="mt-2 text-2xl font-bold text-[#843C6D]">
                   {stats.totalRecords}
                 </div>
               </CardContent>
