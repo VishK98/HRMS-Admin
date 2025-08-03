@@ -10,8 +10,8 @@ import {
   BarChart3,
   LogOut,
   Home,
-  Moon ,
-  Plane ,
+  Moon,
+  Plane,
   SatelliteDish,
   Shield,
 } from "lucide-react";
@@ -44,9 +44,9 @@ const adminItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Employees", url: "/employees", icon: Users },
   { title: "Attendance", url: "/attendance", icon: Clock },
-  { title: "Leave", url: "/leave", icon: Plane   },
-  { title: "Calendar", url: "/calendar", icon: Calendar },
+  { title: "Leave", url: "/leave", icon: Plane },
   { title: "Payroll", url: "/payroll", icon: IndianRupee },
+  { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "Broadcast", url: "/broadcast", icon: SatelliteDish },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
@@ -130,11 +130,18 @@ export function AppSidebar() {
         {/* User Info & Logout */}
         <div className="mt-auto p-4 border-t border-sidebar-border">
           {!collapsed && (
-            <div className="mb-4 p-3 bg-sidebar-accent/50 rounded-lg">
+            <div className="relative mb-4 p-4 bg-sidebar-accent/50 rounded-lg">
+              {/* Online Badge */}
+              <div className="absolute top-0.5 right-2 flex items-center gap-1 bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                <span>Online</span>
+              </div>
+
+              {/* User Info */}
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-8 h-8 bg-sidebar-primary rounded-full flex items-center justify-center">
                   <span className="text-xs font-semibold text-sidebar-primary-foreground">
-                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -146,13 +153,9 @@ export function AppSidebar() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-xs text-sidebar-foreground/70">Online</span>
-              </div>
             </div>
           )}
-          
+
           {/* Enhanced Logout Button */}
           <Button
             onClick={logout}
@@ -166,13 +169,13 @@ export function AppSidebar() {
               collapsed && "justify-center"
             )}
           >
-            <LogOut className={cn(
-              "w-4 h-4 transition-transform duration-200",
-              "group-hover:scale-110 group-hover:-translate-x-0.5"
-            )} />
-            {!collapsed && (
-              <span className="ml-2">Sign Out</span>
-            )}
+            <LogOut
+              className={cn(
+                "w-4 h-4 transition-transform duration-200",
+                "group-hover:scale-110 group-hover:-translate-x-0.5"
+              )}
+            />
+            {!collapsed && <span className="ml-2">Sign Out</span>}
           </Button>
         </div>
       </SidebarContent>

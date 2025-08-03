@@ -206,12 +206,6 @@ export const CalendarView = () => {
             </Button>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Event
-          </Button>
-        </div>
       </div>
 
       {/* Calendar Grid */}
