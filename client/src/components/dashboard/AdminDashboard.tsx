@@ -107,7 +107,7 @@ export const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-foreground">
             {getGreeting()}
           </h1>
-          <p className="text-muted-foreground">Welcome Back, {user?.name}</p>
+          <p className="text-muted-foreground">Glad You’re Back — Welcome to {user?.name}</p>
         </div>
         <Button className="gap-2 bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200">
           <Plus className="w-4 h-4" />
