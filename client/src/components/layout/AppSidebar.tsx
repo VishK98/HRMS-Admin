@@ -86,7 +86,7 @@ export function AppSidebar() {
       <SidebarContent className="bg-sidebar-background">
         {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
-          <div className="flex items-center justify-center w-8 h-8 bg-sidebar-primary rounded-lg">
+          <div className="flex items-center justify-center w-8 h-8  rounded-lg">
             <Shield className="w-5 h-5 text-sidebar-primary-foreground" />
           </div>
           {!collapsed && (
