@@ -160,28 +160,9 @@ export const EmployeeManagement = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-destructive">{error}</p>
-          <Button onClick={fetchEmployees} className="mt-2">Retry</Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header - Always visible */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Employee Management</h1>
@@ -199,145 +180,167 @@ export const EmployeeManagement = () => {
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Employee Directory</CardTitle>
-          <CardDescription>Search and filter employees</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mb-4">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search employees..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="w-4 h-4" />
-                  Status: {statusFilter === "all" ? "All" : statusFilter.replace("_", " ")}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setStatusFilter("all")}>
-                  All Employees
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("active")}>
-                  Active
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>
-                  Inactive
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("terminated")}>
-                  Terminated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("resigned")}>
-                  Resigned
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      )}
 
-          {/* Employee Table */}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Join Date</TableHead>
-                  <TableHead>Salary</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEmployees.map((employee) => (
-                  <TableRow key={employee._id}>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <p className="font-medium">{employee.firstName} {employee.lastName}</p>
-                        <p className="text-sm text-muted-foreground">{employee.employeeId}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Mail className="w-3 h-3" />
-                          {employee.email}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Phone className="w-3 h-3" />
-                          {employee.phone}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <p className="font-medium">{employee.department}</p>
-                        <p className="text-sm text-muted-foreground">{employee.designation}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(employee.status)}
-                    </TableCell>
-                    <TableCell>
-                      {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {employee.salary?.basic ? `$${employee.salary.basic.toLocaleString()}` : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem 
-                            className="gap-2" 
-                            onClick={() => handleViewDetails(employee)}
-                          >
-                            <Eye className="w-4 h-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="gap-2" 
-                            onClick={() => handleEditEmployee(employee)}
-                          >
-                            <Edit className="w-4 h-4" />
-                            Edit Employee
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="gap-2 text-destructive" 
-                            onClick={() => handleDeleteEmployee(employee)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Delete Employee
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+      {/* Error State */}
+      {error && !loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-destructive">{error}</p>
+            <Button onClick={fetchEmployees} className="mt-2">Retry</Button>
           </div>
+        </div>
+      )}
 
-          {filteredEmployees.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No employees found matching your criteria.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Content - Only show when not loading and no error */}
+      {!loading && !error && (
+        <>
+          {/* Filters and Search */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Employee Directory</CardTitle>
+              <CardDescription>Search and filter employees</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-4">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search employees..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <Filter className="w-4 h-4" />
+                      Status: {statusFilter === "all" ? "All" : statusFilter.replace("_", " ")}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+                      All Employees
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("active")}>
+                      Active
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>
+                      Inactive
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("terminated")}>
+                      Terminated
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("resigned")}>
+                      Resigned
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Employee Table */}
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Employee</TableHead>
+                      <TableHead>Contact</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Join Date</TableHead>
+                      <TableHead>Salary</TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredEmployees.map((employee) => (
+                      <TableRow key={employee._id}>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <p className="font-medium">{employee.firstName} {employee.lastName}</p>
+                            <p className="text-sm text-muted-foreground">{employee.employeeId}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Mail className="w-3 h-3" />
+                              {employee.email}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Phone className="w-3 h-3" />
+                              {employee.phone}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <p className="font-medium">{employee.department}</p>
+                            <p className="text-sm text-muted-foreground">{employee.designation}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(employee.status)}
+                        </TableCell>
+                        <TableCell>
+                          {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {employee.salary?.basic ? `$${employee.salary.basic.toLocaleString()}` : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem 
+                                className="gap-2" 
+                                onClick={() => handleViewDetails(employee)}
+                              >
+                                <Eye className="w-4 h-4" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="gap-2" 
+                                onClick={() => handleEditEmployee(employee)}
+                              >
+                                <Edit className="w-4 h-4" />
+                                Edit Employee
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="gap-2 text-destructive" 
+                                onClick={() => handleDeleteEmployee(employee)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                Delete Employee
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {filteredEmployees.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No employees found matching your criteria.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       {/* Employee Modal */}
       <EmployeeModal

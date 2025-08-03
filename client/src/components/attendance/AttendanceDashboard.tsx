@@ -167,153 +167,156 @@ export const AttendanceDashboard = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-destructive">{error}</p>
-          <Button onClick={fetchDashboardData} className="mt-2">Retry</Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Monthly Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Present</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{getStatusCount("present")}</div>
-            <p className="text-xs text-muted-foreground">Employees</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Absent</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{getStatusCount("absent")}</div>
-            <p className="text-xs text-muted-foreground">Employees</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Late</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{getStatusCount("late")}</div>
-            <p className="text-xs text-muted-foreground">Employees</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Half Day</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{getStatusCount("half_day")}</div>
-            <p className="text-xs text-muted-foreground">Employees</p>
-          </CardContent>
-        </Card>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      )}
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Short Leave</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{getStatusCount("short_leave")}</div>
-            <p className="text-xs text-muted-foreground">Employees</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Error State */}
+      {error && !loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-destructive">{error}</p>
+            <Button onClick={fetchDashboardData} className="mt-2">Retry</Button>
+          </div>
+        </div>
+      )}
 
-      {/* Attendance Regularization Requests */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Attendance Regularization Requests</CardTitle>
-          <CardDescription>View attendance regularization requests and manager actions (manager actions are handled via mobile app)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium">Recent Requests</h3>
+      {/* Content - Only show when not loading and no error */}
+      {!loading && !error && (
+        <>
+          {/* Monthly Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Present</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{getStatusCount("present")}</div>
+                <p className="text-xs text-muted-foreground">Employees</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Absent</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{getStatusCount("absent")}</div>
+                <p className="text-xs text-muted-foreground">Employees</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Late</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{getStatusCount("late")}</div>
+                <p className="text-xs text-muted-foreground">Employees</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Half Day</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{getStatusCount("half_day")}</div>
+                <p className="text-xs text-muted-foreground">Employees</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Short Leave</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{getStatusCount("short_leave")}</div>
+                <p className="text-xs text-muted-foreground">Employees</p>
+              </CardContent>
+            </Card>
           </div>
 
-          {regularizationRequests.length > 0 ? (
-            <div className="rounded-md border overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="p-3 text-left font-medium">Date</th>
-                      <th className="p-3 text-left font-medium">Employee</th>
-                      <th className="p-3 text-left font-medium">Reason</th>
-                      <th className="p-3 text-left font-medium">Reporting Manager</th>
-                      <th className="p-3 text-left font-medium">Manager Action</th>
-                      <th className="p-3 text-left font-medium">Manager Comment</th>
-                      <th className="p-3 text-left font-medium">Requested At</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {regularizationRequests.map((request) => (
-                      <tr key={request._id} className="border-t hover:bg-muted/50">
-                        <td className="p-3">{new Date(request.date).toLocaleDateString()}</td>
-                        <td className="p-3">
-                          {request.employee.firstName} {request.employee.lastName}
-                          <br />
-                          <span className="text-xs text-muted-foreground">{request.employee.employeeId}</span>
-                        </td>
-                        <td className="p-3">{request.reason}</td>
-                        <td className="p-3">
-                          {request.reportingManager?.firstName} {request.reportingManager?.lastName}
-                          <br />
-                          <span className="text-xs text-muted-foreground">{request.reportingManager?.employeeId}</span>
-                        </td>
-                        <td className="p-3">
-                          {getManagerActionBadge(request.managerAction || "pending")}
-                          {request.managerActionDate && (
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {new Date(request.managerActionDate).toLocaleDateString()}
-                            </div>
-                          )}
-                        </td>
-                        <td className="p-3">
-                          {request.managerComment ? (
-                            <span className="text-sm">{request.managerComment}</span>
-                          ) : (
-                            <span className="text-xs text-muted-foreground">No comment</span>
-                          )}
-                        </td>
-                        <td className="p-3">{new Date(request.requestedAt).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* Attendance Regularization Requests */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Attendance Regularization Requests</CardTitle>
+              <CardDescription>View attendance regularization requests and manager actions (manager actions are handled via mobile app)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Recent Requests</h3>
               </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-32">
-              <div className="text-center">
-                <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground" />
-                <p className="mt-2 text-muted-foreground">No regularization requests found</p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+              {regularizationRequests.length > 0 ? (
+                <div className="rounded-md border overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="p-3 text-left font-medium">Date</th>
+                          <th className="p-3 text-left font-medium">Employee</th>
+                          <th className="p-3 text-left font-medium">Reason</th>
+                          <th className="p-3 text-left font-medium">Reporting Manager</th>
+                          <th className="p-3 text-left font-medium">Manager Action</th>
+                          <th className="p-3 text-left font-medium">Manager Comment</th>
+                          <th className="p-3 text-left font-medium">Requested At</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {regularizationRequests.map((request) => (
+                          <tr key={request._id} className="border-t hover:bg-muted/50">
+                            <td className="p-3">{new Date(request.date).toLocaleDateString()}</td>
+                            <td className="p-3">
+                              {request.employee.firstName} {request.employee.lastName}
+                              <br />
+                              <span className="text-xs text-muted-foreground">{request.employee.employeeId}</span>
+                            </td>
+                            <td className="p-3">{request.reason}</td>
+                            <td className="p-3">
+                              {request.reportingManager?.firstName} {request.reportingManager?.lastName}
+                              <br />
+                              <span className="text-xs text-muted-foreground">{request.reportingManager?.employeeId}</span>
+                            </td>
+                            <td className="p-3">
+                              {getManagerActionBadge(request.managerAction || "pending")}
+                              {request.managerActionDate && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  {new Date(request.managerActionDate).toLocaleDateString()}
+                                </div>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              {request.managerComment ? (
+                                <span className="text-sm">{request.managerComment}</span>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">No comment</span>
+                              )}
+                            </td>
+                            <td className="p-3">{new Date(request.requestedAt).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-32">
+                  <div className="text-center">
+                    <AlertCircle className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <p className="mt-2 text-muted-foreground">No regularization requests found</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 };
