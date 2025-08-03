@@ -8,7 +8,8 @@ const {
   getDepartmentById,
   addSubCategory,
 } = require("../controllers/department.controller");
-const { authenticate } = require("../middlewares/auth.middleware");
+const authMiddleware = require("../middlewares/auth.middleware");
+const { authenticate } = authMiddleware;
 
 // Apply authentication middleware to all routes
 router.use(authenticate);

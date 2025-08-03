@@ -108,6 +108,8 @@ export const DesignationModal = ({
   const isEditMode = mode === "edit";
   const isAddMode = mode === "add";
 
+  console.log("DesignationModal render:", { open, mode, designation: !!designation });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -222,7 +224,7 @@ export const DesignationModal = ({
                   Delete
                 </Button>
               )}
-              <Button onClick={handleSubmit}>
+              <Button type="submit">
                 {isAddMode ? "Create" : "Save Changes"}
               </Button>
             </>

@@ -7,7 +7,8 @@ const {
   deleteAnnouncement,
   getAnnouncementById,
 } = require("../controllers/announcement.controller");
-const { authenticate } = require("../middlewares/auth.middleware");
+const authMiddleware = require("../middlewares/auth.middleware");
+const { authenticate } = authMiddleware;
 
 // Apply authentication middleware to all routes
 router.use(authenticate);
@@ -27,4 +28,4 @@ router.put("/:id", updateAnnouncement);
 // Delete an announcement
 router.delete("/:id", deleteAnnouncement);
 
-module.exports = router; 
+module.exports = router;

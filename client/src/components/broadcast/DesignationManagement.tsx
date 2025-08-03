@@ -54,8 +54,9 @@ export const DesignationManagement = () => {
       // Fetch designations from the API
       const response = await apiClient.getDesignationsByCompany(user!.company!._id);
       
-      if (response.success) {
-        setDesignations(response.data!.designations);
+      if (response.success && response.data) {
+        const data = response.data as { designations: Designation[] };
+        setDesignations(data.designations || []);
       } else {
         setError(response.message || "Failed to fetch designations");
       }
@@ -97,9 +98,11 @@ export const DesignationManagement = () => {
   };
 
   const handleAddDesignation = () => {
+    console.log("Add designation clicked");
     setSelectedDesignation(null);
     setModalMode("add");
     setModalOpen(true);
+    console.log("Modal state set:", { modalOpen: true, modalMode: "add" });
   };
 
   const handleSaveDesignation = async (designation: Designation) => {
