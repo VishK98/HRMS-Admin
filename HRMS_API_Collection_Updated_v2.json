@@ -1,0 +1,862 @@
+{
+	"info": {
+		"_postman_id": "hrms-api-collection-updated-v2",
+		"name": "HRMS API Collection (Updated v2)",
+		"description": "Complete API collection for HRMS Admin system with authentication, company management, user management, employee management, attendance, leave, regularization, announcements, departments, designations, and holidays.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Check if the HRMS API server is running"
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@othtech.com\",\n  \"password\": \"admin@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate admin/super admin and get JWT token"
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"employee@company.com\",\n  \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"login"
+							]
+						},
+						"description": "Authenticate employee and get JWT token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Announcement Management",
+			"item": [
+				{
+					"name": "Get Company Announcements",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/company/{{company_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"company",
+								"{{company_id}}"
+							]
+						},
+						"description": "Get all announcements for a company (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Announcement by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/{{announcement_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"{{announcement_id}}"
+							]
+						},
+						"description": "Get specific announcement by ID (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Announcement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Important Company Update\",\n  \"content\": \"Please be informed about the upcoming company meeting.\",\n  \"type\": \"general\",\n  \"priority\": \"high\",\n  \"startDate\": \"2024-01-15\",\n  \"endDate\": \"2024-01-20\",\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/announcements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements"
+							]
+						},
+						"description": "Create a new announcement (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Announcement",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Company Update\",\n  \"content\": \"Updated content for the company meeting.\",\n  \"type\": \"urgent\",\n  \"priority\": \"medium\",\n  \"startDate\": \"2024-01-15\",\n  \"endDate\": \"2024-01-25\",\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/announcements/{{announcement_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"{{announcement_id}}"
+							]
+						},
+						"description": "Update an existing announcement (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Announcement",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/{{announcement_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"{{announcement_id}}"
+							]
+						},
+						"description": "Delete an announcement (Admin only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Department Management",
+			"item": [
+				{
+					"name": "Get Company Departments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/departments/company/{{company_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"company",
+								"{{company_id}}"
+							]
+						},
+						"description": "Get all departments for a company (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Department by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/departments/{{department_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{department_id}}"
+							]
+						},
+						"description": "Get specific department by ID (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Department",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Engineering\",\n  \"description\": \"Software Engineering Department\",\n  \"headOfDepartment\": \"John Doe\",\n  \"location\": \"Floor 3\",\n  \"contactEmail\": \"engineering@company.com\",\n  \"contactPhone\": \"+1234567890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/departments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						},
+						"description": "Create a new department (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Department",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Software Engineering\",\n  \"description\": \"Updated Software Engineering Department\",\n  \"headOfDepartment\": \"Jane Smith\",\n  \"location\": \"Floor 3, Building A\",\n  \"contactEmail\": \"software@company.com\",\n  \"contactPhone\": \"+1234567891\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/departments/{{department_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{department_id}}"
+							]
+						},
+						"description": "Update an existing department (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Department",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/departments/{{department_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{department_id}}"
+							]
+						},
+						"description": "Delete a department (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Department Subcategory",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Frontend Development\",\n  \"description\": \"Frontend development team\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/departments/{{department_id}}/subcategories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{department_id}}",
+								"subcategories"
+							]
+						},
+						"description": "Add a subcategory to a department (Admin only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Designation Management",
+			"item": [
+				{
+					"name": "Get Company Designations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/designations/company/{{company_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"designations",
+								"company",
+								"{{company_id}}"
+							]
+						},
+						"description": "Get all designations for a company (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Designation by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/designations/{{designation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"designations",
+								"{{designation_id}}"
+							]
+						},
+						"description": "Get specific designation by ID (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Designation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Senior Software Engineer\",\n  \"description\": \"Senior level software engineering position\",\n  \"level\": \"senior\",\n  \"department\": \"Engineering\",\n  \"salaryRange\": {\n    \"min\": 80000,\n    \"max\": 120000\n  },\n  \"requirements\": [\"5+ years experience\", \"React/Vue.js\", \"Node.js\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/designations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"designations"
+							]
+						},
+						"description": "Create a new designation (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Designation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Lead Software Engineer\",\n  \"description\": \"Updated lead level software engineering position\",\n  \"level\": \"lead\",\n  \"department\": \"Engineering\",\n  \"salaryRange\": {\n    \"min\": 100000,\n    \"max\": 150000\n  },\n  \"requirements\": [\"7+ years experience\", \"React/Vue.js\", \"Node.js\", \"Team leadership\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/designations/{{designation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"designations",
+								"{{designation_id}}"
+							]
+						},
+						"description": "Update an existing designation (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Designation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/designations/{{designation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"designations",
+								"{{designation_id}}"
+							]
+						},
+						"description": "Delete a designation (Admin only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Holiday Management",
+			"item": [
+				{
+					"name": "Get Company Holidays",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/holidays/company/{{company_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"holidays",
+								"company",
+								"{{company_id}}"
+							]
+						},
+						"description": "Get all holidays for a company (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Holiday by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/holidays/{{holiday_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"holidays",
+								"{{holiday_id}}"
+							]
+						},
+						"description": "Get specific holiday by ID (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Holiday",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New Year's Day\",\n  \"date\": \"2024-01-01\",\n  \"type\": \"public\",\n  \"description\": \"New Year celebration\",\n  \"isOptional\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/holidays",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"holidays"
+							]
+						},
+						"description": "Create a new holiday (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Holiday",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated New Year's Day\",\n  \"date\": \"2024-01-01\",\n  \"type\": \"public\",\n  \"description\": \"Updated New Year celebration description\",\n  \"isOptional\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/holidays/{{holiday_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"holidays",
+								"{{holiday_id}}"
+							]
+						},
+						"description": "Update an existing holiday (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Holiday",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/holidays/{{holiday_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"holidays",
+								"{{holiday_id}}"
+							]
+						},
+						"description": "Delete a holiday (Admin only)"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "company_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "employee_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "request_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "attendance_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "leave_request_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "announcement_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "department_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "designation_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "holiday_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 

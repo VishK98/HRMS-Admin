@@ -12,6 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Designation } from "@/types/broadcast";
 
 interface DesignationModalProps {
@@ -42,6 +49,20 @@ export const DesignationModal = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Static department options
+  const staticDepartments = [
+    { _id: "it", name: "Information Technology" },
+    { _id: "hr", name: "Human Resources" },
+    { _id: "finance", name: "Finance" },
+    { _id: "marketing", name: "Marketing" },
+    { _id: "sales", name: "Sales" },
+    { _id: "operations", name: "Operations" },
+    { _id: "engineering", name: "Engineering" },
+    { _id: "customer-support", name: "Customer Support" },
+    { _id: "legal", name: "Legal" },
+    { _id: "administration", name: "Administration" },
+  ];
 
   useEffect(() => {
     if (designation && mode !== "add") {
@@ -108,7 +129,9 @@ export const DesignationModal = ({
   const isEditMode = mode === "edit";
   const isAddMode = mode === "add";
 
-  console.log("DesignationModal render:", { open, mode, designation: !!designation });
+  if (!open) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -170,13 +193,22 @@ export const DesignationModal = ({
 
             <div className="space-y-2">
               <Label htmlFor="department">Department</Label>
-              <Input
-                id="department"
+              <Select
                 value={formData.department}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                placeholder="Enter department"
+                onValueChange={(value) => setFormData({ ...formData, department: value })}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent>
+                  {staticDepartments.map((dept) => (
+                    <SelectItem key={dept._id} value={dept._id}>
+                      {dept.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
