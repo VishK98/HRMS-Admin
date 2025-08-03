@@ -69,7 +69,7 @@ export function AppSidebar() {
 
   const getNavCls = (active: boolean) =>
     cn(
-      "w-full justify-start transition-all duration-200",
+      "w-full justify-start transition-all duration-200 py-5",
       active
         ? "bg-[#521149] text-white shadow-sm"
         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
