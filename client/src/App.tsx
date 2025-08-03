@@ -13,6 +13,7 @@ import Leave from "./pages/Leave";
 import Broadcast from "./pages/Broadcast";
 import { Settings } from "./pages/Settings";
 import Payroll from "./pages/Payroll";
+import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const ProtectedApp = () => {
         <Route path="/employees" element={<Employees />} />
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/leave" element={<Leave />} />
+        <Route path="/calendar" element={<Calendar />} />
         <Route path="/broadcast" element={<Broadcast />} />
         <Route path="/payroll" element={<Payroll />} />
         <Route path="/settings" element={<Settings />} />
