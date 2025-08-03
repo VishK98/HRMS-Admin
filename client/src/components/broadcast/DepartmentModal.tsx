@@ -169,7 +169,7 @@ export const DepartmentModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {isAddMode && "Add New Department"}
@@ -183,18 +183,33 @@ export const DepartmentModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Enter department name"
-              disabled={isViewMode}
-              className={errors.name ? "border-destructive" : ""}
-            />
-            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter department name"
+                disabled={isViewMode}
+                className={errors.name ? "border-destructive" : ""}
+              />
+              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manager">Manager</Label>
+              <Input
+                id="manager"
+                value={formData.manager}
+                onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
+                placeholder="Enter manager name"
+                disabled={isViewMode}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -206,17 +221,6 @@ export const DepartmentModal = ({
               placeholder="Enter description"
               disabled={isViewMode}
               rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="manager">Manager</Label>
-            <Input
-              id="manager"
-              value={formData.manager}
-              onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-              placeholder="Enter manager name"
-              disabled={isViewMode}
             />
           </div>
 
@@ -238,8 +242,8 @@ export const DepartmentModal = ({
               </div>
 
               {/* Subcategory Form */}
-              <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="subCategoryName">Name *</Label>
                     <Input
@@ -302,25 +306,25 @@ export const DepartmentModal = ({
 
               {/* Subcategories List */}
               {formData.subCategories && formData.subCategories.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Current Sub Categories</Label>
-                  <div className="space-y-2">
+                <div className="space-y-3">
+                  <Label>Current Sub Categories ({formData.subCategories.length})</Label>
+                  <div className="grid gap-3 max-h-60 overflow-y-auto scrollbar-hide">
                     {formData.subCategories.map((subCategory, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 border rounded-lg bg-background">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-medium">{subCategory.name}</span>
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="font-medium truncate">{subCategory.name}</span>
                             {subCategory.isActive ? (
-                              <Badge variant="default" className="text-xs">Active</Badge>
+                              <Badge variant="default" className="text-xs flex-shrink-0">Active</Badge>
                             ) : (
-                              <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                              <Badge variant="secondary" className="text-xs flex-shrink-0">Inactive</Badge>
                             )}
                           </div>
                           {subCategory.description && (
-                            <p className="text-sm text-muted-foreground mt-1">{subCategory.description}</p>
+                            <p className="text-sm text-muted-foreground truncate">{subCategory.description}</p>
                           )}
                         </div>
-                        <div className="flex space-x-1">
+                        <div className="flex space-x-1 ml-2 flex-shrink-0">
                           <Button
                             type="button"
                             variant="ghost"
@@ -348,22 +352,22 @@ export const DepartmentModal = ({
 
           {/* View Subcategories */}
           {isViewMode && formData.subCategories && formData.subCategories.length > 0 && (
-            <div className="space-y-2 pt-4 border-t">
-              <Label>Sub Categories</Label>
-              <div className="space-y-2">
+            <div className="space-y-3 pt-4 border-t">
+              <Label>Sub Categories ({formData.subCategories.length})</Label>
+              <div className="grid gap-3 max-h-60 overflow-y-auto scrollbar-hide">
                 {formData.subCategories.map((subCategory, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded-lg bg-muted/30">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium">{subCategory.name}</span>
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-muted/30">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium truncate">{subCategory.name}</span>
                         {subCategory.isActive ? (
-                          <Badge variant="default" className="text-xs">Active</Badge>
+                          <Badge variant="default" className="text-xs flex-shrink-0">Active</Badge>
                         ) : (
-                          <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                          <Badge variant="secondary" className="text-xs flex-shrink-0">Inactive</Badge>
                         )}
                       </div>
                       {subCategory.description && (
-                        <p className="text-sm text-muted-foreground mt-1">{subCategory.description}</p>
+                        <p className="text-sm text-muted-foreground truncate">{subCategory.description}</p>
                       )}
                     </div>
                   </div>
@@ -395,8 +399,9 @@ export const DepartmentModal = ({
             </div>
           )}
         </form>
+        </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0">
           {isViewMode ? (
             <>
               <Button variant="outline" onClick={onCancel}>
