@@ -10,12 +10,20 @@ const employeeRoutes = require("./routes/employee.routes");
 const attendanceRoutes = require("./routes/attendance.routes");
 const regularizationRoutes = require("./routes/regularization.routes");
 const leaveRoutes = require("./routes/leave.routes");
+const designationRoutes = require("./routes/designation.routes");
+const departmentRoutes = require("./routes/department.routes");
+const holidayRoutes = require("./routes/holiday.routes");
+const announcementRoutes = require("./routes/announcement.routes");
 
 // Debug: Log route loading
 console.log("Loading routes...");
 console.log("User routes loaded:", !!userRoutes);
 console.log("Employee routes loaded:", !!employeeRoutes);
 console.log("Leave routes loaded:", !!leaveRoutes);
+console.log("Designation routes loaded:", !!designationRoutes);
+console.log("Department routes loaded:", !!departmentRoutes);
+console.log("Holiday routes loaded:", !!holidayRoutes);
+console.log("Announcement routes loaded:", !!announcementRoutes);
 
 const app = express();
 
@@ -56,6 +64,10 @@ app.use("/api/employees", employeeRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/regularization", regularizationRoutes);
 app.use("/api/leave", leaveRoutes);
+app.use("/api/designations", designationRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/holidays", holidayRoutes);
+app.use("/api/announcements", announcementRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

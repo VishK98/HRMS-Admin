@@ -46,8 +46,7 @@ const adminItems = [
   { title: "Attendance", url: "/attendance", icon: Clock },
   { title: "Leave", url: "/leave", icon: Plane   },
   { title: "Payroll", url: "/payroll", icon: IndianRupee },
-  { title: "Calendar", url: "/designations", icon: Calendar },
-  { title: "Broadcast", url: "/departments", icon: SatelliteDish },
+  { title: "Broadcast", url: "/broadcast", icon: SatelliteDish },
   { title: "Settings", url: "/company-settings", icon: Settings },
 ];
 

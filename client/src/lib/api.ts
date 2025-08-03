@@ -234,6 +234,114 @@ class ApiClient {
 
     return this.request(`/leave/summary?${queryParams.toString()}`);
   }
+
+  // Broadcast Management endpoints
+  // Designations
+  async getDesignationsByCompany(companyId: string) {
+    return this.request(`/designations/company/${companyId}`);
+  }
+
+  async createDesignation(designationData: any) {
+    return this.request('/designations', {
+      method: 'POST',
+      body: JSON.stringify(designationData),
+    });
+  }
+
+  async updateDesignation(designationId: string, updateData: any) {
+    return this.request(`/designations/${designationId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+    });
+  }
+
+  async deleteDesignation(designationId: string) {
+    return this.request(`/designations/${designationId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Departments
+  async getDepartmentsByCompany(companyId: string) {
+    return this.request(`/departments/company/${companyId}`);
+  }
+
+  async createDepartment(departmentData: any) {
+    return this.request('/departments', {
+      method: 'POST',
+      body: JSON.stringify(departmentData),
+    });
+  }
+
+  async updateDepartment(departmentId: string, updateData: any) {
+    return this.request(`/departments/${departmentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+    });
+  }
+
+  async deleteDepartment(departmentId: string) {
+    return this.request(`/departments/${departmentId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async addSubCategory(departmentId: string, subCategoryData: any) {
+    return this.request(`/departments/${departmentId}/subcategories`, {
+      method: 'POST',
+      body: JSON.stringify(subCategoryData),
+    });
+  }
+
+  // Holidays
+  async getHolidaysByCompany(companyId: string) {
+    return this.request(`/holidays/company/${companyId}`);
+  }
+
+  async createHoliday(holidayData: any) {
+    return this.request('/holidays', {
+      method: 'POST',
+      body: JSON.stringify(holidayData),
+    });
+  }
+
+  async updateHoliday(holidayId: string, updateData: any) {
+    return this.request(`/holidays/${holidayId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+    });
+  }
+
+  async deleteHoliday(holidayId: string) {
+    return this.request(`/holidays/${holidayId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Announcements
+  async getAnnouncementsByCompany(companyId: string) {
+    return this.request(`/announcements/company/${companyId}`);
+  }
+
+  async createAnnouncement(announcementData: any) {
+    return this.request('/announcements', {
+      method: 'POST',
+      body: JSON.stringify(announcementData),
+    });
+  }
+
+  async updateAnnouncement(announcementId: string, updateData: any) {
+    return this.request(`/announcements/${announcementId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+    });
+  }
+
+  async deleteAnnouncement(announcementId: string) {
+    return this.request(`/announcements/${announcementId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiClient = new ApiClient(); 
