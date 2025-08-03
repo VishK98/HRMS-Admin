@@ -71,7 +71,7 @@ export function AppSidebar() {
     cn(
       "w-full justify-start transition-all duration-200",
       active
-        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+        ? "bg-[#521149] text-white shadow-sm"
         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
     );
 
@@ -139,11 +139,20 @@ export function AppSidebar() {
 
               {/* User Info */}
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-sidebar-primary rounded-full flex items-center justify-center">
-                  <span className="text-xs font-semibold text-sidebar-primary-foreground">
-                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center",
+                    "bg-gradient-to-br from-[#521138] to-[#843C6D]",
+                    "text-white font-bold text-sm shadow-sm"
+                  )}
+                >
+                  <span>
+                    {String(user?.company_name || user?.name || "OT")
+                      .charAt(0)
+                      .toUpperCase()}
                   </span>
                 </div>
+
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-sidebar-foreground truncate">
                     {user?.name}

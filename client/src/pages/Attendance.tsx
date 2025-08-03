@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, CheckCircle, XCircle, User, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { AttendanceDashboard } from "@/components/attendance/AttendanceDashboard";
 import { CheckInOut } from "@/components/attendance/CheckInOut";
 import { AttendanceReports } from "@/components/attendance/AttendanceReports";
@@ -23,24 +24,39 @@ export default function Attendance() {
       {/* Navigation Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-border">
         <Button
-          variant={activeTab === "dashboard" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "dashboard" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("dashboard")}
         >
           <Calendar className="w-4 h-4" />
           Dashboard
         </Button>
         <Button
-          variant={activeTab === "check" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "check" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("check")}
         >
           <Clock className="w-4 h-4" />
           Check In/Out
         </Button>
         <Button
-          variant={activeTab === "reports" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "reports" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("reports")}
         >
           <User className="w-4 h-4" />

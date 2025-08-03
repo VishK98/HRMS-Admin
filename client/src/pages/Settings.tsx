@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Settings as SettingsIcon, Building2, Bell, Shield, Database } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 import { CompanySettings } from "@/components/settings/CompanySettings";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { NotificationSettings } from "@/components/settings/NotificationSettings";
@@ -25,32 +26,52 @@ export default function Settings() {
       {/* Navigation Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-border">
         <Button
-          variant={activeTab === "company" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "company" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("company")}
         >
           <Building2 className="w-4 h-4" />
           Company
         </Button>
         <Button
-          variant={activeTab === "notifications" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "notifications" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("notifications")}
         >
           <Bell className="w-4 h-4" />
           Notifications
         </Button>
         <Button
-          variant={activeTab === "security" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "security" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("security")}
         >
           <Shield className="w-4 h-4" />
           Security
         </Button>
         <Button
-          variant={activeTab === "data" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "data" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("data")}
         >
           <Database className="w-4 h-4" />

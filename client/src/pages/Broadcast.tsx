@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Building2, Users, Calendar, Megaphone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 import { DesignationManagement } from "@/components/broadcast/DesignationManagement";
 import { DepartmentManagement } from "@/components/broadcast/DepartmentManagement";
 import { HolidayManagement } from "@/components/broadcast/HolidayManagement";
@@ -23,32 +24,52 @@ export default function Broadcast() {
       {/* Navigation Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-border">
         <Button
-          variant={activeTab === "designations" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "designations" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("designations")}
         >
           <Users className="w-4 h-4" />
           Designations
         </Button>
         <Button
-          variant={activeTab === "departments" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "departments" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("departments")}
         >
           <Building2 className="w-4 h-4" />
           Departments
         </Button>
         <Button
-          variant={activeTab === "holidays" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "holidays" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("holidays")}
         >
           <Calendar className="w-4 h-4" />
           Holidays
         </Button>
         <Button
-          variant={activeTab === "announcements" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "announcements" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("announcements")}
         >
           <Megaphone className="w-4 h-4" />
