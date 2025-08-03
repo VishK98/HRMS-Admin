@@ -11,7 +11,7 @@ import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
 import Leave from "./pages/Leave";
 import Broadcast from "./pages/Broadcast";
-import { Settings } from "./pages/Settings";
+import Settings from "./pages/Settings";
 import Payroll from "./pages/Payroll";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
