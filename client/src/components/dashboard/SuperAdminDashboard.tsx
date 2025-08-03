@@ -8,6 +8,25 @@ import {
 } from "lucide-react";
 import { CompanyRegistration } from '@/components/companies/CompanyRegistration';
 import { CompaniesList } from '@/components/companies/CompaniesList';
+import { useAuth } from "@/contexts/AuthContext";
+
+// Function to get dynamic greeting based on IST time
+const getGreeting = () => {
+  // Get current time in IST (UTC + 5:30)
+  const now = new Date();
+  const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000)); // Add 5:30 hours for IST
+  const hour = istTime.getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return "Good morning";
+  } else if (hour >= 12 && hour < 17) {
+    return "Good afternoon";
+  } else if (hour >= 17 && hour < 21) {
+    return "Good evening";
+  } else {
+    return "Good night";
+  }
+};
 
 type DashboardView = 'overview' | 'register-company' | 'companies-list';
 
@@ -55,6 +74,7 @@ const recentCompanies = [
 
 export const SuperAdminDashboard = () => {
   const [currentView, setCurrentView] = useState<DashboardView>('overview');
+  const { user } = useAuth();
 
   const renderView = () => {
     switch (currentView) {
@@ -68,8 +88,8 @@ export const SuperAdminDashboard = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Super Admin Dashboard</h1>
-                <p className="text-muted-foreground">Manage companies and platform-wide settings</p>
+                <h1 className="text-3xl font-bold text-foreground">{getGreeting()}</h1>
+                <p className="text-muted-foreground">Welcome back, {user?.name}</p>
               </div>
               <div className="flex gap-2">
                 <Button 

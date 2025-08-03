@@ -1,12 +1,46 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Users, Clock, Calendar, DollarSign, 
-  UserCheck, UserX, Plus, TrendingUp, AlertCircle
+import {
+  Users,
+  Clock,
+  Calendar,
+  DollarSign,
+  UserCheck,
+  UserX,
+  Plus,
+  TrendingUp,
+  AlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+
+// Function to get dynamic greeting based on IST time
+const getGreeting = () => {
+  const nowIST = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+    hour: "numeric",
+    hour12: false,
+  });
+
+  const hour = parseInt(nowIST, 10);
+
+  if (hour >= 5 && hour < 12) {
+    return "Good Morning";
+  } else if (hour >= 12 && hour < 17) {
+    return "Good Afternoon";
+  } else if (hour >= 17 && hour < 21) {
+    return "Good Evening";
+  } else {
+    return "Good Night";
+  }
+};
 
 const stats = [
   {
@@ -14,29 +48,29 @@ const stats = [
     value: "85",
     change: "+3 this month",
     icon: Users,
-    color: "text-primary"
+    color: "text-primary",
   },
   {
     title: "Present Today",
     value: "78",
     change: "91.8% attendance",
     icon: UserCheck,
-    color: "text-success"
+    color: "text-success",
   },
   {
     title: "Pending Leaves",
     value: "12",
     change: "Needs approval",
     icon: Calendar,
-    color: "text-warning"
+    color: "text-warning",
   },
   {
     title: "Monthly Payroll",
     value: "$45,890",
     change: "Processing",
     icon: DollarSign,
-    color: "text-accent"
-  }
+    color: "text-accent",
+  },
 ];
 
 const recentActivities = [
@@ -47,8 +81,18 @@ const recentActivities = [
 ];
 
 const pendingApprovals = [
-  { name: "Sarah Wilson", type: "Sick Leave", duration: "2 days", date: "Jan 25-26" },
-  { name: "Mike Johnson", type: "Vacation", duration: "5 days", date: "Feb 1-5" },
+  {
+    name: "Sarah Wilson",
+    type: "Sick Leave",
+    duration: "2 days",
+    date: "Jan 25-26",
+  },
+  {
+    name: "Mike Johnson",
+    type: "Vacation",
+    duration: "5 days",
+    date: "Feb 1-5",
+  },
   { name: "Emma Davis", type: "Personal", duration: "1 day", date: "Jan 30" },
 ];
 
@@ -60,8 +104,10 @@ export const AdminDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {user?.name} • {user?.company_name}</p>
+          <h1 className="text-3xl font-bold text-foreground">
+            {getGreeting()}
+          </h1>
+          <p className="text-muted-foreground">Welcome Back, {user?.name}</p>
         </div>
         <Button variant="gradient" className="gap-2">
           <Plus className="w-4 h-4" />
@@ -80,8 +126,12 @@ export const AdminDashboard = () => {
               <stat.icon className={`w-5 h-5 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+              <div className="text-2xl font-bold text-foreground">
+                {stat.value}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stat.change}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -99,10 +149,12 @@ export const AdminDashboard = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Attendance Rate</span>
-                <span className="text-sm text-muted-foreground">78/85 (91.8%)</span>
+                <span className="text-sm text-muted-foreground">
+                  78/85 (91.8%)
+                </span>
               </div>
               <Progress value={91.8} className="h-2" />
-              
+
               <div className="grid grid-cols-3 gap-4 mt-6">
                 <div className="text-center p-4 rounded-lg bg-success/10">
                   <UserCheck className="w-6 h-6 text-success mx-auto mb-2" />
@@ -133,24 +185,41 @@ export const AdminDashboard = () => {
                   <AlertCircle className="w-5 h-5 text-warning" />
                   Pending Approvals
                 </CardTitle>
-                <CardDescription>Leave requests waiting for approval</CardDescription>
+                <CardDescription>
+                  Leave requests waiting for approval
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {pendingApprovals.map((approval, index) => (
-                <div key={index} className="p-3 rounded-lg bg-muted/30 space-y-1">
+                <div
+                  key={index}
+                  className="p-3 rounded-lg bg-muted/30 space-y-1"
+                >
                   <div className="flex items-center justify-between">
                     <p className="font-medium text-sm">{approval.name}</p>
-                    <Badge variant="outline" className="text-xs">{approval.type}</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {approval.type}
+                    </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{approval.duration} • {approval.date}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {approval.duration} • {approval.date}
+                  </p>
                   <div className="flex gap-2 mt-2">
-                    <Button size="sm" variant="success" className="h-6 px-2 text-xs">
+                    <Button
+                      size="sm"
+                      variant="success"
+                      className="h-6 px-2 text-xs"
+                    >
                       Approve
                     </Button>
-                    <Button size="sm" variant="outline" className="h-6 px-2 text-xs">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 px-2 text-xs"
+                    >
                       Reject
                     </Button>
                   </div>
@@ -170,11 +239,16 @@ export const AdminDashboard = () => {
         <CardContent>
           <div className="space-y-3">
             {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
+              >
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{activity.action}</p>
-                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activity.time}
+                  </p>
                 </div>
                 <Badge variant="outline" className="text-xs capitalize">
                   {activity.type}
