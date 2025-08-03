@@ -19,7 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Designation } from "@/types/broadcast";
+import { Designation, Department } from "@/types/broadcast";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/lib/api";
 
 interface DesignationModalProps {
   open: boolean;
@@ -40,6 +42,7 @@ export const DesignationModal = ({
   onDelete,
   onCancel,
 }: DesignationModalProps) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState<Partial<Designation>>({
     name: "",
     description: "",
@@ -49,20 +52,44 @@ export const DesignationModal = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
 
-  // Static department options
-  const staticDepartments = [
-    { _id: "it", name: "Information Technology" },
-    { _id: "hr", name: "Human Resources" },
-    { _id: "finance", name: "Finance" },
-    { _id: "marketing", name: "Marketing" },
-    { _id: "sales", name: "Sales" },
-    { _id: "operations", name: "Operations" },
-    { _id: "engineering", name: "Engineering" },
-    { _id: "customer-support", name: "Customer Support" },
-    { _id: "legal", name: "Legal" },
-    { _id: "administration", name: "Administration" },
-  ];
+  // Fetch departments when modal opens
+  useEffect(() => {
+    console.log("Modal useEffect triggered:", { open, user: user?.company?._id });
+    if (open && user?.company?._id) {
+      fetchDepartments();
+    } else if (open && !user?.company?._id) {
+      console.error("No company ID found for user:", user);
+    }
+  }, [open, user]);
+
+  const fetchDepartments = async () => {
+    setLoadingDepartments(true);
+    
+    try {
+      console.log("Fetching departments for company:", user!.company!._id);
+      console.log("Token available:", !!localStorage.getItem('hrms_token'));
+      
+      const response = await apiClient.getDepartmentsByCompany(user!.company!._id);
+      console.log("Departments response:", response);
+      
+      if (response.success) {
+        const departments = (response.data as any)?.departments || [];
+        console.log("Setting departments:", departments);
+        setDepartments(departments);
+      } else {
+        console.error("Failed to fetch departments:", response.message);
+        setDepartments([]);
+      }
+    } catch (err) {
+      console.error("Error fetching departments:", err);
+      setDepartments([]);
+    } finally {
+      setLoadingDepartments(false);
+    }
+  };
 
   useEffect(() => {
     if (designation && mode !== "add") {
@@ -133,8 +160,10 @@ export const DesignationModal = ({
     return null;
   }
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  // Add error boundary
+  try {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
@@ -202,13 +231,24 @@ export const DesignationModal = ({
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
-                  {staticDepartments.map((dept) => (
-                    <SelectItem key={dept._id} value={dept._id}>
-                      {dept.name}
+                  {departments.length > 0 ? (
+                    departments.map((dept) => (
+                      <SelectItem key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-departments" disabled>
+                      {loadingDepartments ? "Loading departments..." : "No departments available"}
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
+              {!loadingDepartments && departments.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No departments found. Please add departments first.
+                </p>
+              )}
             </div>
           </div>
 
@@ -265,4 +305,27 @@ export const DesignationModal = ({
       </DialogContent>
     </Dialog>
   );
+  } catch (error) {
+    console.error("Error rendering DesignationModal:", error);
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+            <DialogDescription>
+              An error occurred while loading the designation modal.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4">
+            <p className="text-destructive">Failed to load designation modal. Please try again.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={onCancel}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 }; 

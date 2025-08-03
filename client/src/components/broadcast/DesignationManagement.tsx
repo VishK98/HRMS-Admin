@@ -99,6 +99,14 @@ export const DesignationManagement = () => {
 
   const handleAddDesignation = () => {
     console.log("Add designation clicked");
+    console.log("Current user:", user);
+    console.log("User company:", user?.company);
+    
+    if (!user?.company?._id) {
+      setError("No company ID found. Please contact your administrator.");
+      return;
+    }
+    
     setSelectedDesignation(null);
     setModalMode("add");
     setModalOpen(true);
