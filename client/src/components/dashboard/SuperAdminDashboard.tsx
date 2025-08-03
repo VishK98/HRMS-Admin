@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,7 +74,26 @@ const recentCompanies = [
 
 export const SuperAdminDashboard = () => {
   const [currentView, setCurrentView] = useState<DashboardView>('overview');
+  const [currentTime, setCurrentTime] = useState(new Date());
   const { user } = useAuth();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      timeZone: 'Asia/Kolkata',
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   const renderView = () => {
     switch (currentView) {
@@ -88,7 +107,12 @@ export const SuperAdminDashboard = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">{getGreeting()}</h1>
+                <div className="flex items-center gap-6">
+                  <h1 className="text-3xl font-bold text-foreground">{getGreeting()}</h1>
+                  <div className="text-3xl font-bold text-foreground">
+                    {formatTime(currentTime)}
+                  </div>
+                </div>
                 <p className="text-muted-foreground">Welcome back, {user?.name}</p>
               </div>
               <div className="flex gap-2">

@@ -20,6 +20,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
 
 // Function to get dynamic greeting based on IST time
 const getGreeting = () => {
@@ -98,15 +99,39 @@ const pendingApprovals = [
 
 export const AdminDashboard = () => {
   const { user } = useAuth();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      timeZone: 'Asia/Kolkata',
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            {getGreeting()}
-          </h1>
+          <div className="flex items-center gap-6">
+            <h1 className="text-3xl font-bold text-foreground">
+              {getGreeting()}
+            </h1>
+            <div className="text-3xl font-bold text-foreground">
+              {formatTime(currentTime)}
+            </div>
+          </div>
           <p className="text-muted-foreground">Glad You’re Back — Welcome to {user?.name}</p>
         </div>
         <Button className="gap-2 bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200">
