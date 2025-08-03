@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar as CalendarIcon, Plus, Filter, Search, Users, Clock, CheckCircle, AlertCircle, CalendarDays, MapPin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 import { CalendarView } from "@/components/calendar/CalendarView";
 import { EventManagement } from "@/components/calendar/EventManagement";
 import { CalendarStats } from "@/components/calendar/CalendarStats";
@@ -27,24 +28,39 @@ export default function Calendar() {
       {/* Navigation Tabs */}
       <div className="flex space-x-2 border-b">
         <Button
-          variant={activeTab === "view" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "view" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("view")}
         >
           <CalendarDays className="w-4 h-4" />
           Calendar View
         </Button>
         <Button
-          variant={activeTab === "events" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "events" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("events")}
         >
           <CalendarDays className="w-4 h-4" />
           Event Management
         </Button>
         <Button
-          variant={activeTab === "stats" ? "default" : "ghost"}
-          className="gap-2"
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "stats" 
+              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "hover:bg-[#521149] hover:text-white"
+          )}
           onClick={() => setActiveTab("stats")}
         >
           <Users className="w-4 h-4" />
