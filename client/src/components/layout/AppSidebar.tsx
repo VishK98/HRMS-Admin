@@ -47,7 +47,7 @@ const adminItems = [
   { title: "Leave", url: "/leave", icon: Plane   },
   { title: "Payroll", url: "/payroll", icon: IndianRupee },
   { title: "Broadcast", url: "/broadcast", icon: SatelliteDish },
-  { title: "Settings", url: "/company-settings", icon: Settings },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
