@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, Building2, User, Shield, Bell, Database } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Settings as SettingsIcon, Building2, Bell, Shield, Database } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { CompanySettings } from "@/components/settings/CompanySettings";
-import { ProfileSettings } from "@/components/settings/ProfileSettings";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { NotificationSettings } from "@/components/settings/NotificationSettings";
 import { DataSettings } from "@/components/settings/DataSettings";
 
-export const Settings = () => {
-  const [activeTab, setActiveTab] = useState("company");
+export default function Settings() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"company" | "notifications" | "security" | "data">("company");
 
   return (
     <div className="space-y-6">
@@ -21,56 +22,49 @@ export const Settings = () => {
         </p>
       </div>
 
-      {/* Settings Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
-          <TabsTrigger value="company" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Company</span>
-          </TabsTrigger>
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="data" className="flex items-center gap-2">
-            <Database className="h-4 w-4" />
-            <span className="hidden sm:inline">Data</span>
-          </TabsTrigger>
-        </TabsList>
+      {/* Navigation Tabs */}
+      <div className="flex flex-wrap gap-2 border-b border-border">
+        <Button
+          variant={activeTab === "company" ? "default" : "ghost"}
+          className="gap-2"
+          onClick={() => setActiveTab("company")}
+        >
+          <Building2 className="w-4 h-4" />
+          Company
+        </Button>
+        <Button
+          variant={activeTab === "notifications" ? "default" : "ghost"}
+          className="gap-2"
+          onClick={() => setActiveTab("notifications")}
+        >
+          <Bell className="w-4 h-4" />
+          Notifications
+        </Button>
+        <Button
+          variant={activeTab === "security" ? "default" : "ghost"}
+          className="gap-2"
+          onClick={() => setActiveTab("security")}
+        >
+          <Shield className="w-4 h-4" />
+          Security
+        </Button>
+        <Button
+          variant={activeTab === "data" ? "default" : "ghost"}
+          className="gap-2"
+          onClick={() => setActiveTab("data")}
+        >
+          <Database className="w-4 h-4" />
+          Data
+        </Button>
+      </div>
 
-        {/* Company Settings */}
-        <TabsContent value="company" className="space-y-6">
-          <CompanySettings />
-        </TabsContent>
-
-        {/* Profile Settings */}
-        <TabsContent value="profile" className="space-y-6">
-          <ProfileSettings />
-        </TabsContent>
-
-        {/* Security Settings */}
-        <TabsContent value="security" className="space-y-6">
-          <SecuritySettings />
-        </TabsContent>
-
-        {/* Notification Settings */}
-        <TabsContent value="notifications" className="space-y-6">
-          <NotificationSettings />
-        </TabsContent>
-
-        {/* Data Settings */}
-        <TabsContent value="data" className="space-y-6">
-          <DataSettings />
-        </TabsContent>
-      </Tabs>
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === "company" && <CompanySettings />}
+        {activeTab === "notifications" && <NotificationSettings />}
+        {activeTab === "security" && <SecuritySettings />}
+        {activeTab === "data" && <DataSettings />}
+      </div>
     </div>
   );
-}; 
+} 
