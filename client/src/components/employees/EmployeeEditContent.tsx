@@ -99,62 +99,166 @@ export const EmployeeEditContent = ({
               className="border-gray-200 focus:border-gray-800"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="dateOfBirth" className="text-gray-800 font-medium">
-              Date of Birth
-            </Label>
-            <Input
-              id="dateOfBirth"
-              type="date"
-              value={
-                editedEmployee.dateOfBirth
-                  ? new Date(editedEmployee.dateOfBirth)
-                      .toISOString()
-                      .split("T")[0]
-                  : ""
-              }
-              onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="gender" className="text-gray-800 font-medium">
-              Gender
-            </Label>
-            <Input
-              id="gender"
-              value={editedEmployee.gender}
-              onChange={(e) => handleInputChange("gender", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="maritalStatus"
-              className="text-gray-800 font-medium"
-            >
-              Marital Status
-            </Label>
-            <Input
-              id="maritalStatus"
-              value={editedEmployee.maritalStatus || ""}
-              onChange={(e) =>
-                handleInputChange("maritalStatus", e.target.value)
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="bloodGroup" className="text-gray-800 font-medium">
-              Blood Group
-            </Label>
-            <Input
-              id="bloodGroup"
-              value={editedEmployee.bloodGroup || ""}
-              onChange={(e) => handleInputChange("bloodGroup", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
+                     <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="dateOfBirth" className="text-gray-800 font-medium">
+                 Date of Birth
+               </Label>
+               <Input
+                 id="dateOfBirth"
+                 type="date"
+                 value={
+                   editedEmployee.dateOfBirth
+                     ? new Date(editedEmployee.dateOfBirth)
+                         .toISOString()
+                         .split("T")[0]
+                     : ""
+                 }
+                 onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="gender" className="text-gray-800 font-medium">
+                 Gender
+               </Label>
+               <Select
+                 value={editedEmployee.gender}
+                 onValueChange={(value) => handleInputChange("gender", value)}
+               >
+                 <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                   <SelectValue placeholder="Select gender" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem
+                     value="male"
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     Male
+                   </SelectItem>
+                   <SelectItem
+                     value="female"
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     Female
+                   </SelectItem>
+                   <SelectItem
+                     value="other"
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     Other
+                   </SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+           </div>
+                                           <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="maritalStatus"
+                  className="text-gray-800 font-medium"
+                >
+                  Marital Status
+                </Label>
+                <Select
+                  value={editedEmployee.maritalStatus || ""}
+                  onValueChange={(value) => handleInputChange("maritalStatus", value)}
+                >
+                  <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                    <SelectValue placeholder="Select marital status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem
+                      value="single"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      Single
+                    </SelectItem>
+                    <SelectItem
+                      value="married"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      Married
+                    </SelectItem>
+                    <SelectItem
+                      value="divorced"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      Divorced
+                    </SelectItem>
+                    <SelectItem
+                      value="widowed"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      Widowed
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bloodGroup" className="text-gray-800 font-medium">
+                  Blood Group
+                </Label>
+                <Select
+                  value={editedEmployee.bloodGroup || ""}
+                  onValueChange={(value) => handleInputChange("bloodGroup", value)}
+                >
+                  <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                    <SelectValue placeholder="Select blood group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem
+                      value="A+"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      A+
+                    </SelectItem>
+                    <SelectItem
+                      value="A-"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      A-
+                    </SelectItem>
+                    <SelectItem
+                      value="B+"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      B+
+                    </SelectItem>
+                    <SelectItem
+                      value="B-"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      B-
+                    </SelectItem>
+                    <SelectItem
+                      value="AB+"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      AB+
+                    </SelectItem>
+                    <SelectItem
+                      value="AB-"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      AB-
+                    </SelectItem>
+                    <SelectItem
+                      value="O+"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      O+
+                    </SelectItem>
+                    <SelectItem
+                      value="O-"
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      O-
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
         </InfoCard>
 
         {/* Employment Information */}
