@@ -119,7 +119,7 @@ export const EmployeeModal = ({
 
   const renderViewContent = () => (
     <div className="space-y-8">
-      {/* Enhanced Header with Gradient Background */}
+      {/* Enhanced Header with Purple Gradient Background */}
       <div className="relative bg-gradient-to-r from-[#521138] to-[#843C6D] rounded-lg px-4 py-3 text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -128,7 +128,7 @@ export const EmployeeModal = ({
             </div>
             <div>
               <h3 className="text-lg font-bold">
-                {employee.firstName} {employee.lastName}
+                {employee.firstName.toUpperCase()} {employee.lastName.toUpperCase()}
               </h3>
               <p className="text-white/80 text-xs">{employee.employeeId}</p>
               <div className="flex items-center gap-3 mt-1">
@@ -159,27 +159,19 @@ export const EmployeeModal = ({
             >
               {employee.status}
             </Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 p-1"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
 
-      {/* Quick Stats Row */}
+      {/* Quick Stats Row - Simple Black Professional */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="px-3 py-2">
             <div className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-gray-600" />
               <div>
-                <p className="text-xs font-medium text-blue-800">Joined</p>
-                <p className="text-sm font-bold text-blue-900">
+                <p className="text-xs font-medium text-gray-600">Joined</p>
+                <p className="text-sm font-bold text-gray-900">
                   {employee.joiningDate
                     ? new Date(employee.joiningDate).toLocaleDateString()
                     : "N/A"}
@@ -189,15 +181,15 @@ export const EmployeeModal = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="px-3 py-2">
             <div className="flex items-center gap-1.5">
-              <DollarSign className="h-4 w-4 text-green-600" />
+              <DollarSign className="h-4 w-4 text-gray-600" />
               <div>
-                <p className="text-xs font-medium text-green-800">
+                <p className="text-xs font-medium text-gray-600">
                   Basic Salary
                 </p>
-                <p className="text-sm font-bold text-green-900">
+                <p className="text-sm font-bold text-gray-900">
                   {employee.salary?.basic
                     ? `₹${employee.salary.basic.toLocaleString()}`
                     : "Not set"}
@@ -207,13 +199,13 @@ export const EmployeeModal = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="px-3 py-2">
             <div className="flex items-center gap-1.5">
-              <Users className="h-4 w-4 text-purple-600" />
+              <Users className="h-4 w-4 text-gray-600" />
               <div>
-                <p className="text-xs font-medium text-purple-800">Role</p>
-                <p className="text-sm font-bold text-purple-900 capitalize">
+                <p className="text-xs font-medium text-gray-600">Role</p>
+                <p className="text-sm font-bold text-gray-900 capitalize">
                   {employee.role}
                 </p>
               </div>
@@ -221,15 +213,15 @@ export const EmployeeModal = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="px-3 py-2">
             <div className="flex items-center gap-1.5">
-              <Star className="h-4 w-4 text-orange-600" />
+              <Star className="h-4 w-4 text-gray-600" />
               <div>
-                <p className="text-xs font-medium text-orange-800">
+                <p className="text-xs font-medium text-gray-600">
                   Performance
                 </p>
-                <p className="text-sm font-bold text-orange-900">
+                <p className="text-sm font-bold text-gray-900">
                   {employee.performance?.rating
                     ? `${employee.performance.rating}/5`
                     : "N/A"}
@@ -240,49 +232,49 @@ export const EmployeeModal = ({
         </Card>
       </div>
 
-      {/* Main Content Grid */}
+      {/* Main Content Grid - Simple Black Professional */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Personal Information */}
-        <Card className="border-l-4 border-l-blue-500 overflow-hidden">
-          <CardHeader className="bg-blue-50 px-4 py-3 border-b border-blue-100">
-            <CardTitle className="flex items-center gap-1.5 text-blue-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <User className="h-4 w-4" />
               Personal Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 px-4 py-3">
             <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <Mail className="h-3 w-3 text-blue-600" />
-              <span className="text-sm font-medium">{employee.email}</span>
+              <Mail className="h-3 w-3 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900">{employee.email}</span>
             </div>
             <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <Phone className="h-3 w-3 text-green-600" />
-              <span className="text-sm font-medium">{employee.phone}</span>
+              <Phone className="h-3 w-3 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900">{employee.phone}</span>
             </div>
             <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <Calendar className="h-3 w-3 text-purple-600" />
-              <span className="text-sm font-medium">
+              <Calendar className="h-3 w-3 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900">
                 DOB: {new Date(employee.dateOfBirth).toLocaleDateString()}
               </span>
             </div>
             <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <Heart className="h-3 w-3 text-red-600" />
-              <span className="text-sm font-medium capitalize">
+              <Heart className="h-3 w-3 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900 capitalize">
                 Gender: {employee.gender}
               </span>
             </div>
             {employee.maritalStatus && (
               <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                <Shield className="h-3 w-3 text-indigo-600" />
-                <span className="text-sm font-medium capitalize">
+                <Shield className="h-3 w-3 text-gray-600" />
+                <span className="text-sm font-medium text-gray-900 capitalize">
                   Status: {employee.maritalStatus}
                 </span>
               </div>
             )}
             {employee.bloodGroup && (
               <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                <AlertTriangle className="h-3 w-3 text-red-600" />
-                <span className="text-sm font-medium">
+                <AlertTriangle className="h-3 w-3 text-gray-600" />
+                <span className="text-sm font-medium text-gray-900">
                   Blood Group: {employee.bloodGroup}
                 </span>
               </div>
@@ -291,28 +283,28 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Employment Information */}
-        <Card className="border-l-4 border-l-green-500 overflow-hidden">
-          <CardHeader className="bg-green-50 px-4 py-3 border-b border-green-100">
-            <CardTitle className="flex items-center gap-1.5 text-green-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <Building className="h-4 w-4" />
               Employment Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 px-4 py-3">
-            <div className="p-1.5 bg-green-50 rounded-lg">
-              <p className="text-sm font-medium text-green-800">
+            <div className="p-1.5 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium text-gray-800">
                 Department: {employee.department || "Not assigned"}
               </p>
-              <p className="text-xs text-green-600">
+              <p className="text-xs text-gray-600">
                 Designation: {employee.designation || "Not assigned"}
               </p>
             </div>
             {employee.reportingManager && (
-              <div className="p-1.5 bg-blue-50 rounded-lg">
-                <p className="text-sm font-medium text-blue-800">
+              <div className="p-1.5 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-800">
                   Reporting Manager
                 </p>
-                <p className="text-xs text-blue-600">
+                <p className="text-xs text-gray-600">
                   {employee.reportingManager.firstName}{" "}
                   {employee.reportingManager.lastName} (
                   {employee.reportingManager.employeeId})
@@ -320,8 +312,8 @@ export const EmployeeModal = ({
               </div>
             )}
             <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <Calendar className="h-3 w-3 text-green-600" />
-              <span className="text-sm font-medium">
+              <Calendar className="h-3 w-3 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900">
                 Joined:{" "}
                 {employee.joiningDate
                   ? new Date(employee.joiningDate).toLocaleDateString()
@@ -329,8 +321,8 @@ export const EmployeeModal = ({
               </span>
             </div>
             <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <Crown className="h-3 w-3 text-yellow-600" />
-              <span className="text-sm font-medium capitalize">
+              <Crown className="h-3 w-3 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900 capitalize">
                 Role: {employee.role}
               </span>
             </div>
@@ -339,26 +331,26 @@ export const EmployeeModal = ({
 
         {/* Team Information */}
         {employee.team && (
-          <Card className="border-l-4 border-l-purple-500 overflow-hidden">
-            <CardHeader className="bg-purple-50 px-4 py-3 border-b border-purple-100">
-              <CardTitle className="flex items-center gap-1.5 text-purple-800 font-semibold text-sm">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
                 <Users2 className="h-4 w-4" />
                 Team Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 px-4 py-3">
-              <div className="p-1.5 bg-purple-50 rounded-lg">
-                <p className="text-sm font-medium text-purple-800">
+              <div className="p-1.5 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-800">
                   Team: {employee.team.name}
                 </p>
-                <p className="text-xs text-purple-600">
+                <p className="text-xs text-gray-600">
                   {employee.team.members || 0} members
                 </p>
               </div>
               {employee.team.lead && (
-                <div className="p-1.5 bg-blue-50 rounded-lg">
-                  <p className="text-sm font-medium text-blue-800">Team Lead</p>
-                  <p className="text-xs text-blue-600">
+                <div className="p-1.5 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-800">Team Lead</p>
+                  <p className="text-xs text-gray-600">
                     {employee.team.lead.firstName} {employee.team.lead.lastName}{" "}
                     ({employee.team.lead.employeeId})
                   </p>
@@ -366,7 +358,7 @@ export const EmployeeModal = ({
               )}
               {employee.team.projects && employee.team.projects.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-purple-800 mb-1.5">
+                  <p className="text-sm font-medium text-gray-800 mb-1.5">
                     Active Projects
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -374,7 +366,7 @@ export const EmployeeModal = ({
                       <Badge
                         key={index}
                         variant="secondary"
-                        className="bg-purple-100 text-purple-800 text-xs"
+                        className="bg-gray-100 text-gray-800 text-xs"
                       >
                         {project}
                       </Badge>
@@ -388,9 +380,9 @@ export const EmployeeModal = ({
 
         {/* Performance Information */}
         {employee.performance && (
-          <Card className="border-l-4 border-l-orange-500 overflow-hidden">
-            <CardHeader className="bg-orange-50 px-4 py-3 border-b border-orange-100">
-              <CardTitle className="flex items-center gap-1.5 text-orange-800 font-semibold text-sm">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
                 <TrendingUp className="h-4 w-4" />
                 Performance
               </CardTitle>
@@ -398,16 +390,16 @@ export const EmployeeModal = ({
             <CardContent className="space-y-2 px-4 py-3">
               {employee.performance.rating && (
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <Star className="h-3 w-3 text-yellow-600" />
-                  <span className="text-sm font-medium">
+                  <Star className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-900">
                     Rating: {employee.performance.rating}/5
                   </span>
                 </div>
               )}
               {employee.performance.lastReview && (
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <Calendar className="h-3 w-3 text-orange-600" />
-                  <span className="text-sm font-medium">
+                  <Calendar className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-900">
                     Last Review:{" "}
                     {new Date(
                       employee.performance.lastReview
@@ -418,7 +410,7 @@ export const EmployeeModal = ({
               {employee.performance.achievements &&
                 employee.performance.achievements.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium text-orange-800 mb-1.5">
+                    <p className="text-sm font-medium text-gray-800 mb-1.5">
                       Achievements
                     </p>
                     <div className="space-y-1">
@@ -428,8 +420,8 @@ export const EmployeeModal = ({
                             key={index}
                             className="flex items-center gap-1.5 text-xs"
                           >
-                            <Award className="h-3 w-3 text-orange-600" />
-                            <span>{achievement}</span>
+                            <Award className="h-3 w-3 text-gray-600" />
+                            <span className="text-gray-900">{achievement}</span>
                           </div>
                         )
                       )}
@@ -442,50 +434,50 @@ export const EmployeeModal = ({
 
         {/* Leave Balance Information */}
         {employee.leaveBalance && (
-          <Card className="border-l-4 border-l-teal-500 overflow-hidden">
-            <CardHeader className="bg-teal-50 px-4 py-3 border-b border-teal-100">
-              <CardTitle className="flex items-center gap-1.5 text-teal-800 font-semibold text-sm">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
                 <CalendarDays className="h-4 w-4" />
                 Leave Balance
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 px-4 py-3">
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-1.5 bg-teal-50 rounded">
-                  <p className="font-medium text-teal-800">Paid Leave</p>
-                  <p className="text-teal-600 font-bold">
+                <div className="p-1.5 bg-gray-50 rounded">
+                  <p className="font-medium text-gray-800">Paid Leave</p>
+                  <p className="text-gray-900 font-bold">
                     {employee.leaveBalance.paid || 0} days
                   </p>
                 </div>
-                <div className="p-1.5 bg-blue-50 rounded">
-                  <p className="font-medium text-blue-800">Casual Leave</p>
-                  <p className="text-blue-600 font-bold">
+                <div className="p-1.5 bg-gray-50 rounded">
+                  <p className="font-medium text-gray-800">Casual Leave</p>
+                  <p className="text-gray-900 font-bold">
                     {employee.leaveBalance.casual || 0} days
                   </p>
                 </div>
-                <div className="p-1.5 bg-green-50 rounded">
-                  <p className="font-medium text-green-800">Sick Leave</p>
-                  <p className="text-green-600 font-bold">
+                <div className="p-1.5 bg-gray-50 rounded">
+                  <p className="font-medium text-gray-800">Sick Leave</p>
+                  <p className="text-gray-900 font-bold">
                     {employee.leaveBalance.sick || 0} days
                   </p>
                 </div>
-                <div className="p-1.5 bg-purple-50 rounded">
-                  <p className="font-medium text-purple-800">Short Leave</p>
-                  <p className="text-purple-600 font-bold">
+                <div className="p-1.5 bg-gray-50 rounded">
+                  <p className="font-medium text-gray-800">Short Leave</p>
+                  <p className="text-gray-900 font-bold">
                     {employee.leaveBalance.short || 0} days
                   </p>
                 </div>
-                <div className="p-1.5 bg-orange-50 rounded">
-                  <p className="font-medium text-orange-800">
+                <div className="p-1.5 bg-gray-50 rounded">
+                  <p className="font-medium text-gray-800">
                     Compensatory Off
                   </p>
-                  <p className="text-orange-600 font-bold">
+                  <p className="text-gray-900 font-bold">
                     {employee.leaveBalance.compensatory || 0} days
                   </p>
                 </div>
-                <div className="p-1.5 bg-indigo-50 rounded">
-                  <p className="font-medium text-indigo-800">Total Balance</p>
-                  <p className="text-indigo-600 font-bold">
+                <div className="p-1.5 bg-gray-50 rounded">
+                  <p className="font-medium text-gray-800">Total Balance</p>
+                  <p className="text-gray-900 font-bold">
                     {employee.leaveBalance.total || 0} days
                   </p>
                 </div>
@@ -495,58 +487,58 @@ export const EmployeeModal = ({
         )}
 
         {/* Salary Information */}
-        <Card className="border-l-4 border-l-green-500 overflow-hidden">
-          <CardHeader className="bg-green-50 px-4 py-3 border-b border-green-100">
-            <CardTitle className="flex items-center gap-1.5 text-green-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <DollarSign className="h-4 w-4" />
               Salary Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 px-4 py-3">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-1.5 bg-green-50 rounded">
-                <p className="font-medium text-green-800">Basic Pay</p>
-                <p className="text-green-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Basic Pay</p>
+                <p className="text-gray-900">
                   {employee.salary?.basic
                     ? `₹${employee.salary.basic.toLocaleString()}`
                     : "Not set"}
                 </p>
               </div>
-              <div className="p-1.5 bg-blue-50 rounded">
-                <p className="font-medium text-blue-800">HRA</p>
-                <p className="text-blue-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">HRA</p>
+                <p className="text-gray-900">
                   {employee.salary?.hra
                     ? `₹${employee.salary.hra.toLocaleString()}`
                     : "Not set"}
                 </p>
               </div>
-              <div className="p-1.5 bg-purple-50 rounded">
-                <p className="font-medium text-purple-800">DA</p>
-                <p className="text-purple-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">DA</p>
+                <p className="text-gray-900">
                   {employee.salary?.da
                     ? `₹${employee.salary.da.toLocaleString()}`
                     : "Not set"}
                 </p>
               </div>
-              <div className="p-1.5 bg-orange-50 rounded">
-                <p className="font-medium text-orange-800">Special Allowance</p>
-                <p className="text-orange-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Special Allowance</p>
+                <p className="text-gray-900">
                   {employee.salary?.specialAllowance
                     ? `₹${employee.salary.specialAllowance.toLocaleString()}`
                     : "Not set"}
                 </p>
               </div>
-              <div className="p-1.5 bg-pink-50 rounded">
-                <p className="font-medium text-pink-800">Transport Allowance</p>
-                <p className="text-pink-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Transport Allowance</p>
+                <p className="text-gray-900">
                   {employee.salary?.transportAllowance
                     ? `₹${employee.salary.transportAllowance.toLocaleString()}`
                     : "Not set"}
                 </p>
               </div>
-              <div className="p-1.5 bg-indigo-50 rounded">
-                <p className="font-medium text-indigo-800">Medical Allowance</p>
-                <p className="text-indigo-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Medical Allowance</p>
+                <p className="text-gray-900">
                   {employee.salary?.medicalAllowance
                     ? `₹${employee.salary.medicalAllowance.toLocaleString()}`
                     : "Not set"}
@@ -554,8 +546,8 @@ export const EmployeeModal = ({
               </div>
             </div>
             {employee.salary?.totalSalary && (
-              <div className="pt-2 border-t border-green-200">
-                <p className="font-bold text-sm text-green-800">
+              <div className="pt-2 border-t border-gray-200">
+                <p className="font-bold text-sm text-gray-900">
                   Total: ₹{employee.salary.totalSalary.toLocaleString()}
                 </p>
               </div>
@@ -564,9 +556,9 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Bank Details */}
-        <Card className="border-l-4 border-l-indigo-500 overflow-hidden">
-          <CardHeader className="bg-indigo-50 px-4 py-3 border-b border-indigo-100">
-            <CardTitle className="flex items-center gap-1.5 text-indigo-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <CreditCard className="h-4 w-4" />
               Bank Details
             </CardTitle>
@@ -575,45 +567,45 @@ export const EmployeeModal = ({
             {employee.bankDetails ? (
               <>
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <CreditCard className="h-3 w-3 text-indigo-600" />
+                  <CreditCard className="h-3 w-3 text-gray-600" />
                   <div>
-                    <p className="text-sm font-medium text-indigo-800">
+                    <p className="text-sm font-medium text-gray-800">
                       Bank Name
                     </p>
-                    <p className="text-xs text-indigo-600">
+                    <p className="text-xs text-gray-600">
                       {employee.bankDetails.bankName}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <FileText className="h-3 w-3 text-indigo-600" />
+                  <FileText className="h-3 w-3 text-gray-600" />
                   <div>
-                    <p className="text-sm font-medium text-indigo-800">
+                    <p className="text-sm font-medium text-gray-800">
                       Account Number
                     </p>
-                    <p className="text-xs text-indigo-600">
+                    <p className="text-xs text-gray-600">
                       {employee.bankDetails.accountNumber}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <IdCard className="h-3 w-3 text-indigo-600" />
+                  <IdCard className="h-3 w-3 text-gray-600" />
                   <div>
-                    <p className="text-sm font-medium text-indigo-800">
+                    <p className="text-sm font-medium text-gray-800">
                       IFSC Code
                     </p>
-                    <p className="text-xs text-indigo-600">
+                    <p className="text-xs text-gray-600">
                       {employee.bankDetails.ifscCode}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <Building className="h-3 w-3 text-indigo-600" />
+                  <Building className="h-3 w-3 text-gray-600" />
                   <div>
-                    <p className="text-sm font-medium text-indigo-800">
+                    <p className="text-sm font-medium text-gray-800">
                       Branch
                     </p>
-                    <p className="text-xs text-indigo-600">
+                    <p className="text-xs text-gray-600">
                       {employee.bankDetails.branchName}
                     </p>
                   </div>
@@ -628,27 +620,27 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Current Address */}
-        <Card className="border-l-4 border-l-red-500 overflow-hidden">
-          <CardHeader className="bg-red-50 px-4 py-3 border-b border-red-100">
-            <CardTitle className="flex items-center gap-1.5 text-red-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <MapPin className="h-4 w-4" />
               Current Address
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 px-4 py-3">
             <div className="flex items-start gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-              <MapPin className="h-3 w-3 text-red-600 mt-0.5" />
+              <MapPin className="h-3 w-3 text-gray-600 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-red-800">
+                <p className="text-sm font-medium text-gray-900">
                   {employee.address?.street || "Not provided"}
                 </p>
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-gray-600">
                   {employee.address?.city || ""}
                   {employee.address?.city && ", "}
                   {employee.address?.state || ""}{" "}
                   {employee.address?.zipCode || ""}
                 </p>
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-gray-600">
                   {employee.address?.country || ""}
                 </p>
               </div>
@@ -657,9 +649,9 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Permanent Address */}
-        <Card className="border-l-4 border-l-orange-500 overflow-hidden">
-          <CardHeader className="bg-orange-50 px-4 py-3 border-b border-orange-100">
-            <CardTitle className="flex items-center gap-1.5 text-orange-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <MapPin className="h-4 w-4" />
               Permanent Address
             </CardTitle>
@@ -667,18 +659,18 @@ export const EmployeeModal = ({
           <CardContent className="space-y-2 px-4 py-3">
             {employee.address?.permanentAddress ? (
               <div className="flex items-start gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                <MapPin className="h-3 w-3 text-orange-600 mt-0.5" />
+                <MapPin className="h-3 w-3 text-gray-600 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-orange-800">
+                  <p className="text-sm font-medium text-gray-900">
                     {employee.address.permanentAddress.street || "Not provided"}
                   </p>
-                  <p className="text-xs text-orange-600">
+                  <p className="text-xs text-gray-600">
                     {employee.address.permanentAddress.city || ""}
                     {employee.address.permanentAddress.city && ", "}
                     {employee.address.permanentAddress.state || ""}{" "}
                     {employee.address.permanentAddress.zipCode || ""}
                   </p>
-                  <p className="text-xs text-orange-600">
+                  <p className="text-xs text-gray-600">
                     {employee.address.permanentAddress.country || ""}
                   </p>
                 </div>
@@ -692,9 +684,9 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Emergency Contact */}
-        <Card className="border-l-4 border-l-pink-500 overflow-hidden">
-          <CardHeader className="bg-pink-50 px-4 py-3 border-b border-pink-100">
-            <CardTitle className="flex items-center gap-1.5 text-pink-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <Phone className="h-4 w-4" />
               Emergency Contact
             </CardTitle>
@@ -702,17 +694,17 @@ export const EmployeeModal = ({
           <CardContent className="space-y-2 px-4 py-3">
             {employee.emergencyContact ? (
               <>
-                <div className="p-1.5 bg-pink-50 rounded-lg">
-                  <p className="text-sm font-medium text-pink-800">
+                <div className="p-1.5 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-800">
                     {employee.emergencyContact.name}
                   </p>
-                  <p className="text-xs text-pink-600">
+                  <p className="text-xs text-gray-600">
                     {employee.emergencyContact.relationship}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <Phone className="h-3 w-3 text-pink-600" />
-                  <span className="text-sm font-medium">
+                  <Phone className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-900">
                     {employee.emergencyContact.phone}
                   </span>
                 </div>
@@ -726,42 +718,42 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Documents */}
-        <Card className="border-l-4 border-l-teal-500 overflow-hidden">
-          <CardHeader className="bg-teal-50 px-4 py-3 border-b border-teal-100">
-            <CardTitle className="flex items-center gap-1.5 text-teal-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <IdCard className="h-4 w-4" />
               Documents
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 px-4 py-3">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-1.5 bg-teal-50 rounded">
-                <p className="font-medium text-teal-800">Aadhar</p>
-                <p className="text-teal-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Aadhar</p>
+                <p className="text-gray-900">
                   {employee.documents?.aadhar || "Not provided"}
                 </p>
               </div>
-              <div className="p-1.5 bg-blue-50 rounded">
-                <p className="font-medium text-blue-800">PAN</p>
-                <p className="text-blue-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">PAN</p>
+                <p className="text-gray-900">
                   {employee.documents?.pan || "Not provided"}
                 </p>
               </div>
-              <div className="p-1.5 bg-purple-50 rounded">
-                <p className="font-medium text-purple-800">Passport</p>
-                <p className="text-purple-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Passport</p>
+                <p className="text-gray-900">
                   {employee.documents?.passport || "Not provided"}
                 </p>
               </div>
-              <div className="p-1.5 bg-orange-50 rounded">
-                <p className="font-medium text-orange-800">Driving License</p>
-                <p className="text-orange-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Driving License</p>
+                <p className="text-gray-900">
                   {employee.documents?.drivingLicense || "Not provided"}
                 </p>
               </div>
-              <div className="p-1.5 bg-pink-50 rounded">
-                <p className="font-medium text-pink-800">Voter ID</p>
-                <p className="text-pink-600">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Voter ID</p>
+                <p className="text-gray-900">
                   {employee.documents?.voterId || "Not provided"}
                 </p>
               </div>
@@ -770,9 +762,9 @@ export const EmployeeModal = ({
         </Card>
 
         {/* Education */}
-        <Card className="border-l-4 border-l-cyan-500 overflow-hidden">
-          <CardHeader className="bg-cyan-50 px-4 py-3 border-b border-cyan-100">
-            <CardTitle className="flex items-center gap-1.5 text-cyan-800 font-semibold text-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
               <GraduationCap className="h-4 w-4" />
               Education
             </CardTitle>
@@ -780,24 +772,24 @@ export const EmployeeModal = ({
           <CardContent className="space-y-2 px-4 py-3">
             {employee.education ? (
               <>
-                <div className="p-1.5 bg-cyan-50 rounded-lg">
-                  <p className="text-sm font-medium text-cyan-800">
+                <div className="p-1.5 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-800">
                     {employee.education.highestQualification}
                   </p>
-                  <p className="text-xs text-cyan-600">
+                  <p className="text-xs text-gray-600">
                     {employee.education.institution}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                  <Calendar className="h-3 w-3 text-cyan-600" />
-                  <span className="text-sm font-medium">
+                  <Calendar className="h-3 w-3 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-900">
                     Completed: {employee.education.yearOfCompletion}
                   </span>
                 </div>
                 {employee.education.percentage && (
                   <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
-                    <Target className="h-3 w-3 text-cyan-600" />
-                    <span className="text-sm font-medium">
+                    <Target className="h-3 w-3 text-gray-600" />
+                    <span className="text-sm font-medium text-gray-900">
                       Percentage: {employee.education.percentage}%
                     </span>
                   </div>
@@ -813,9 +805,9 @@ export const EmployeeModal = ({
 
         {/* Skills */}
         {employee.skills && employee.skills.length > 0 && (
-          <Card className="border-l-4 border-l-emerald-500 overflow-hidden">
-            <CardHeader className="bg-emerald-50 px-4 py-3 border-b border-emerald-100">
-              <CardTitle className="flex items-center gap-1.5 text-emerald-800 font-semibold text-sm">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
                 <UserCheck className="h-4 w-4" />
                 Skills
               </CardTitle>
@@ -826,7 +818,7 @@ export const EmployeeModal = ({
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 text-xs"
+                    className="bg-gray-100 text-gray-800 hover:bg-gray-200 text-xs"
                   >
                     {skill}
                   </Badge>
@@ -838,9 +830,9 @@ export const EmployeeModal = ({
 
         {/* Work Experience */}
         {employee.workExperience && employee.workExperience.length > 0 && (
-          <Card className="lg:col-span-2 border-l-4 border-l-violet-500 overflow-hidden">
-            <CardHeader className="bg-violet-50 px-4 py-3 border-b border-violet-100">
-              <CardTitle className="flex items-center gap-1.5 text-violet-800 font-semibold text-sm">
+          <Card className="lg:col-span-2 bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
                 <Building className="h-4 w-4" />
                 Work Experience
               </CardTitle>
@@ -850,22 +842,22 @@ export const EmployeeModal = ({
                 {employee.workExperience.map((exp, index) => (
                   <div
                     key={index}
-                    className="p-3 border border-violet-200 rounded-lg bg-violet-50/50"
+                    className="p-3 border border-gray-200 rounded-lg bg-gray-50/50"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-sm font-medium text-violet-800">
+                        <p className="text-sm font-medium text-gray-800">
                           {exp.position}
                         </p>
-                        <p className="text-xs text-violet-600">{exp.company}</p>
+                        <p className="text-xs text-gray-600">{exp.company}</p>
                       </div>
-                      <div className="text-xs text-violet-600">
+                      <div className="text-xs text-gray-600">
                         {new Date(exp.fromDate).toLocaleDateString()} -{" "}
                         {new Date(exp.toDate).toLocaleDateString()}
                       </div>
                     </div>
                     {exp.description && (
-                      <p className="text-xs text-violet-600 mt-1.5">
+                      <p className="text-xs text-gray-600 mt-1.5">
                         {exp.description}
                       </p>
                     )}
@@ -876,6 +868,9 @@ export const EmployeeModal = ({
           </Card>
         )}
       </div>
+      
+      {/* Bottom Padding */}
+      <div className="pb-1"></div>
     </div>
   );
 
