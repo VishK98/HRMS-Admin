@@ -924,319 +924,554 @@ export const EmployeeModal = ({
 
   const renderEditContent = () => (
     <div className="space-y-8">
-      {/* Enhanced Edit Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-        <h3 className="text-xl font-bold text-blue-800 mb-2">
-          Edit Employee Information
-        </h3>
-        <p className="text-blue-600">Update the employee's details below</p>
+      {/* Edit Header */}
+      <div className="relative bg-gradient-to-r from-[#521138] to-[#843C6D] rounded-lg px-4 py-3 text-white">
+        <h3 className="text-lg font-bold">Edit Employee Information</h3>
+        <p className="text-white/80 text-xs">Update the employee's details below</p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Personal Information */}
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="bg-blue-50">
-            <CardTitle className="flex items-center gap-2 text-blue-800">
-              <User className="h-5 w-5" />
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <User className="h-4 w-4" />
               Personal Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-4">
+          <CardContent className="space-y-2 px-4 py-3">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label
-                  htmlFor="firstName"
-                  className="text-blue-800 font-medium"
-                >
-                  First Name
-                </Label>
+                <Label htmlFor="firstName" className="text-gray-800 font-medium">First Name</Label>
                 <Input
                   id="firstName"
                   value={editedEmployee.firstName}
-                  onChange={(e) =>
-                    handleInputChange("firstName", e.target.value)
-                  }
-                  className="border-blue-200 focus:border-blue-500"
+                  onChange={e => handleInputChange("firstName", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-blue-800 font-medium">
-                  Last Name
-                </Label>
+                <Label htmlFor="lastName" className="text-gray-800 font-medium">Last Name</Label>
                 <Input
                   id="lastName"
                   value={editedEmployee.lastName}
-                  onChange={(e) =>
-                    handleInputChange("lastName", e.target.value)
-                  }
-                  className="border-blue-200 focus:border-blue-500"
+                  onChange={e => handleInputChange("lastName", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-blue-800 font-medium">
-                Email
-              </Label>
+              <Label htmlFor="email" className="text-gray-800 font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={editedEmployee.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="border-blue-200 focus:border-blue-500"
+                onChange={e => handleInputChange("email", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-blue-800 font-medium">
-                Phone
-              </Label>
+              <Label htmlFor="phone" className="text-gray-800 font-medium">Phone</Label>
               <Input
                 id="phone"
                 value={editedEmployee.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                className="border-blue-200 focus:border-blue-500"
+                onChange={e => handleInputChange("phone", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateOfBirth" className="text-gray-800 font-medium">Date of Birth</Label>
+              <Input
+                id="dateOfBirth"
+                type="date"
+                value={editedEmployee.dateOfBirth ? new Date(editedEmployee.dateOfBirth).toISOString().split("T")[0] : ""}
+                onChange={e => handleInputChange("dateOfBirth", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gender" className="text-gray-800 font-medium">Gender</Label>
+              <Input
+                id="gender"
+                value={editedEmployee.gender}
+                onChange={e => handleInputChange("gender", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="maritalStatus" className="text-gray-800 font-medium">Marital Status</Label>
+              <Input
+                id="maritalStatus"
+                value={editedEmployee.maritalStatus || ""}
+                onChange={e => handleInputChange("maritalStatus", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bloodGroup" className="text-gray-800 font-medium">Blood Group</Label>
+              <Input
+                id="bloodGroup"
+                value={editedEmployee.bloodGroup || ""}
+                onChange={e => handleInputChange("bloodGroup", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
               />
             </div>
           </CardContent>
         </Card>
-
+  
         {/* Employment Information */}
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="bg-green-50">
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <Building className="h-5 w-5" />
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <Building className="h-4 w-4" />
               Employment Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="department"
-                  className="text-green-800 font-medium"
-                >
-                  Department
-                </Label>
-                <Input
-                  id="department"
-                  value={editedEmployee.department || ""}
-                  onChange={(e) =>
-                    handleInputChange("department", e.target.value)
-                  }
-                  className="border-green-200 focus:border-green-500"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="designation"
-                  className="text-green-800 font-medium"
-                >
-                  Designation
-                </Label>
-                <Input
-                  id="designation"
-                  value={editedEmployee.designation || ""}
-                  onChange={(e) =>
-                    handleInputChange("designation", e.target.value)
-                  }
-                  className="border-green-200 focus:border-green-500"
-                />
-              </div>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="space-y-2">
+              <Label htmlFor="department" className="text-gray-800 font-medium">Department</Label>
+              <Input
+                id="department"
+                value={editedEmployee.department || ""}
+                onChange={e => handleInputChange("department", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="designation" className="text-gray-800 font-medium">Designation</Label>
+              <Input
+                id="designation"
+                value={editedEmployee.designation || ""}
+                onChange={e => handleInputChange("designation", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role" className="text-gray-800 font-medium">Role</Label>
+              <Input
+                id="role"
+                value={editedEmployee.role || ""}
+                onChange={e => handleInputChange("role", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="joiningDate" className="text-gray-800 font-medium">Joining Date</Label>
+              <Input
+                id="joiningDate"
+                type="date"
+                value={editedEmployee.joiningDate ? new Date(editedEmployee.joiningDate).toISOString().split("T")[0] : ""}
+                onChange={e => handleInputChange("joiningDate", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            {/* Add more employment fields as needed */}
+          </CardContent>
+        </Card>
+  
+        {/* Leave Balance (Editable) */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <CalendarDays className="h-4 w-4" />
+              Leave Balance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-green-800 font-medium">
-                  Status
-                </Label>
-                <Select
-                  value={editedEmployee.status}
-                  onValueChange={(value) => handleInputChange("status", value)}
-                >
-                  <SelectTrigger className="border-green-200 focus:border-green-500">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem
-                      value="active"
-                      className="hover:bg-[#843C6D] hover:text-white"
-                    >
-                      Active
-                    </SelectItem>
-                    <SelectItem
-                      value="inactive"
-                      className="hover:bg-[#843C6D] hover:text-white"
-                    >
-                      Inactive
-                    </SelectItem>
-                    <SelectItem
-                      value="terminated"
-                      className="hover:bg-[#843C6D] hover:text-white"
-                    >
-                      Terminated
-                    </SelectItem>
-                    <SelectItem
-                      value="resigned"
-                      className="hover:bg-[#843C6D] hover:text-white"
-                    >
-                      Resigned
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Paid Leave</Label>
+                <Input
+                  type="number"
+                  value={editedEmployee.leaveBalance?.paid || ""}
+                  onChange={e => handleNestedInputChange("leaveBalance", "paid", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
+                />
               </div>
               <div className="space-y-2">
-                <Label
-                  htmlFor="joiningDate"
-                  className="text-green-800 font-medium"
-                >
-                  Joining Date
-                </Label>
+                <Label>Casual Leave</Label>
                 <Input
-                  id="joiningDate"
-                  type="date"
-                  value={
-                    editedEmployee.joiningDate
-                      ? new Date(editedEmployee.joiningDate)
-                          .toISOString()
-                          .split("T")[0]
-                      : ""
-                  }
-                  onChange={(e) =>
-                    handleInputChange("joiningDate", e.target.value)
-                  }
-                  className="border-green-200 focus:border-green-500"
+                  type="number"
+                  value={editedEmployee.leaveBalance?.casual || ""}
+                  onChange={e => handleNestedInputChange("leaveBalance", "casual", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Sick Leave</Label>
+                <Input
+                  type="number"
+                  value={editedEmployee.leaveBalance?.sick || ""}
+                  onChange={e => handleNestedInputChange("leaveBalance", "sick", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Short Leave</Label>
+                <Input
+                  type="number"
+                  value={editedEmployee.leaveBalance?.short || ""}
+                  onChange={e => handleNestedInputChange("leaveBalance", "short", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Comp Off</Label>
+                <Input
+                  type="number"
+                  value={editedEmployee.leaveBalance?.compensatory || ""}
+                  onChange={e => handleNestedInputChange("leaveBalance", "compensatory", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Total Leave</Label>
+                <Input
+                  type="number"
+                  value={editedEmployee.leaveBalance?.total || ""}
+                  onChange={e => handleNestedInputChange("leaveBalance", "total", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
             </div>
           </CardContent>
         </Card>
-
+  
         {/* Salary Information */}
-        <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="bg-purple-50">
-            <CardTitle className="flex items-center gap-2 text-purple-800">
-              <IndianRupee className="h-5 w-5" />
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <IndianRupee className="h-4 w-4" />
               Salary Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-4">
+          <CardContent className="space-y-2 px-4 py-3">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label
-                  htmlFor="basicSalary"
-                  className="text-purple-800 font-medium"
-                >
-                  Basic Salary
-                </Label>
+                <Label htmlFor="basicSalary" className="text-gray-800 font-medium">Basic Salary</Label>
                 <Input
                   id="basicSalary"
                   type="number"
                   value={editedEmployee.salary?.basic || ""}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "salary",
-                      "basic",
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  className="border-purple-200 focus:border-purple-500"
+                  onChange={e => handleNestedInputChange("salary", "basic", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="hra" className="text-purple-800 font-medium">
-                  HRA
-                </Label>
+                <Label htmlFor="hra" className="text-gray-800 font-medium">HRA</Label>
                 <Input
                   id="hra"
                   type="number"
                   value={editedEmployee.salary?.hra || ""}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "salary",
-                      "hra",
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  className="border-purple-200 focus:border-purple-500"
+                  onChange={e => handleNestedInputChange("salary", "hra", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="da" className="text-gray-800 font-medium">DA</Label>
+                <Input
+                  id="da"
+                  type="number"
+                  value={editedEmployee.salary?.da || ""}
+                  onChange={e => handleNestedInputChange("salary", "da", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="specialAllowance" className="text-gray-800 font-medium">Special Allowance</Label>
+                <Input
+                  id="specialAllowance"
+                  type="number"
+                  value={editedEmployee.salary?.specialAllowance || ""}
+                  onChange={e => handleNestedInputChange("salary", "specialAllowance", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="transportAllowance" className="text-gray-800 font-medium">Transport Allowance</Label>
+                <Input
+                  id="transportAllowance"
+                  type="number"
+                  value={editedEmployee.salary?.transportAllowance || ""}
+                  onChange={e => handleNestedInputChange("salary", "transportAllowance", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="medicalAllowance" className="text-gray-800 font-medium">Medical Allowance</Label>
+                <Input
+                  id="medicalAllowance"
+                  type="number"
+                  value={editedEmployee.salary?.medicalAllowance || ""}
+                  onChange={e => handleNestedInputChange("salary", "medicalAllowance", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bank Details */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <CreditCard className="h-4 w-4" />
+              Bank Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="space-y-2">
+              <Label htmlFor="bankName" className="text-gray-800 font-medium">Bank Name</Label>
+              <Input
+                id="bankName"
+                value={editedEmployee.bankDetails?.bankName || ""}
+                onChange={e => handleNestedInputChange("bankDetails", "bankName", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="accountNumber" className="text-gray-800 font-medium">Account Number</Label>
+              <Input
+                id="accountNumber"
+                value={editedEmployee.bankDetails?.accountNumber || ""}
+                onChange={e => handleNestedInputChange("bankDetails", "accountNumber", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ifscCode" className="text-gray-800 font-medium">IFSC Code</Label>
+              <Input
+                id="ifscCode"
+                value={editedEmployee.bankDetails?.ifscCode || ""}
+                onChange={e => handleNestedInputChange("bankDetails", "ifscCode", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="branchName" className="text-gray-800 font-medium">Branch Name</Label>
+              <Input
+                id="branchName"
+                value={editedEmployee.bankDetails?.branchName || ""}
+                onChange={e => handleNestedInputChange("bankDetails", "branchName", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Current Address */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <MapPin className="h-4 w-4" />
+              Current Address
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="space-y-2">
+              <Label htmlFor="street" className="text-gray-800 font-medium">Street</Label>
+              <Input
+                id="street"
+                value={editedEmployee.address?.street || ""}
+                onChange={e => handleNestedInputChange("address", "street", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city" className="text-gray-800 font-medium">City</Label>
+                <Input
+                  id="city"
+                  value={editedEmployee.address?.city || ""}
+                  onChange={e => handleNestedInputChange("address", "city", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="state" className="text-gray-800 font-medium">State</Label>
+                <Input
+                  id="state"
+                  value={editedEmployee.address?.state || ""}
+                  onChange={e => handleNestedInputChange("address", "state", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="da" className="text-purple-800 font-medium">
-                  DA
-                </Label>
+                <Label htmlFor="zipCode" className="text-gray-800 font-medium">Zip Code</Label>
                 <Input
-                  id="da"
-                  type="number"
-                  value={editedEmployee.salary?.da || ""}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "salary",
-                      "da",
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  className="border-purple-200 focus:border-purple-500"
+                  id="zipCode"
+                  value={editedEmployee.address?.zipCode || ""}
+                  onChange={e => handleNestedInputChange("address", "zipCode", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
               <div className="space-y-2">
-                <Label
-                  htmlFor="specialAllowance"
-                  className="text-purple-800 font-medium"
-                >
-                  Special Allowance
-                </Label>
+                <Label htmlFor="country" className="text-gray-800 font-medium">Country</Label>
                 <Input
-                  id="specialAllowance"
-                  type="number"
-                  value={editedEmployee.salary?.specialAllowance || ""}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "salary",
-                      "specialAllowance",
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  className="border-purple-200 focus:border-purple-500"
+                  id="country"
+                  value={editedEmployee.address?.country || ""}
+                  onChange={e => handleNestedInputChange("address", "country", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
                 />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Address Information */}
-        <Card className="border-l-4 border-l-orange-500">
-          <CardHeader className="bg-orange-50">
-            <CardTitle className="flex items-center gap-2 text-orange-800">
-              <MapPin className="h-5 w-5" />
-              Address Information
+        {/* Emergency Contact */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <Phone className="h-4 w-4" />
+              Emergency Contact
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-4">
+          <CardContent className="space-y-2 px-4 py-3">
             <div className="space-y-2">
-              <Label htmlFor="address" className="text-orange-800 font-medium">
-                Current Address
-              </Label>
-              <Textarea
-                id="address"
-                value={editedEmployee.address?.street || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "street", e.target.value)
-                }
-                placeholder="Enter full address"
-                className="border-orange-200 focus:border-orange-500"
-                rows={3}
+              <Label htmlFor="emergencyName" className="text-gray-800 font-medium">Contact Name</Label>
+              <Input
+                id="emergencyName"
+                value={editedEmployee.emergencyContact?.name || ""}
+                onChange={e => handleNestedInputChange("emergencyContact", "name", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="emergencyPhone" className="text-gray-800 font-medium">Contact Phone</Label>
+              <Input
+                id="emergencyPhone"
+                value={editedEmployee.emergencyContact?.phone || ""}
+                onChange={e => handleNestedInputChange("emergencyContact", "phone", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="emergencyRelationship" className="text-gray-800 font-medium">Relationship</Label>
+              <Input
+                id="emergencyRelationship"
+                value={editedEmployee.emergencyContact?.relationship || ""}
+                onChange={e => handleNestedInputChange("emergencyContact", "relationship", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
               />
             </div>
           </CardContent>
         </Card>
-      </div>
 
+        {/* Documents */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <IdCard className="h-4 w-4" />
+              Documents
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="aadhar" className="text-gray-800 font-medium">Aadhar</Label>
+                <Input
+                  id="aadhar"
+                  value={editedEmployee.documents?.aadhar || ""}
+                  onChange={e => handleNestedInputChange("documents", "aadhar", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pan" className="text-gray-800 font-medium">PAN</Label>
+                <Input
+                  id="pan"
+                  value={editedEmployee.documents?.pan || ""}
+                  onChange={e => handleNestedInputChange("documents", "pan", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="passport" className="text-gray-800 font-medium">Passport</Label>
+                <Input
+                  id="passport"
+                  value={editedEmployee.documents?.passport || ""}
+                  onChange={e => handleNestedInputChange("documents", "passport", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="drivingLicense" className="text-gray-800 font-medium">Driving License</Label>
+                <Input
+                  id="drivingLicense"
+                  value={editedEmployee.documents?.drivingLicense || ""}
+                  onChange={e => handleNestedInputChange("documents", "drivingLicense", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="voterId" className="text-gray-800 font-medium">Voter ID</Label>
+                <Input
+                  id="voterId"
+                  value={editedEmployee.documents?.voterId || ""}
+                  onChange={e => handleNestedInputChange("documents", "voterId", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Education */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <GraduationCap className="h-4 w-4" />
+              Education
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="space-y-2">
+              <Label htmlFor="highestQualification" className="text-gray-800 font-medium">Highest Qualification</Label>
+              <Input
+                id="highestQualification"
+                value={editedEmployee.education?.highestQualification || ""}
+                onChange={e => handleNestedInputChange("education", "highestQualification", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="institution" className="text-gray-800 font-medium">Institution</Label>
+              <Input
+                id="institution"
+                value={editedEmployee.education?.institution || ""}
+                onChange={e => handleNestedInputChange("education", "institution", e.target.value)}
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="yearOfCompletion" className="text-gray-800 font-medium">Year of Completion</Label>
+                <Input
+                  id="yearOfCompletion"
+                  value={editedEmployee.education?.yearOfCompletion || ""}
+                  onChange={e => handleNestedInputChange("education", "yearOfCompletion", e.target.value)}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="percentage" className="text-gray-800 font-medium">Percentage</Label>
+                <Input
+                  id="percentage"
+                  type="number"
+                  value={editedEmployee.education?.percentage || ""}
+                  onChange={e => handleNestedInputChange("education", "percentage", Number(e.target.value))}
+                  className="border-gray-200 focus:border-gray-800"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+  
       <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button
-          variant="outline"
-          onClick={onCancel}
-          className="hover:bg-gray-100"
-        >
+        <Button variant="outline" onClick={onCancel} className="hover:bg-gray-100">
           Cancel
         </Button>
         <Button
