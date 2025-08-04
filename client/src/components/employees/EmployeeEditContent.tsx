@@ -473,250 +473,261 @@ export const EmployeeEditContent = ({
           </div>
         </InfoCard>
 
-                {/* Current Address */}
-        <InfoCard icon={MapPin} title="Current Address">
-          <div className="space-y-2">
-            <Label htmlFor="street" className="text-gray-800 font-medium">
-              Street
-            </Label>
-            <Input
-              id="street"
-              value={editedEmployee.address?.street || ""}
-              onChange={(e) =>
-                handleNestedInputChange("address", "street", e.target.value)
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city" className="text-gray-800 font-medium">
-                City
-              </Label>
-              <Input
-                id="city"
-                value={editedEmployee.address?.city || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "city", e.target.value)
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="state" className="text-gray-800 font-medium">
-                State
-              </Label>
-              <Input
-                id="state"
-                value={editedEmployee.address?.state || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "state", e.target.value)
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="zipCode" className="text-gray-800 font-medium">
-                Zip Code
-              </Label>
-              <Input
-                id="zipCode"
-                value={editedEmployee.address?.zipCode || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "zipCode", e.target.value)
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country" className="text-gray-800 font-medium">
-                Country
-              </Label>
-              <Input
-                id="country"
-                value={editedEmployee.address?.country || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "country", e.target.value)
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-          </div>
-        </InfoCard>
-
-        {/* Bank Details */}
-        <InfoCard icon={CreditCard} title="Bank Details">
-          <div className="space-y-2">
-            <Label htmlFor="bankName" className="text-gray-800 font-medium">
-              Bank Name
-            </Label>
-            <Input
-              id="bankName"
-              value={editedEmployee.bankDetails?.bankName || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "bankDetails",
-                  "bankName",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="accountNumber"
-              className="text-gray-800 font-medium"
-            >
-              Account Number
-            </Label>
-            <Input
-              id="accountNumber"
-              value={editedEmployee.bankDetails?.accountNumber || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "bankDetails",
-                  "accountNumber",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ifscCode" className="text-gray-800 font-medium">
-              IFSC Code
-            </Label>
-            <Input
-              id="ifscCode"
-              value={editedEmployee.bankDetails?.ifscCode || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "bankDetails",
-                  "ifscCode",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="branchName" className="text-gray-800 font-medium">
-              Branch Name
-            </Label>
-            <Input
-              id="branchName"
-              value={editedEmployee.bankDetails?.branchName || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "bankDetails",
-                  "branchName",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-        </InfoCard>
-
-
       </div>
 
-      {/* Emergency Contact and Education Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Emergency Contact */}
-        <InfoCard icon={Phone} title="Emergency Contact">
-          <div className="space-y-2">
-            <Label
-              htmlFor="emergencyName"
-              className="text-gray-800 font-medium"
-            >
-              Contact Name
-            </Label>
-            <Input
-              id="emergencyName"
-              value={editedEmployee.emergencyContact?.name || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "emergencyContact",
-                  "name",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="emergencyPhone"
-              className="text-gray-800 font-medium"
-            >
-              Contact Phone
-            </Label>
-            <Input
-              id="emergencyPhone"
-              value={editedEmployee.emergencyContact?.phone || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "emergencyContact",
-                  "phone",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label
-              htmlFor="emergencyRelationship"
-              className="text-gray-800 font-medium"
-            >
-              Relationship
-            </Label>
-            <Input
-              id="emergencyRelationship"
-              value={editedEmployee.emergencyContact?.relationship || ""}
-              onChange={(e) =>
-                handleNestedInputChange(
-                  "emergencyContact",
-                  "relationship",
-                  e.target.value
-                )
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-        </InfoCard>
+                    {/* Permanent Address, Current Address, Education, Bank Details Row */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+         {/* Permanent Address */}
+         <InfoCard icon={MapPin} title="Permanent Address">
+           <div className="space-y-2">
+             <Label htmlFor="permanentStreet" className="text-gray-800 font-medium">
+               Street
+             </Label>
+             <Input
+               id="permanentStreet"
+               value={editedEmployee.address?.permanentAddress?.street || ""}
+               onChange={(e) =>
+                 handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, street: e.target.value })
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="permanentCity" className="text-gray-800 font-medium">
+                 City
+               </Label>
+               <Input
+                 id="permanentCity"
+                 value={editedEmployee.address?.permanentAddress?.city || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, city: e.target.value })
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="permanentState" className="text-gray-800 font-medium">
+                 State
+               </Label>
+               <Input
+                 id="permanentState"
+                 value={editedEmployee.address?.permanentAddress?.state || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, state: e.target.value })
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
+           <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="permanentZipCode" className="text-gray-800 font-medium">
+                 Zip Code
+               </Label>
+               <Input
+                 id="permanentZipCode"
+                 value={editedEmployee.address?.permanentAddress?.zipCode || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, zipCode: e.target.value })
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="permanentCountry" className="text-gray-800 font-medium">
+                 Country
+               </Label>
+               <Input
+                 id="permanentCountry"
+                 value={editedEmployee.address?.permanentAddress?.country || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, country: e.target.value })
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
+         </InfoCard>
 
-        {/* Education */}
-        <InfoCard icon={GraduationCap} title="Education">
-          <div className="grid grid-cols-2 gap-4">
-            <FileUpload
-              label="Intermediate Certificate (10+2)"
-              icon="education"
-              onFileChange={(file) => handleFileUpload?.("intermediate", file)}
-            />
-            <FileUpload
-              label="Undergraduate Certificate (UG)"
-              icon="education"
-              onFileChange={(file) => handleFileUpload?.("undergraduate", file)}
-            />
-            <div className="col-start-1 col-end-3 flex justify-center">
-              <div className="w-1/2">
-                <FileUpload
-                  label="Postgraduate Certificate (PG)"
-                  icon="education"
-                  onFileChange={(file) =>
-                    handleFileUpload?.("postgraduate", file)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        </InfoCard>
-      </div>
+         {/* Current Address */}
+         <InfoCard icon={MapPin} title="Current Address">
+           <div className="space-y-2">
+             <Label htmlFor="currentStreet" className="text-gray-800 font-medium">
+               Street
+             </Label>
+             <Input
+               id="currentStreet"
+               value={editedEmployee.address?.street || ""}
+               onChange={(e) =>
+                 handleNestedInputChange("address", "street", e.target.value)
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="currentCity" className="text-gray-800 font-medium">
+                 City
+               </Label>
+               <Input
+                 id="currentCity"
+                 value={editedEmployee.address?.city || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "city", e.target.value)
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="currentState" className="text-gray-800 font-medium">
+                 State
+               </Label>
+               <Input
+                 id="currentState"
+                 value={editedEmployee.address?.state || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "state", e.target.value)
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
+           <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="currentZipCode" className="text-gray-800 font-medium">
+                 Zip Code
+               </Label>
+               <Input
+                 id="currentZipCode"
+                 value={editedEmployee.address?.zipCode || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "zipCode", e.target.value)
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="currentCountry" className="text-gray-800 font-medium">
+                 Country
+               </Label>
+               <Input
+                 id="currentCountry"
+                 value={editedEmployee.address?.country || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "country", e.target.value)
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
+         </InfoCard>
+       </div>
+
+       {/* Education and Bank Details Row */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+         {/* Education */}
+         <InfoCard icon={GraduationCap} title="Education">
+           <div className="grid grid-cols-2 gap-4">
+             <FileUpload
+               label="Intermediate Certificate (10+2)"
+               icon="education"
+               onFileChange={(file) => handleFileUpload?.("intermediate", file)}
+             />
+             <FileUpload
+               label="Undergraduate Certificate (UG)"
+               icon="education"
+               onFileChange={(file) => handleFileUpload?.("undergraduate", file)}
+             />
+             <div className="col-start-1 col-end-3 flex justify-center">
+               <div className="w-1/2">
+                 <FileUpload
+                   label="Postgraduate Certificate (PG)"
+                   icon="education"
+                   onFileChange={(file) =>
+                     handleFileUpload?.("postgraduate", file)
+                   }
+                 />
+               </div>
+             </div>
+           </div>
+         </InfoCard>
+
+         {/* Bank Details */}
+         <InfoCard icon={CreditCard} title="Bank Details">
+           <div className="space-y-2">
+             <Label htmlFor="bankName" className="text-gray-800 font-medium">
+               Bank Name
+             </Label>
+             <Input
+               id="bankName"
+               value={editedEmployee.bankDetails?.bankName || ""}
+               onChange={(e) =>
+                 handleNestedInputChange(
+                   "bankDetails",
+                   "bankName",
+                   e.target.value
+                 )
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="space-y-2">
+             <Label
+               htmlFor="accountNumber"
+               className="text-gray-800 font-medium"
+             >
+               Account Number
+             </Label>
+             <Input
+               id="accountNumber"
+               value={editedEmployee.bankDetails?.accountNumber || ""}
+               onChange={(e) =>
+                 handleNestedInputChange(
+                   "bankDetails",
+                   "accountNumber",
+                   e.target.value
+                 )
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="space-y-2">
+             <Label htmlFor="ifscCode" className="text-gray-800 font-medium">
+               IFSC Code
+             </Label>
+             <Input
+               id="ifscCode"
+               value={editedEmployee.bankDetails?.ifscCode || ""}
+               onChange={(e) =>
+                 handleNestedInputChange(
+                   "bankDetails",
+                   "ifscCode",
+                   e.target.value
+                 )
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="space-y-2">
+             <Label htmlFor="branchName" className="text-gray-800 font-medium">
+               Branch Name
+             </Label>
+             <Input
+               id="branchName"
+               value={editedEmployee.bankDetails?.branchName || ""}
+               onChange={(e) =>
+                 handleNestedInputChange(
+                   "bankDetails",
+                   "branchName",
+                   e.target.value
+                 )
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+         </InfoCard>
+       </div>
 
       {/* Documents */}
       <InfoCard icon={IdCard} title="Documents">
