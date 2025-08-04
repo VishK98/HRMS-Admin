@@ -77,6 +77,45 @@ export const EmployeeModal = ({
     });
   };
 
+  const handleFileUpload = (type: string, file: File | null) => {
+    // Handle file upload logic here
+    // You can implement file upload to server or store file info
+    console.log(`File upload for ${type}:`, file);
+    
+    // For now, we'll store file info in the employee data
+    if (file) {
+      setEditedEmployee((prev) => {
+        if (!prev) return null;
+        
+        // Determine which section this file belongs to
+        if (type === "aadhar" || type === "pan" || type === "passport" || 
+            type === "drivingLicense" || type === "voterId") {
+          return {
+            ...prev,
+            documents: {
+              ...(prev.documents || {}),
+              [type]: {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified,
+              },
+            },
+          };
+        } else if (type === "intermediate" || type === "undergraduate" || 
+                   type === "postgraduate" || type === "other") {
+          // For education documents, we'll store them in a separate state
+          // This avoids type conflicts with the existing Employee interface
+          console.log(`Education document uploaded: ${type}`, file);
+          // You can implement server upload here
+          return prev;
+        }
+        
+        return prev;
+      });
+    }
+  };
+
   const getTitle = () => {
     switch (mode) {
       case "view":
@@ -113,6 +152,7 @@ export const EmployeeModal = ({
             editedEmployee={editedEmployee}
             handleInputChange={handleInputChange}
             handleNestedInputChange={handleNestedInputChange}
+            handleFileUpload={handleFileUpload}
           />
         );
       case "delete":
