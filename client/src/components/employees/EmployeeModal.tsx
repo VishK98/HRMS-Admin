@@ -17,6 +17,7 @@ interface EmployeeModalProps {
   onOpenChange: (open: boolean) => void;
   mode: "view" | "edit" | "delete";
   employee: Employee | null;
+  teamMembers?: Employee[]; // For showing team members if employee is a manager
   onSave?: (updatedEmployee: Employee) => void;
   onDelete?: (employeeId: string) => void;
   onCancel?: () => void;
@@ -27,6 +28,7 @@ export const EmployeeModal = ({
   onOpenChange,
   mode,
   employee,
+  teamMembers = [],
   onSave,
   onDelete,
   onCancel,
@@ -42,11 +44,23 @@ export const EmployeeModal = ({
 
   if (!employee || !editedEmployee) return null;
 
-  const handleSave = () => {
-    if (onSave && editedEmployee) {
-      onSave(editedEmployee);
+  const handleSave = async () => {
+    try {
+      if (mode === 'edit' && !employee) {
+        // Creating new employee
+        if (onSave && editedEmployee) {
+          await onSave(editedEmployee);
+        }
+      } else if (mode === 'edit' && employee) {
+        // Updating existing employee
+        if (onSave && editedEmployee) {
+          await onSave(editedEmployee);
+        }
+      }
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error saving employee:', error);
     }
-    onOpenChange(false);
   };
 
   const handleDelete = () => {
@@ -145,7 +159,7 @@ export const EmployeeModal = ({
   const renderContent = () => {
     switch (mode) {
       case "view":
-        return <EmployeeViewContent employee={employee} />;
+        return <EmployeeViewContent employee={employee} teamMembers={teamMembers} />;
       case "edit":
         return (
           <EmployeeEditContent
