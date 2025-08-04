@@ -24,7 +24,7 @@ import {
   Phone,
   MapPin,
   Calendar,
-  DollarSign,
+  IndianRupee,
   Building,
   User,
   IdCard,
@@ -184,7 +184,7 @@ export const EmployeeModal = ({
         <Card className="bg-white border border-gray-200 shadow-sm">
           <CardContent className="px-3 py-2">
             <div className="flex items-center gap-1.5">
-              <DollarSign className="h-4 w-4 text-gray-600" />
+              <IndianRupee className="h-4 w-4 text-gray-600" />
               <div>
                 <p className="text-xs font-medium text-gray-600">
                   Basic Salary
@@ -490,7 +490,7 @@ export const EmployeeModal = ({
         <Card className="bg-white border border-gray-200 shadow-sm">
           <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
             <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
-              <DollarSign className="h-4 w-4" />
+              <IndianRupee className="h-4 w-4" />
               Salary Details
             </CardTitle>
           </CardHeader>
@@ -1065,7 +1065,7 @@ export const EmployeeModal = ({
         <Card className="border-l-4 border-l-purple-500">
           <CardHeader className="bg-purple-50">
             <CardTitle className="flex items-center gap-2 text-purple-800">
-              <DollarSign className="h-5 w-5" />
+              <IndianRupee className="h-5 w-5" />
               Salary Information
             </CardTitle>
           </CardHeader>
