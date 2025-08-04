@@ -43,9 +43,7 @@ import {
   Heart,
   Briefcase,
   GraduationCap,
-  Globe,
-  Clock,
-  Zap,
+  BedDouble,
   Crown,
   Users2,
   CalendarDays,
@@ -485,6 +483,56 @@ export const EmployeeModal = ({
             </CardContent>
           </Card>
         )}
+
+        {/* Salary Balance Card - Employee Leave Balance */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <CardTitle className="flex items-center gap-1.5 text-gray-800 font-semibold text-sm">
+              <BedDouble className="h-4 w-4" />
+              Leave  Balance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 px-4 py-3">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Paid Leave</p>
+                <p className="text-gray-900 font-bold">
+                  {employee.leaveBalance?.paid || 0} days
+                </p>
+              </div>
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Casual Leave</p>
+                <p className="text-gray-900 font-bold">
+                  {employee.leaveBalance?.casual || 0} days
+                </p>
+              </div>
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Sick Leave</p>
+                <p className="text-gray-900 font-bold">
+                  {employee.leaveBalance?.sick || 0} days
+                </p>
+              </div>
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Short Leave</p>
+                <p className="text-gray-900 font-bold">
+                  {employee.leaveBalance?.short || 0} days
+                </p>
+              </div>
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Comp Off</p>
+                <p className="text-gray-900 font-bold">
+                  {employee.leaveBalance?.compensatory || 0} days
+                </p>
+              </div>
+              <div className="p-1.5 bg-gray-50 rounded">
+                <p className="font-medium text-gray-800">Total Leave</p>
+                <p className="text-gray-900 font-bold">
+                  {employee.leaveBalance?.total || 0} days
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Salary Information */}
         <Card className="bg-white border border-gray-200 shadow-sm">
