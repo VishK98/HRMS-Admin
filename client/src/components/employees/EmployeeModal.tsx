@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Mail, Phone, MapPin, Calendar, DollarSign, Building, User, IdCard, 
-  CreditCard, FileText, Users, UserCheck, UserX, AlertTriangle 
+  CreditCard, FileText, Users, UserCheck, UserX, AlertTriangle, 
+  X, Star, Award, Target, TrendingUp, Shield, Heart, Briefcase,
+  GraduationCap, Globe, Clock, Zap, Crown, Users2, CalendarDays
 } from "lucide-react";
 import { Employee } from "@/types/employee";
 
@@ -75,208 +77,774 @@ export const EmployeeModal = ({
   };
 
   const renderViewContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="bg-primary/10 p-3 rounded-full">
-            <User className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold">{employee.firstName} {employee.lastName}</h3>
-            <p className="text-muted-foreground">{employee.employeeId}</p>
+    <div className="space-y-8">
+             {/* Enhanced Header with Gradient Background */}
+       <div className="relative bg-gradient-to-r from-[#521138] to-[#843C6D] rounded-lg px-4 py-3 text-white">
+         <div className="flex items-center justify-between">
+           <div className="flex items-center gap-3">
+             <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm">
+               <User className="h-6 w-6 text-white" />
+             </div>
+                          <div>
+                <h3 className="text-lg font-bold">{employee.firstName} {employee.lastName}</h3>
+                <p className="text-white/80 text-xs">{employee.employeeId}</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="flex items-center gap-1.5">
+                    <Building className="h-3 w-3" />
+                    <span className="text-xs">{employee.department || "Not assigned"}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Briefcase className="h-3 w-3" />
+                    <span className="text-xs">{employee.designation || "Not assigned"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className={`${employee.status === "active" ? "bg-green-500 text-white" : employee.status === "inactive" ? "bg-red-500 text-white" : "bg-yellow-500 text-white"} border-0 text-xs`}>
+                {employee.status}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 p-1"
+                onClick={() => onOpenChange(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-        <Badge className={employee.status === "active" ? "bg-success text-success-foreground" : employee.status === "inactive" ? "bg-destructive text-destructive-foreground" : "bg-warning"}>
-          {employee.status}
-        </Badge>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Personal Information
+                           {/* Quick Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <CardContent className="px-3 py-2">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4 text-blue-600" />
+                <div>
+                  <p className="text-xs font-medium text-blue-800">Joined</p>
+                  <p className="text-sm font-bold text-blue-900">
+                    {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+            <CardContent className="px-3 py-2">
+              <div className="flex items-center gap-1.5">
+                <DollarSign className="h-4 w-4 text-green-600" />
+                <div>
+                  <p className="text-xs font-medium text-green-800">Basic Salary</p>
+                  <p className="text-sm font-bold text-green-900">
+                    {employee.salary?.basic ? `₹${employee.salary.basic.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+            <CardContent className="px-3 py-2">
+              <div className="flex items-center gap-1.5">
+                <Users className="h-4 w-4 text-purple-600" />
+                <div>
+                  <p className="text-xs font-medium text-purple-800">Role</p>
+                  <p className="text-sm font-bold text-purple-900 capitalize">{employee.role}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+            <CardContent className="px-3 py-2">
+              <div className="flex items-center gap-1.5">
+                <Star className="h-4 w-4 text-orange-600" />
+                <div>
+                  <p className="text-xs font-medium text-orange-800">Performance</p>
+                  <p className="text-sm font-bold text-orange-900">
+                    {employee.performance?.rating ? `${employee.performance.rating}/5` : "N/A"}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+             {/* Main Content Grid */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Personal Information */}
+          <Card className="border-l-4 border-l-blue-500 overflow-hidden">
+            <CardHeader className="bg-blue-50 px-4 py-3 border-b border-blue-100">
+              <CardTitle className="flex items-center gap-1.5 text-blue-800 font-semibold text-sm">
+                <User className="h-4 w-4" />
+                Personal Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 px-4 py-3">
+                           <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                <Mail className="h-3 w-3 text-blue-600" />
+                <span className="text-sm font-medium">{employee.email}</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                <Phone className="h-3 w-3 text-green-600" />
+                <span className="text-sm font-medium">{employee.phone}</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                <Calendar className="h-3 w-3 text-purple-600" />
+                <span className="text-sm font-medium">DOB: {new Date(employee.dateOfBirth).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                <Heart className="h-3 w-3 text-red-600" />
+                <span className="text-sm font-medium capitalize">Gender: {employee.gender}</span>
+              </div>
+              {employee.maritalStatus && (
+                <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                  <Shield className="h-3 w-3 text-indigo-600" />
+                  <span className="text-sm font-medium capitalize">Status: {employee.maritalStatus}</span>
+                </div>
+              )}
+              {employee.bloodGroup && (
+                <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                  <AlertTriangle className="h-3 w-3 text-red-600" />
+                  <span className="text-sm font-medium">Blood Group: {employee.bloodGroup}</span>
+                </div>
+              )}
+           </CardContent>
+         </Card>
+
+                                   {/* Employment Information */}
+          <Card className="border-l-4 border-l-green-500 overflow-hidden">
+            <CardHeader className="bg-green-50 px-4 py-3 border-b border-green-100">
+              <CardTitle className="flex items-center gap-1.5 text-green-800 font-semibold text-sm">
+                <Building className="h-4 w-4" />
+                Employment Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 px-4 py-3">
+              <div className="p-1.5 bg-green-50 rounded-lg">
+                <p className="text-sm font-medium text-green-800">Department: {employee.department || "Not assigned"}</p>
+                <p className="text-xs text-green-600">Designation: {employee.designation || "Not assigned"}</p>
+              </div>
+              {employee.reportingManager && (
+                <div className="p-1.5 bg-blue-50 rounded-lg">
+                  <p className="text-sm font-medium text-blue-800">Reporting Manager</p>
+                  <p className="text-xs text-blue-600">
+                    {employee.reportingManager.firstName} {employee.reportingManager.lastName} ({employee.reportingManager.employeeId})
+                  </p>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                <Calendar className="h-3 w-3 text-green-600" />
+                <span className="text-sm font-medium">Joined: {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                <Crown className="h-3 w-3 text-yellow-600" />
+                <span className="text-sm font-medium capitalize">Role: {employee.role}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+                                   {/* Team Information */}
+          {employee.team && (
+            <Card className="border-l-4 border-l-purple-500 overflow-hidden">
+              <CardHeader className="bg-purple-50 px-4 py-3 border-b border-purple-100">
+                <CardTitle className="flex items-center gap-1.5 text-purple-800 font-semibold text-sm">
+                  <Users2 className="h-4 w-4" />
+                  Team Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 px-4 py-3">
+                <div className="p-1.5 bg-purple-50 rounded-lg">
+                  <p className="text-sm font-medium text-purple-800">Team: {employee.team.name}</p>
+                  <p className="text-xs text-purple-600">{employee.team.members || 0} members</p>
+                </div>
+                {employee.team.lead && (
+                  <div className="p-1.5 bg-blue-50 rounded-lg">
+                    <p className="text-sm font-medium text-blue-800">Team Lead</p>
+                    <p className="text-xs text-blue-600">
+                      {employee.team.lead.firstName} {employee.team.lead.lastName} ({employee.team.lead.employeeId})
+                    </p>
+                  </div>
+                )}
+                {employee.team.projects && employee.team.projects.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-purple-800 mb-1.5">Active Projects</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {employee.team.projects.map((project, index) => (
+                        <Badge key={index} variant="secondary" className="bg-purple-100 text-purple-800 text-xs">
+                          {project}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+                                   {/* Performance Information */}
+          {employee.performance && (
+            <Card className="border-l-4 border-l-orange-500 overflow-hidden">
+              <CardHeader className="bg-orange-50 px-4 py-3 border-b border-orange-100">
+                <CardTitle className="flex items-center gap-1.5 text-orange-800 font-semibold text-sm">
+                  <TrendingUp className="h-4 w-4" />
+                  Performance
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 px-4 py-3">
+                {employee.performance.rating && (
+                  <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                    <Star className="h-3 w-3 text-yellow-600" />
+                    <span className="text-sm font-medium">Rating: {employee.performance.rating}/5</span>
+                  </div>
+                )}
+                {employee.performance.lastReview && (
+                  <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-gray-50">
+                    <Calendar className="h-3 w-3 text-orange-600" />
+                    <span className="text-sm font-medium">Last Review: {new Date(employee.performance.lastReview).toLocaleDateString()}</span>
+                  </div>
+                )}
+                {employee.performance.achievements && employee.performance.achievements.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-orange-800 mb-1.5">Achievements</p>
+                    <div className="space-y-1">
+                      {employee.performance.achievements.map((achievement, index) => (
+                        <div key={index} className="flex items-center gap-1.5 text-xs">
+                          <Award className="h-3 w-3 text-orange-600" />
+                          <span>{achievement}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+                   {/* Leave Balance Information */}
+          {employee.leaveBalance && (
+            <Card className="border-l-4 border-l-teal-500 overflow-hidden">
+              <CardHeader className="bg-teal-50 px-4 py-3 border-b border-teal-100">
+                <CardTitle className="flex items-center gap-1.5 text-teal-800 font-semibold text-sm">
+                  <CalendarDays className="h-4 w-4" />
+                  Leave Balance
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 px-4 py-3">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-1.5 bg-teal-50 rounded">
+                    <p className="font-medium text-teal-800">Paid Leave</p>
+                    <p className="text-teal-600 font-bold">{employee.leaveBalance.paid || 0} days</p>
+                  </div>
+                  <div className="p-1.5 bg-blue-50 rounded">
+                    <p className="font-medium text-blue-800">Casual Leave</p>
+                    <p className="text-blue-600 font-bold">{employee.leaveBalance.casual || 0} days</p>
+                  </div>
+                  <div className="p-1.5 bg-green-50 rounded">
+                    <p className="font-medium text-green-800">Sick Leave</p>
+                    <p className="text-green-600 font-bold">{employee.leaveBalance.sick || 0} days</p>
+                  </div>
+                  <div className="p-1.5 bg-purple-50 rounded">
+                    <p className="font-medium text-purple-800">Short Leave</p>
+                    <p className="text-purple-600 font-bold">{employee.leaveBalance.short || 0} days</p>
+                  </div>
+                  <div className="p-1.5 bg-orange-50 rounded">
+                    <p className="font-medium text-orange-800">Compensatory Off</p>
+                    <p className="text-orange-600 font-bold">{employee.leaveBalance.compensatory || 0} days</p>
+                  </div>
+                  <div className="p-1.5 bg-indigo-50 rounded">
+                    <p className="font-medium text-indigo-800">Total Balance</p>
+                    <p className="text-indigo-600 font-bold">{employee.leaveBalance.total || 0} days</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+                                   {/* Salary Information */}
+          <Card className="border-l-4 border-l-green-500 overflow-hidden">
+            <CardHeader className="bg-green-50 px-4 py-3 border-b border-green-100">
+              <CardTitle className="flex items-center gap-1.5 text-green-800 font-semibold text-sm">
+                <DollarSign className="h-4 w-4" />
+                Salary Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 px-4 py-3">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-1.5 bg-green-50 rounded">
+                  <p className="font-medium text-green-800">Basic Pay</p>
+                  <p className="text-green-600">
+                    {employee.salary?.basic ? `₹${employee.salary.basic.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+                <div className="p-1.5 bg-blue-50 rounded">
+                  <p className="font-medium text-blue-800">HRA</p>
+                  <p className="text-blue-600">
+                    {employee.salary?.hra ? `₹${employee.salary.hra.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+                <div className="p-1.5 bg-purple-50 rounded">
+                  <p className="font-medium text-purple-800">DA</p>
+                  <p className="text-purple-600">
+                    {employee.salary?.da ? `₹${employee.salary.da.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+                <div className="p-1.5 bg-orange-50 rounded">
+                  <p className="font-medium text-orange-800">Special Allowance</p>
+                  <p className="text-orange-600">
+                    {employee.salary?.specialAllowance ? `₹${employee.salary.specialAllowance.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+                <div className="p-1.5 bg-pink-50 rounded">
+                  <p className="font-medium text-pink-800">Transport Allowance</p>
+                  <p className="text-pink-600">
+                    {employee.salary?.transportAllowance ? `₹${employee.salary.transportAllowance.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+                <div className="p-1.5 bg-indigo-50 rounded">
+                  <p className="font-medium text-indigo-800">Medical Allowance</p>
+                  <p className="text-indigo-600">
+                    {employee.salary?.medicalAllowance ? `₹${employee.salary.medicalAllowance.toLocaleString()}` : "Not set"}
+                  </p>
+                </div>
+              </div>
+              {employee.salary?.totalSalary && (
+                <div className="pt-2 border-t border-green-200">
+                  <p className="font-bold text-sm text-green-800">
+                    Total: ₹{employee.salary.totalSalary.toLocaleString()}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+        {/* Bank Details */}
+        <Card className="border-l-4 border-l-indigo-500">
+          <CardHeader className="bg-indigo-50">
+            <CardTitle className="flex items-center gap-2 text-indigo-800">
+              <CreditCard className="h-5 w-5" />
+              Bank Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span>{employee.email}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span>{employee.phone}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>{new Date(employee.dateOfBirth).toLocaleDateString()}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="capitalize">{employee.gender}</span>
-            </div>
+          <CardContent className="space-y-3 pt-4">
+            {employee.bankDetails ? (
+              <>
+                <div className="p-2 rounded-lg hover:bg-gray-50">
+                  <p className="font-medium text-indigo-800">Bank Name</p>
+                  <p className="text-sm text-indigo-600">{employee.bankDetails.bankName}</p>
+                </div>
+                <div className="p-2 rounded-lg hover:bg-gray-50">
+                  <p className="font-medium text-indigo-800">Account Number</p>
+                  <p className="text-sm text-indigo-600">{employee.bankDetails.accountNumber}</p>
+                </div>
+                <div className="p-2 rounded-lg hover:bg-gray-50">
+                  <p className="font-medium text-indigo-800">IFSC Code</p>
+                  <p className="text-sm text-indigo-600">{employee.bankDetails.ifscCode}</p>
+                </div>
+                <div className="p-2 rounded-lg hover:bg-gray-50">
+                  <p className="font-medium text-indigo-800">Branch</p>
+                  <p className="text-sm text-indigo-600">{employee.bankDetails.branchName}</p>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Bank details not provided</p>
+            )}
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building className="h-4 w-4" />
-              Employment Information
+        {/* Current Address */}
+        <Card className="border-l-4 border-l-red-500">
+          <CardHeader className="bg-red-50">
+            <CardTitle className="flex items-center gap-2 text-red-800">
+              <MapPin className="h-5 w-5" />
+              Current Address
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="font-medium">{employee.department}</p>
-              <p className="text-sm text-muted-foreground">{employee.designation}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>Joined: {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <span>{employee.salary?.basic ? `$${employee.salary.basic.toLocaleString()}` : "Not set"}</span>
-            </div>
+          <CardContent className="pt-4">
+            <p className="font-medium">{employee.address?.street || "Not provided"}</p>
+            <p className="text-sm text-muted-foreground">{employee.address?.city || ""}{employee.address?.city && ", "}{employee.address?.state || ""} {employee.address?.zipCode || ""}</p>
+            <p className="text-sm text-muted-foreground">{employee.address?.country || ""}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Address
+        {/* Permanent Address */}
+        <Card className="border-l-4 border-l-orange-500">
+          <CardHeader className="bg-orange-50">
+            <CardTitle className="flex items-center gap-2 text-orange-800">
+              <MapPin className="h-5 w-5" />
+              Permanent Address
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p>{employee.address?.street || "Not provided"}</p>
-            <p>{employee.address?.city || ""}{employee.address?.city && ", "}{employee.address?.state || ""} {employee.address?.zipCode || ""}</p>
-            <p>{employee.address?.country || ""}</p>
+          <CardContent className="pt-4">
+            {employee.address?.permanentAddress ? (
+              <>
+                <p className="font-medium">{employee.address.permanentAddress.street || "Not provided"}</p>
+                <p className="text-sm text-muted-foreground">{employee.address.permanentAddress.city || ""}{employee.address.permanentAddress.city && ", "}{employee.address.permanentAddress.state || ""} {employee.address.permanentAddress.zipCode || ""}</p>
+                <p className="text-sm text-muted-foreground">{employee.address.permanentAddress.country || ""}</p>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Permanent address not provided</p>
+            )}
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IdCard className="h-4 w-4" />
+        {/* Emergency Contact */}
+        <Card className="border-l-4 border-l-pink-500">
+          <CardHeader className="bg-pink-50">
+            <CardTitle className="flex items-center gap-2 text-pink-800">
+              <Phone className="h-5 w-5" />
+              Emergency Contact
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-4">
+            {employee.emergencyContact ? (
+              <>
+                <div className="p-3 bg-pink-50 rounded-lg">
+                  <p className="font-medium text-pink-800">{employee.emergencyContact.name}</p>
+                  <p className="text-sm text-pink-600">{employee.emergencyContact.relationship}</p>
+                </div>
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+                  <Phone className="h-4 w-4 text-pink-600" />
+                  <span className="font-medium">{employee.emergencyContact.phone}</span>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Emergency contact not provided</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Documents */}
+        <Card className="border-l-4 border-l-teal-500">
+          <CardHeader className="bg-teal-50">
+            <CardTitle className="flex items-center gap-2 text-teal-800">
+              <IdCard className="h-5 w-5" />
               Documents
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <p>Aadhar: {employee.documents?.aadhar || "Not provided"}</p>
-            <p>PAN: {employee.documents?.pan || "Not provided"}</p>
-            <p>Passport: {employee.documents?.passport || "Not provided"}</p>
+          <CardContent className="space-y-2 pt-4">
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="p-2 bg-teal-50 rounded">
+                <p className="font-medium text-teal-800">Aadhar</p>
+                <p className="text-teal-600">{employee.documents?.aadhar || "Not provided"}</p>
+              </div>
+              <div className="p-2 bg-blue-50 rounded">
+                <p className="font-medium text-blue-800">PAN</p>
+                <p className="text-blue-600">{employee.documents?.pan || "Not provided"}</p>
+              </div>
+              <div className="p-2 bg-purple-50 rounded">
+                <p className="font-medium text-purple-800">Passport</p>
+                <p className="text-purple-600">{employee.documents?.passport || "Not provided"}</p>
+              </div>
+              <div className="p-2 bg-orange-50 rounded">
+                <p className="font-medium text-orange-800">Driving License</p>
+                <p className="text-orange-600">{employee.documents?.drivingLicense || "Not provided"}</p>
+              </div>
+              <div className="p-2 bg-pink-50 rounded">
+                <p className="font-medium text-pink-800">Voter ID</p>
+                <p className="text-pink-600">{employee.documents?.voterId || "Not provided"}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Education */}
+        <Card className="border-l-4 border-l-cyan-500">
+          <CardHeader className="bg-cyan-50">
+            <CardTitle className="flex items-center gap-2 text-cyan-800">
+              <GraduationCap className="h-5 w-5" />
+              Education
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-4">
+            {employee.education ? (
+              <>
+                <div className="p-3 bg-cyan-50 rounded-lg">
+                  <p className="font-medium text-cyan-800">{employee.education.highestQualification}</p>
+                  <p className="text-sm text-cyan-600">{employee.education.institution}</p>
+                </div>
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+                  <Calendar className="h-4 w-4 text-cyan-600" />
+                  <span className="font-medium">Completed: {employee.education.yearOfCompletion}</span>
+                </div>
+                {employee.education.percentage && (
+                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+                    <Target className="h-4 w-4 text-cyan-600" />
+                    <span className="font-medium">Percentage: {employee.education.percentage}%</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-muted-foreground">Education details not provided</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Skills */}
+        {employee.skills && employee.skills.length > 0 && (
+          <Card className="border-l-4 border-l-emerald-500">
+            <CardHeader className="bg-emerald-50">
+              <CardTitle className="flex items-center gap-2 text-emerald-800">
+                <UserCheck className="h-5 w-5" />
+                Skills
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="flex flex-wrap gap-2">
+                {employee.skills.map((skill, index) => (
+                  <Badge key={index} variant="secondary" className="bg-emerald-100 text-emerald-800 hover:bg-emerald-200">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Work Experience */}
+        {employee.workExperience && employee.workExperience.length > 0 && (
+          <Card className="lg:col-span-2 border-l-4 border-l-violet-500">
+            <CardHeader className="bg-violet-50">
+              <CardTitle className="flex items-center gap-2 text-violet-800">
+                <Building className="h-5 w-5" />
+                Work Experience
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="space-y-4">
+                {employee.workExperience.map((exp, index) => (
+                  <div key={index} className="p-4 border border-violet-200 rounded-lg bg-violet-50/50">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium text-violet-800">{exp.position}</p>
+                        <p className="text-sm text-violet-600">{exp.company}</p>
+                      </div>
+                      <div className="text-sm text-violet-600">
+                        {new Date(exp.fromDate).toLocaleDateString()} - {new Date(exp.toDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                    {exp.description && (
+                      <p className="text-sm text-violet-600 mt-2">{exp.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
 
   const renderEditContent = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="firstName">First Name</Label>
-          <Input 
-            id="firstName" 
-            value={editedEmployee.firstName} 
-            onChange={(e) => handleInputChange("firstName", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name</Label>
-          <Input 
-            id="lastName" 
-            value={editedEmployee.lastName} 
-            onChange={(e) => handleInputChange("lastName", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            value={editedEmployee.email} 
-            onChange={(e) => handleInputChange("email", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input 
-            id="phone" 
-            value={editedEmployee.phone} 
-            onChange={(e) => handleInputChange("phone", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="department">Department</Label>
-          <Input 
-            id="department" 
-            value={editedEmployee.department || ""} 
-            onChange={(e) => handleInputChange("department", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="designation">Designation</Label>
-          <Input 
-            id="designation" 
-            value={editedEmployee.designation || ""} 
-            onChange={(e) => handleInputChange("designation", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select 
-            value={editedEmployee.status} 
-            onValueChange={(value) => handleInputChange("status", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="terminated">Terminated</SelectItem>
-              <SelectItem value="resigned">Resigned</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="joiningDate">Joining Date</Label>
-          <Input 
-            id="joiningDate" 
-            type="date" 
-            value={editedEmployee.joiningDate ? new Date(editedEmployee.joiningDate).toISOString().split('T')[0] : ""} 
-            onChange={(e) => handleInputChange("joiningDate", e.target.value)} 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="basicSalary">Basic Salary</Label>
-          <Input 
-            id="basicSalary" 
-            type="number" 
-            value={editedEmployee.salary?.basic || ""} 
-            onChange={(e) => handleNestedInputChange("salary", "basic", e.target.value ? Number(e.target.value) : undefined)} 
-          />
-        </div>
+    <div className="space-y-8">
+      {/* Enhanced Edit Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+        <h3 className="text-xl font-bold text-blue-800 mb-2">Edit Employee Information</h3>
+        <p className="text-blue-600">Update the employee's details below</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Personal Information */}
+        <Card className="border-l-4 border-l-blue-500">
+          <CardHeader className="bg-blue-50">
+            <CardTitle className="flex items-center gap-2 text-blue-800">
+              <User className="h-5 w-5" />
+              Personal Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-blue-800 font-medium">First Name</Label>
+                <Input 
+                  id="firstName" 
+                  value={editedEmployee.firstName} 
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  className="border-blue-200 focus:border-blue-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="text-blue-800 font-medium">Last Name</Label>
+                <Input 
+                  id="lastName" 
+                  value={editedEmployee.lastName} 
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  className="border-blue-200 focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-blue-800 font-medium">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                value={editedEmployee.email} 
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className="border-blue-200 focus:border-blue-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-blue-800 font-medium">Phone</Label>
+              <Input 
+                id="phone" 
+                value={editedEmployee.phone} 
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className="border-blue-200 focus:border-blue-500"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Employment Information */}
+        <Card className="border-l-4 border-l-green-500">
+          <CardHeader className="bg-green-50">
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <Building className="h-5 w-5" />
+              Employment Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="department" className="text-green-800 font-medium">Department</Label>
+                <Input 
+                  id="department" 
+                  value={editedEmployee.department || ""} 
+                  onChange={(e) => handleInputChange("department", e.target.value)}
+                  className="border-green-200 focus:border-green-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="designation" className="text-green-800 font-medium">Designation</Label>
+                <Input 
+                  id="designation" 
+                  value={editedEmployee.designation || ""} 
+                  onChange={(e) => handleInputChange("designation", e.target.value)}
+                  className="border-green-200 focus:border-green-500"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-green-800 font-medium">Status</Label>
+                <Select 
+                  value={editedEmployee.status} 
+                  onValueChange={(value) => handleInputChange("status", value)}
+                >
+                  <SelectTrigger className="border-green-200 focus:border-green-500">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active" className="hover:bg-[#843C6D] hover:text-white">Active</SelectItem>
+                    <SelectItem value="inactive" className="hover:bg-[#843C6D] hover:text-white">Inactive</SelectItem>
+                    <SelectItem value="terminated" className="hover:bg-[#843C6D] hover:text-white">Terminated</SelectItem>
+                    <SelectItem value="resigned" className="hover:bg-[#843C6D] hover:text-white">Resigned</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="joiningDate" className="text-green-800 font-medium">Joining Date</Label>
+                <Input 
+                  id="joiningDate" 
+                  type="date" 
+                  value={editedEmployee.joiningDate ? new Date(editedEmployee.joiningDate).toISOString().split('T')[0] : ""} 
+                  onChange={(e) => handleInputChange("joiningDate", e.target.value)}
+                  className="border-green-200 focus:border-green-500"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Salary Information */}
+        <Card className="border-l-4 border-l-purple-500">
+          <CardHeader className="bg-purple-50">
+            <CardTitle className="flex items-center gap-2 text-purple-800">
+              <DollarSign className="h-5 w-5" />
+              Salary Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="basicSalary" className="text-purple-800 font-medium">Basic Salary</Label>
+                <Input 
+                  id="basicSalary" 
+                  type="number" 
+                  value={editedEmployee.salary?.basic || ""} 
+                  onChange={(e) => handleNestedInputChange("salary", "basic", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-purple-200 focus:border-purple-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hra" className="text-purple-800 font-medium">HRA</Label>
+                <Input 
+                  id="hra" 
+                  type="number" 
+                  value={editedEmployee.salary?.hra || ""} 
+                  onChange={(e) => handleNestedInputChange("salary", "hra", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-purple-200 focus:border-purple-500"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="da" className="text-purple-800 font-medium">DA</Label>
+                <Input 
+                  id="da" 
+                  type="number" 
+                  value={editedEmployee.salary?.da || ""} 
+                  onChange={(e) => handleNestedInputChange("salary", "da", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-purple-200 focus:border-purple-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="specialAllowance" className="text-purple-800 font-medium">Special Allowance</Label>
+                <Input 
+                  id="specialAllowance" 
+                  type="number" 
+                  value={editedEmployee.salary?.specialAllowance || ""} 
+                  onChange={(e) => handleNestedInputChange("salary", "specialAllowance", e.target.value ? Number(e.target.value) : undefined)}
+                  className="border-purple-200 focus:border-purple-500"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Address Information */}
+        <Card className="border-l-4 border-l-orange-500">
+          <CardHeader className="bg-orange-50">
+            <CardTitle className="flex items-center gap-2 text-orange-800">
+              <MapPin className="h-5 w-5" />
+              Address Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="address" className="text-orange-800 font-medium">Current Address</Label>
+              <Textarea 
+                id="address" 
+                value={editedEmployee.address?.street || ""} 
+                onChange={(e) => handleNestedInputChange("address", "street", e.target.value)} 
+                placeholder="Enter full address"
+                className="border-orange-200 focus:border-orange-500"
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
-        <Textarea 
-          id="address" 
-          value={editedEmployee.address?.street || ""} 
-          onChange={(e) => handleNestedInputChange("address", "street", e.target.value)} 
-          placeholder="Enter full address"
-        />
-      </div>
-      
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onCancel}>
+      <div className="flex justify-end gap-3 pt-4 border-t">
+        <Button variant="outline" onClick={onCancel} className="hover:bg-gray-100">
           Cancel
         </Button>
-        <Button onClick={handleSave}>
+        <Button onClick={handleSave} className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90">
           Save Changes
         </Button>
       </div>
@@ -318,19 +886,21 @@ export const EmployeeModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{getTitle()}</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-2xl font-bold">{getTitle()}</DialogTitle>
+          <DialogDescription className="text-base">
             {mode === "view" && "View detailed information about the employee"}
             {mode === "edit" && "Edit employee information"}
             {mode === "delete" && "Permanently remove this employee"}
           </DialogDescription>
         </DialogHeader>
         
-        {mode === "view" && renderViewContent()}
-        {mode === "edit" && renderEditContent()}
-        {mode === "delete" && renderDeleteContent()}
+        <div className="overflow-y-auto max-h-[calc(95vh-120px)] scrollbar-hide">
+          {mode === "view" && renderViewContent()}
+          {mode === "edit" && renderEditContent()}
+          {mode === "delete" && renderDeleteContent()}
+        </div>
       </DialogContent>
     </Dialog>
   );
