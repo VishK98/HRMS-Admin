@@ -61,6 +61,7 @@ export const EmployeeEditContent = ({
   const [managers, setManagers] = useState<Employee[]>([]);
   const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedDepartmentSubcategories, setSelectedDepartmentSubcategories] = useState<Array<{ _id: string; name: string }>>([]);
 
   // Fetch dynamic data on component mount
   useEffect(() => {
@@ -69,7 +70,7 @@ export const EmployeeEditContent = ({
     }
   }, [user]);
 
-  // Filter designations when department changes
+  // Filter designations and update subcategories when department changes
   useEffect(() => {
     if (editedEmployee.department && designations.length > 0) {
       const filtered = designations.filter(designation => 
@@ -87,7 +88,34 @@ export const EmployeeEditContent = ({
     } else {
       setFilteredDesignations(designations);
     }
-  }, [editedEmployee.department, designations, editedEmployee.designation, handleInputChange]);
+
+    // Update subcategories when department changes
+    if (editedEmployee.department) {
+      const selectedDept = departments.find(dept => dept.name === editedEmployee.department);
+      if (selectedDept && selectedDept.subCategories) {
+        setSelectedDepartmentSubcategories(selectedDept.subCategories);
+        // Clear subcategory if it doesn't belong to the new department
+        if (editedEmployee.subcategory) {
+          const subcategoryExists = selectedDept.subCategories.some(sub => sub.name === editedEmployee.subcategory);
+          if (!subcategoryExists) {
+            handleInputChange("subcategory", "");
+          }
+        }
+      } else {
+        setSelectedDepartmentSubcategories([]);
+        // Clear subcategory if department has no subcategories
+        if (editedEmployee.subcategory) {
+          handleInputChange("subcategory", "");
+        }
+      }
+    } else {
+      setSelectedDepartmentSubcategories([]);
+      // Clear subcategory if no department is selected
+      if (editedEmployee.subcategory) {
+        handleInputChange("subcategory", "");
+      }
+    }
+  }, [editedEmployee.department, designations, editedEmployee.designation, departments, editedEmployee.subcategory, handleInputChange]);
 
   // Fetch team members when reporting manager changes
   useEffect(() => {
@@ -428,6 +456,49 @@ export const EmployeeEditContent = ({
               </SelectContent>
             </Select>
           </div>
+          
+          {/* Subcategory - Only show if department has subcategories */}
+          {selectedDepartmentSubcategories.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="subcategory" className="text-gray-800 font-medium">
+                Subcategory
+              </Label>
+              <p className="text-xs text-gray-500">
+                Subcategories for: <span className="font-medium">{editedEmployee.department}</span>
+              </p>
+              <Select
+                value={editedEmployee.subcategory || "no-subcategory"}
+                onValueChange={(value) => {
+                  if (value === "no-subcategory") {
+                    handleInputChange("subcategory", "");
+                  } else {
+                    handleInputChange("subcategory", value);
+                  }
+                }}
+                disabled={loading}
+              >
+                <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                  <SelectValue placeholder="Select subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="no-subcategory" className="hover:bg-[#843C6D] hover:text-white">
+                    No Subcategory
+                  </SelectItem>
+                  {selectedDepartmentSubcategories
+                    .filter(subcategory => subcategory.name && subcategory.name.trim() !== '')
+                    .map((subcategory) => (
+                      <SelectItem
+                        key={subcategory._id}
+                        value={subcategory.name}
+                        className="hover:bg-[#843C6D] hover:text-white"
+                      >
+                        {subcategory.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="role" className="text-gray-800 font-medium">
               Role

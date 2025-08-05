@@ -68,6 +68,10 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    subcategory: {
+      type: String,
+      trim: true,
+    },
     reportingManager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",

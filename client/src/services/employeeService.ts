@@ -339,6 +339,7 @@ export const employeeService = {
     employeeId?: string;
     department?: string;
     designation?: string;
+    subcategory?: string;
     role?: string;
     status?: string;
     joiningDate?: string;

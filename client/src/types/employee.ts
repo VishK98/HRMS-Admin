@@ -7,6 +7,7 @@ export interface Employee {
   employeeId: string;
   department?: string;
   designation?: string;
+  subcategory?: string; // Add subcategory field
   reportingManager?: {
     _id: string;
     firstName: string;

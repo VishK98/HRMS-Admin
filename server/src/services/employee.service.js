@@ -150,6 +150,7 @@ class EmployeeService {
         "employeeId",
         "department",
         "designation",
+        "subcategory",
         "reportingManager",
         "joiningDate",
         "dateOfBirth",
