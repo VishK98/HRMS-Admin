@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
 const superAdminItems = [
@@ -84,20 +85,14 @@ export function AppSidebar() {
       collapsible="icon"
     >
       <SidebarContent className="bg-sidebar-background">
-        {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
-          {!collapsed && (
-            <div>
-              <h2 className="text-lg font-bold text-sidebar-foreground">
-                HRMS
-              </h2>
-              <p className="text-xs text-sidebar-foreground/70">
-                {user?.role === "super_admin"
-                  ? "Super Admin"
-                  : user?.company_name}
-              </p>
-            </div>
-          )}
+        {/* Header with Professional Logo */}
+        <div className="border-b border-sidebar-border bg-gradient-to-r from-sidebar-background to-sidebar-accent/30">
+          <div className="flex items-center justify-start py-2 pl-4">
+            <Logo
+              role={user?.role as "super_admin" | "admin"}
+              collapsed={collapsed}
+            />
+          </div>
         </div>
 
         {/* Navigation */}
