@@ -60,6 +60,11 @@ export interface Employee {
     passport?: string;
     drivingLicense?: string;
     voterId?: string;
+    relievingLetter?: string;
+    experienceLetter?: string;
+    lastPayslip?: string;
+    passportPhoto?: string;
+    offerLetter?: string;
   };
   education?: {
     highestQualification: string;
@@ -67,13 +72,6 @@ export interface Employee {
     yearOfCompletion: string;
     percentage?: number;
   };
-  workExperience?: {
-    company: string;
-    position: string;
-    fromDate: string;
-    toDate: string;
-    description?: string;
-  }[];
   skills?: {
     technical?: string;
     soft?: string;

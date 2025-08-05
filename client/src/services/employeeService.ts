@@ -52,32 +52,114 @@ export const employeeService = {
     const queryString = params.toString();
     const url = `/employees/company/${companyId}${queryString ? `?${queryString}` : ''}`;
     
-    const response = await apiClient.request<EmployeeResponse>(url);
-    return response.data!;
+    console.log('Making API request to:', url); // Debug log
+    
+    const response = await apiClient.request<{ success: boolean; data: { employees: Employee[] } }>(url);
+    
+    console.log('Raw API response:', response); // Debug log
+    
+    // Check if response exists
+    if (!response) {
+      throw new Error('No response from server');
+    }
+    
+    // The response might be the data directly, or it might be wrapped
+    let employees: Employee[] = [];
+    
+    if (response.data && response.data.employees) {
+      // Response is wrapped in { data: { employees: [...] } }
+      employees = response.data.employees;
+    } else if (response.employees) {
+      // Response is directly { employees: [...] }
+      employees = response.employees;
+    } else if (Array.isArray(response)) {
+      // Response is directly an array of employees
+      employees = response;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    console.log('Employees from response:', employees); // Debug log
+    
+    return { 
+      employees: employees, 
+      pagination: { 
+        currentPage: 1, 
+        totalPages: 1, 
+        totalItems: employees.length, 
+        itemsPerPage: employees.length 
+      } 
+    };
   },
 
   // Get employee by ID
   async getEmployee(id: string): Promise<Employee> {
-    const response = await apiClient.request<Employee>(`/employees/${id}`);
-    return response.data!;
+    const response = await apiClient.request<{ success: boolean; data: { employee: Employee } }>(`/employees/${id}`);
+    
+    console.log('Get employee response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    return employee;
   },
 
   // Create new employee
   async createEmployee(employeeData: Partial<Employee>): Promise<Employee> {
-    const response = await apiClient.request<Employee>('/employees/register', {
+    const response = await apiClient.request<{ success: boolean; data: { employee: Employee } }>('/employees/register', {
       method: 'POST',
       body: JSON.stringify(employeeData)
     });
-    return response.data!;
+    
+    console.log('Create employee response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    return employee;
   },
 
   // Update employee
   async updateEmployee(id: string, employeeData: Partial<Employee>): Promise<Employee> {
-    const response = await apiClient.request<Employee>(`/employees/profile/${id}`, {
+    const response = await apiClient.request<{ success: boolean; data: { employee: Employee } }>(`/employees/profile/${id}`, {
       method: 'PUT',
       body: JSON.stringify(employeeData)
     });
-    return response.data!;
+    
+    console.log('Update employee response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    return employee;
   },
 
   // Delete employee (deactivate)
@@ -89,11 +171,26 @@ export const employeeService = {
 
   // Update reporting manager
   async updateReportingManager(employeeId: string, managerId: string | null): Promise<Employee> {
-    const response = await apiClient.request<Employee>(`/employees/profile/${employeeId}`, {
+    const response = await apiClient.request<{ success: boolean; data: { employee: Employee } }>(`/employees/profile/${employeeId}`, {
       method: 'PUT',
       body: JSON.stringify({ reportingManager: managerId })
     });
-    return response.data!;
+    
+    console.log('Update reporting manager response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    return employee;
   },
 
   // Get team members (this might need a different endpoint)
@@ -112,20 +209,50 @@ export const employeeService = {
 
   // Update leave balance
   async updateLeaveBalance(employeeId: string, leaveBalance: any): Promise<Employee> {
-    const response = await apiClient.request<Employee>(`/employees/profile/${employeeId}`, {
+    const response = await apiClient.request<{ success: boolean; data: { employee: Employee } }>(`/employees/profile/${employeeId}`, {
       method: 'PUT',
       body: JSON.stringify({ leaveBalance })
     });
-    return response.data!;
+    
+    console.log('Update leave balance response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    return employee;
   },
 
   // Update salary
   async updateSalary(employeeId: string, salary: any): Promise<Employee> {
-    const response = await apiClient.request<Employee>(`/employees/profile/${employeeId}`, {
+    const response = await apiClient.request<{ success: boolean; data: { employee: Employee } }>(`/employees/profile/${employeeId}`, {
       method: 'PUT',
       body: JSON.stringify({ salary })
     });
-    return response.data!;
+    
+    console.log('Update salary response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    return employee;
   },
 
   // Upload document (this might need a different endpoint)
@@ -149,11 +276,27 @@ export const employeeService = {
       Object.entries(employeeData).filter(([_, value]) => value !== undefined)
     );
 
-    const response = await apiClient.request<Employee>(`/employees/profile/${id}`, {
+    const response = await apiClient.request<{ success: boolean; message: string; data: { employee: Employee } }>(`/employees/profile/${id}`, {
       method: 'PUT',
       body: JSON.stringify(cleanData)
     });
-    return response.data!;
+    
+    console.log('Comprehensive update response:', response); // Debug log
+    
+    // Handle different response structures
+    let employee: Employee;
+    
+    if (response.data && response.data.employee) {
+      employee = response.data.employee;
+    } else if (response.employee) {
+      employee = response.employee;
+    } else {
+      console.error('Unexpected response structure:', response);
+      throw new Error('Invalid response structure from server');
+    }
+    
+    // Return the employee data from the response structure
+    return employee;
   },
 
   // Update specific sections
@@ -238,24 +381,6 @@ export const employeeService = {
     };
   }): Promise<Employee> {
     return this.updateEmployeeComprehensive(id, leaveData);
-  },
-
-  async updateEducationInfo(id: string, educationData: {
-    education?: {
-      highestQualification: string;
-      institution: string;
-      yearOfCompletion: string;
-      percentage?: number;
-    };
-    workExperience?: {
-      company: string;
-      position: string;
-      fromDate: string;
-      toDate: string;
-      description?: string;
-    }[];
-  }): Promise<Employee> {
-    return this.updateEmployeeComprehensive(id, educationData);
   },
 
   async updateSkillsInfo(id: string, skillsData: {

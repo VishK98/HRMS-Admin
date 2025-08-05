@@ -29,9 +29,15 @@ class ApiClient {
       },
     };
 
+    console.log('Making request to:', url); // Debug log
+    console.log('Request headers:', config.headers); // Debug log
+
     try {
       const response = await fetch(url, config);
       const data = await response.json();
+
+      console.log('Response status:', response.status); // Debug log
+      console.log('Response data:', data); // Debug log
 
       if (!response.ok) {
         throw new Error(data.message || 'Request failed');
@@ -39,6 +45,7 @@ class ApiClient {
 
       return data;
     } catch (error) {
+      console.error('Request error:', error); // Debug log
       if (error instanceof Error) {
         throw error;
       }

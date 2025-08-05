@@ -53,17 +53,32 @@ export const EmployeeManagement = () => {
     setError(null);
     
     try {
+      console.log('User object:', user); // Debug log
+      console.log('Company ID:', user?.company?._id); // Debug log
+      
+      // Check if user is authenticated
+      const token = localStorage.getItem('hrms_token');
+      console.log('Token exists:', !!token); // Debug log
+      
+      if (!user?.company?._id) {
+        throw new Error('User not authenticated or company not found');
+      }
+      
+      console.log('Fetching employees for company:', user.company._id); // Debug log
+      
       // Fetch employees using the employee service
       const response = await employeeService.getEmployees({
-        companyId: user!.company!._id,
+        companyId: user.company._id,
         status: statusFilter === "all" ? undefined : statusFilter,
         search: searchTerm || undefined,
       });
       
+      console.log('Employee service response:', response); // Debug log
+      
       setEmployees(response.employees);
     } catch (err) {
+      console.error('Error fetching employees:', err);
       setError("Failed to fetch employees");
-      console.error("Error fetching employees:", err);
     } finally {
       setLoading(false);
     }
@@ -118,25 +133,57 @@ export const EmployeeManagement = () => {
 
   const handleSaveEmployee = async (updatedEmployee: Employee) => {
     try {
+      console.log('Updating employee with data:', updatedEmployee); // Debug log
+      
       // Use the employee service to update the employee
       const response = await employeeService.updateEmployeeComprehensive(
         updatedEmployee._id,
         updatedEmployee
       );
       
+      console.log('Update response:', response); // Debug log
+      
+      // Ensure we have valid response data
+      if (!response || !response._id) {
+        throw new Error('Invalid response from server');
+      }
+      
       // Update the employee in the state
-      setEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response : emp));
-      setFilteredEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response : emp));
+      setEmployees(prev => {
+        console.log('Previous employees state:', prev); // Debug log
+        const updated = prev.map(emp => emp._id === updatedEmployee._id ? response : emp);
+        console.log('Updated employees state:', updated); // Debug log
+        return updated;
+      });
+      
+      setFilteredEmployees(prev => {
+        console.log('Previous filtered employees state:', prev); // Debug log
+        const updated = prev.map(emp => emp._id === updatedEmployee._id ? response : emp);
+        console.log('Updated filtered employees state:', updated); // Debug log
+        return updated;
+      });
       
       // Show success notification
       toast.success("Employee updated successfully!");
       
       // Close modal after save
       setModalOpen(false);
+      
+      // Fallback: Refresh the employee list after a short delay to ensure data consistency
+      setTimeout(() => {
+        console.log('Refreshing employee list as fallback...'); // Debug log
+        fetchEmployees();
+      }, 1000);
+      
     } catch (err) {
+      console.error('Error updating employee:', err);
       toast.error("Failed to update employee");
       setError("Failed to update employee");
-      console.error("Error updating employee:", err);
+      
+      // If update fails, refresh the list to ensure we have the latest data
+      setTimeout(() => {
+        fetchEmployees();
+      }, 1000);
     }
   };
 

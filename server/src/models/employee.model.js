@@ -209,26 +209,6 @@ const employeeSchema = new mongoose.Schema(
         max: 100,
       },
     },
-    workExperience: [{
-      company: {
-        type: String,
-        trim: true,
-      },
-      position: {
-        type: String,
-        trim: true,
-      },
-      fromDate: {
-        type: Date,
-      },
-      toDate: {
-        type: Date,
-      },
-      description: {
-        type: String,
-        trim: true,
-      },
-    }],
     skills: {
       technical: {
         type: String,

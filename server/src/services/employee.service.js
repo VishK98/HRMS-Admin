@@ -1,25 +1,27 @@
-const Employee = require('../models/employee.model');
-const Company = require('../models/company.model');
-const { generateToken } = require('../utils/token.util');
+const Employee = require("../models/employee.model");
+const Company = require("../models/company.model");
+const { generateToken } = require("../utils/token.util");
 
 class EmployeeService {
   // Employee self-registration
   async registerEmployee(employeeData) {
     try {
       // Check if company exists
-      const company = await Company.findOne({ 
-        name: { $regex: new RegExp(employeeData.companyName, 'i') },
-        isActive: true 
+      const company = await Company.findOne({
+        name: { $regex: new RegExp(employeeData.companyName, "i") },
+        isActive: true,
       });
 
       if (!company) {
-        throw new Error('Company not found or inactive');
+        throw new Error("Company not found or inactive");
       }
 
       // Check if email already exists
-      const existingEmployee = await Employee.findOne({ email: employeeData.email });
+      const existingEmployee = await Employee.findOne({
+        email: employeeData.email,
+      });
       if (existingEmployee) {
-        throw new Error('Employee with this email already exists');
+        throw new Error("Employee with this email already exists");
       }
 
       // Create employee with basic info
@@ -33,7 +35,7 @@ class EmployeeService {
         password: employeeData.password,
         company: company._id,
         employeeId: this.generateEmployeeId(),
-        isProfileComplete: false
+        isProfileComplete: false,
       });
 
       await employee.save();
@@ -44,15 +46,15 @@ class EmployeeService {
 
       return {
         success: true,
-        message: 'Employee registered successfully',
+        message: "Employee registered successfully",
         data: {
           employee: employeeResponse,
           company: {
             id: company._id,
             name: company.name,
-            code: company.code
-          }
-        }
+            code: company.code,
+          },
+        },
       };
     } catch (error) {
       throw error;
@@ -63,20 +65,20 @@ class EmployeeService {
   async loginEmployee(email, password) {
     try {
       const employee = await Employee.findOne({ email: email.toLowerCase() })
-        .populate('company', 'name code')
-        .populate('reportingTo', 'firstName lastName employeeId');
+        .populate("company", "name code")
+        .populate("reportingTo", "firstName lastName employeeId");
 
       if (!employee) {
-        throw new Error('Invalid email or password');
+        throw new Error("Invalid email or password");
       }
 
-      if (employee.status !== 'active') {
-        throw new Error('Account is not active');
+      if (employee.status !== "active") {
+        throw new Error("Account is not active");
       }
 
       const isPasswordValid = await employee.comparePassword(password);
       if (!isPasswordValid) {
-        throw new Error('Invalid email or password');
+        throw new Error("Invalid email or password");
       }
 
       // Update last login
@@ -88,7 +90,7 @@ class EmployeeService {
         id: employee._id,
         email: employee.email,
         role: employee.role,
-        company: employee.company._id
+        company: employee.company._id,
       });
 
       // Return employee data without password
@@ -97,11 +99,11 @@ class EmployeeService {
 
       return {
         success: true,
-        message: 'Login successful',
+        message: "Login successful",
         data: {
           employee: employeeResponse,
-          token
-        }
+          token,
+        },
       };
     } catch (error) {
       throw error;
@@ -112,11 +114,11 @@ class EmployeeService {
   async getEmployeeProfile(employeeId) {
     try {
       const employee = await Employee.findById(employeeId)
-        .populate('company', 'name code')
-        .populate('reportingTo', 'firstName lastName employeeId');
+        .populate("company", "name code")
+        .populate("reportingTo", "firstName lastName employeeId");
 
       if (!employee) {
-        throw new Error('Employee not found');
+        throw new Error("Employee not found");
       }
 
       const employeeResponse = employee.toObject();
@@ -124,7 +126,7 @@ class EmployeeService {
 
       return {
         success: true,
-        data: { employee: employeeResponse }
+        data: { employee: employeeResponse },
       };
     } catch (error) {
       throw error;
@@ -136,17 +138,42 @@ class EmployeeService {
     try {
       const employee = await Employee.findById(employeeId);
       if (!employee) {
-        throw new Error('Employee not found');
+        throw new Error("Employee not found");
       }
 
-      // Update fields
+      // Update fields - expanded to include all employee fields
       const allowedFields = [
-        'department', 'designation', 'reportingTo', 'joiningDate',
-        'salary', 'bankDetails', 'address', 'emergencyContact',
-        'documents', 'status', 'isProfileComplete'
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "employeeId",
+        "department",
+        "designation",
+        "reportingTo",
+        "joiningDate",
+        "dateOfBirth",
+        "gender",
+        "maritalStatus",
+        "bloodGroup",
+        "salary",
+        "bankDetails",
+        "address",
+        "emergencyContact",
+        "documents",
+        "education",
+        "skills",
+        "team",
+        "performance",
+        "notes",
+        "leaveBalance",
+        "status",
+        "isProfileComplete",
+        "role",
+        "lastLogin",
       ];
 
-      allowedFields.forEach(field => {
+      allowedFields.forEach((field) => {
         if (updateData[field] !== undefined) {
           employee[field] = updateData[field];
         }
@@ -164,8 +191,8 @@ class EmployeeService {
 
       return {
         success: true,
-        message: 'Employee profile updated successfully',
-        data: { employee: employeeResponse }
+        message: "Employee profile updated successfully",
+        data: { employee: employeeResponse },
       };
     } catch (error) {
       throw error;
@@ -182,26 +209,26 @@ class EmployeeService {
         query.status = filters.status;
       }
       if (filters.department) {
-        query.department = { $regex: new RegExp(filters.department, 'i') };
+        query.department = { $regex: new RegExp(filters.department, "i") };
       }
       if (filters.search) {
         query.$or = [
-          { firstName: { $regex: new RegExp(filters.search, 'i') } },
-          { lastName: { $regex: new RegExp(filters.search, 'i') } },
-          { email: { $regex: new RegExp(filters.search, 'i') } },
-          { employeeId: { $regex: new RegExp(filters.search, 'i') } }
+          { firstName: { $regex: new RegExp(filters.search, "i") } },
+          { lastName: { $regex: new RegExp(filters.search, "i") } },
+          { email: { $regex: new RegExp(filters.search, "i") } },
+          { employeeId: { $regex: new RegExp(filters.search, "i") } },
         ];
       }
 
       const employees = await Employee.find(query)
-        .populate('company', 'name code')
-        .populate('reportingTo', 'firstName lastName employeeId')
-        .select('-password')
+        .populate("company", "name code")
+        .populate("reportingTo", "firstName lastName employeeId")
+        .select("-password")
         .sort({ createdAt: -1 });
 
       return {
         success: true,
-        data: { employees }
+        data: { employees },
       };
     } catch (error) {
       throw error;
@@ -212,11 +239,11 @@ class EmployeeService {
   async getEmployeeById(employeeId) {
     try {
       const employee = await Employee.findById(employeeId)
-        .populate('company', 'name code')
-        .populate('reportingTo', 'firstName lastName employeeId');
+        .populate("company", "name code")
+        .populate("reportingTo", "firstName lastName employeeId");
 
       if (!employee) {
-        throw new Error('Employee not found');
+        throw new Error("Employee not found");
       }
 
       const employeeResponse = employee.toObject();
@@ -224,7 +251,7 @@ class EmployeeService {
 
       return {
         success: true,
-        data: { employee: employeeResponse }
+        data: { employee: employeeResponse },
       };
     } catch (error) {
       throw error;
@@ -236,15 +263,15 @@ class EmployeeService {
     try {
       const employee = await Employee.findById(employeeId);
       if (!employee) {
-        throw new Error('Employee not found');
+        throw new Error("Employee not found");
       }
 
-      employee.status = 'inactive';
+      employee.status = "inactive";
       await employee.save();
 
       return {
         success: true,
-        message: 'Employee deactivated successfully'
+        message: "Employee deactivated successfully",
       };
     } catch (error) {
       throw error;
@@ -254,7 +281,9 @@ class EmployeeService {
   // Generate unique employee ID
   generateEmployeeId() {
     const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const random = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
     return `EMP${year}${random}`;
   }
 
@@ -268,24 +297,24 @@ class EmployeeService {
             _id: null,
             totalEmployees: { $sum: 1 },
             activeEmployees: {
-              $sum: { $cond: [{ $eq: ['$status', 'active'] }, 1, 0] }
+              $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
             },
             inactiveEmployees: {
-              $sum: { $cond: [{ $eq: ['$status', 'inactive'] }, 1, 0] }
+              $sum: { $cond: [{ $eq: ["$status", "inactive"] }, 1, 0] },
             },
             completeProfiles: {
-              $sum: { $cond: ['$isProfileComplete', 1, 0] }
+              $sum: { $cond: ["$isProfileComplete", 1, 0] },
             },
             incompleteProfiles: {
-              $sum: { $cond: ['$isProfileComplete', 0, 1] }
-            }
-          }
-        }
+              $sum: { $cond: ["$isProfileComplete", 0, 1] },
+            },
+          },
+        },
       ]);
 
       return {
         success: true,
-        data: { stats: stats[0] || {} }
+        data: { stats: stats[0] || {} },
       };
     } catch (error) {
       throw error;
@@ -293,4 +322,4 @@ class EmployeeService {
   }
 }
 
-module.exports = new EmployeeService(); 
+module.exports = new EmployeeService();
