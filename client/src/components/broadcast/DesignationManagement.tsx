@@ -58,6 +58,7 @@ export const DesignationManagement = () => {
       
       if (response.success && response.data) {
         const data = response.data as { designations: Designation[] };
+        console.log("Received designations data:", data.designations);
         setDesignations(data.designations || []);
         toast.success(`Loaded ${data.designations?.length || 0} designations`);
       } else {
@@ -136,10 +137,12 @@ export const DesignationManagement = () => {
         // Create new designation
         const designationData = { ...designation, companyId: user!.company!._id };
         console.log("Creating designation with data:", designationData);
+        console.log("Designation name:", designationData.name);
+        console.log("Designation department:", designationData.department);
         response = await apiClient.createDesignation(designationData);
         console.log("Create designation response:", response);
         if (response.success) {
-          toast.success("Designation created successfully");
+          toast.success(response.message || "Designation created successfully");
         }
       } else {
         // Update existing designation
@@ -297,9 +300,11 @@ export const DesignationManagement = () => {
                     <TableCell>
                       <div className="text-sm">{designation.level || "N/A"}</div>
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{designation.department || "N/A"}</div>
-                    </TableCell>
+                                         <TableCell>
+                       <div className="text-sm">
+                         {designation.department ? designation.department : "N/A"}
+                       </div>
+                     </TableCell>
                     <TableCell>
                       {getStatusBadge(designation.isActive)}
                     </TableCell>

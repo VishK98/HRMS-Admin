@@ -126,7 +126,7 @@ export const DepartmentManagement = () => {
         // Create new department
         response = await apiClient.createDepartment({ ...department, companyId: user!.company!._id });
         if (response.success) {
-          toast.success("Department created successfully");
+          toast.success(response.message || "Department created successfully");
         }
       } else {
         // Update existing department

@@ -38,19 +38,51 @@ const createDepartment = async (req, res) => {
       subCategories,
     });
 
-    // Check if department with same name already exists for this company
+    // Check if department with same name already exists for this company (only active ones)
+    console.log("Checking for existing department with:", { name, companyId });
     const existingDepartment = await Department.findOne({
       name,
       companyId,
+      isActive: true,
     });
 
     console.log("Existing department check:", existingDepartment);
+
+    // Also check for soft-deleted departments with the same name
+    const softDeletedDepartment = await Department.findOne({
+      name,
+      companyId,
+      isActive: false,
+    });
+    console.log(
+      "Soft-deleted department with same name:",
+      softDeletedDepartment
+    );
 
     if (existingDepartment) {
       console.log("Department with this name already exists");
       return res.status(400).json({
         success: false,
         message: "Department with this name already exists",
+      });
+    }
+
+    // If there's a soft-deleted department with the same name, reactivate it
+    if (softDeletedDepartment) {
+      console.log("Reactivating soft-deleted department");
+      softDeletedDepartment.isActive = true;
+      softDeletedDepartment.description = description;
+      softDeletedDepartment.subCategories = subCategories || [];
+      await softDeletedDepartment.save();
+
+      console.log(
+        "Department reactivated successfully:",
+        softDeletedDepartment
+      );
+      return res.status(200).json({
+        success: true,
+        data: softDeletedDepartment,
+        message: "Department reactivated successfully",
       });
     }
 
@@ -87,11 +119,12 @@ const updateDepartment = async (req, res) => {
 
     console.log("Updating department with data:", { id, updateData });
 
-    // If name is being updated, check for duplicates
+    // If name is being updated, check for duplicates (only among active departments)
     if (updateData.name) {
       const existingDepartment = await Department.findOne({
         name: updateData.name,
         companyId: updateData.companyId,
+        isActive: true,
         _id: { $ne: id }, // Exclude current department
       });
 

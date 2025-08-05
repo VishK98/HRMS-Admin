@@ -50,6 +50,7 @@ export const DesignationModal = ({
     department: "",
     isActive: true,
   });
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -94,6 +95,8 @@ export const DesignationModal = ({
   useEffect(() => {
     if (designation && mode !== "add") {
       console.log("Setting form data for edit:", designation);
+      // For editing, we need to find the department ID that matches the department name
+      const departmentId = departments.find(dept => dept.name === designation.department)?._id || "";
       setFormData({
         name: designation.name,
         description: designation.description || "",
@@ -101,6 +104,7 @@ export const DesignationModal = ({
         department: designation.department || "",
         isActive: designation.isActive,
       });
+      setSelectedDepartmentId(departmentId);
     } else {
       console.log("Setting form data for add");
       setFormData({
@@ -110,9 +114,10 @@ export const DesignationModal = ({
         department: "",
         isActive: true,
       });
+      setSelectedDepartmentId("");
     }
     setErrors({});
-  }, [designation, mode]);
+  }, [designation, mode, departments]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -141,6 +146,9 @@ export const DesignationModal = ({
     }
 
     console.log("Creating designation data...");
+    console.log("Form data department:", formData.department);
+    console.log("Selected department ID:", selectedDepartmentId);
+    
     const designationData: Designation = {
       _id: designation?._id || "",
       name: formData.name!,
@@ -233,10 +241,11 @@ export const DesignationModal = ({
             <div className="space-y-2">
               <Label htmlFor="department">Department</Label>
               <Select
-                value={formData.department}
+                value={selectedDepartmentId}
                 onValueChange={(value) => {
                   const selectedDept = departments.find(dept => dept._id === value);
                   console.log("Selected department:", selectedDept);
+                  setSelectedDepartmentId(value);
                   setFormData({ ...formData, department: selectedDept?.name || "" });
                 }}
                 disabled={isViewMode}
