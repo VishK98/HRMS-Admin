@@ -60,7 +60,6 @@ export const DesignationManagement = () => {
         const data = response.data as { designations: Designation[] };
         console.log("Received designations data:", data.designations);
         setDesignations(data.designations || []);
-        toast.success(`Loaded ${data.designations?.length || 0} designations`);
       } else {
         setError(response.message || "Failed to fetch designations");
         toast.error("Failed to fetch designations");

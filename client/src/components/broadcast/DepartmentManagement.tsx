@@ -58,7 +58,6 @@ export const DepartmentManagement = () => {
       
       if (response.success) {
         setDepartments(response.data!.departments);
-        toast.success(`Loaded ${response.data!.departments?.length || 0} departments`);
       } else {
         setError(response.message || "Failed to fetch departments");
         toast.error("Failed to fetch departments");
