@@ -15,7 +15,7 @@ import { Users, UserCheck, ArrowRight } from "lucide-react";
 interface ReportingManagerSelectorProps {
   employee: Employee;
   allEmployees: Employee[];
-  onUpdateReportingManager: (employeeId: string, managerId: string) => void;
+  onUpdateReportingManager: (employeeId: string, managerId: string | null) => void;
 }
 
 export const ReportingManagerSelector = ({
@@ -24,12 +24,12 @@ export const ReportingManagerSelector = ({
   onUpdateReportingManager,
 }: ReportingManagerSelectorProps) => {
   const [selectedManagerId, setSelectedManagerId] = useState<string>(
-    employee.reportingManager?._id || ""
+    employee.reportingManager?._id || "none"
   );
 
   // Filter out the current employee and get potential managers
   const potentialManagers = allEmployees.filter(
-    (emp) => emp._id !== employee._id && emp.role !== "employee"
+    (emp) => emp._id !== employee._id && emp.role === "manager"
   );
 
   // Get current team members (employees who report to this employee)
@@ -42,13 +42,15 @@ export const ReportingManagerSelector = ({
   };
 
   const handleSave = () => {
-    if (selectedManagerId && selectedManagerId !== employee.reportingManager?._id) {
-      onUpdateReportingManager(employee._id, selectedManagerId);
+    const currentManagerId = employee.reportingManager?._id || "none";
+    if (selectedManagerId !== currentManagerId) {
+      const managerId = selectedManagerId === "none" ? null : selectedManagerId;
+      onUpdateReportingManager(employee._id, managerId);
     }
   };
 
   const currentManager = employee.reportingManager;
-  const selectedManager = allEmployees.find((emp) => emp._id === selectedManagerId);
+  const selectedManager = selectedManagerId === "none" ? null : allEmployees.find((emp) => emp._id === selectedManagerId);
 
   return (
     <div className="space-y-6">
@@ -125,7 +127,7 @@ export const ReportingManagerSelector = ({
                 <SelectValue placeholder="Select a manager" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No Manager</SelectItem>
+                <SelectItem value="none">No Manager</SelectItem>
                 {potentialManagers.map((manager) => (
                   <SelectItem key={manager._id} value={manager._id}>
                     {manager.firstName} {manager.lastName} - {manager.designation || "Manager"}
@@ -160,13 +162,13 @@ export const ReportingManagerSelector = ({
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
-              onClick={() => setSelectedManagerId(employee.reportingManager?._id || "")}
+              onClick={() => setSelectedManagerId(employee.reportingManager?._id || "none")}
             >
               Reset
             </Button>
             <Button
               onClick={handleSave}
-              disabled={selectedManagerId === (employee.reportingManager?._id || "")}
+              disabled={selectedManagerId === (employee.reportingManager?._id || "none")}
               className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90"
             >
               Update Manager

@@ -32,6 +32,28 @@ export interface EmployeeStats {
   statusStats: Array<{ _id: string; count: number }>;
 }
 
+export interface Department {
+  _id: string;
+  name: string;
+  description?: string;
+  manager?: string;
+  subCategories?: Array<{ _id: string; name: string }>;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Designation {
+  _id: string;
+  name: string;
+  description?: string;
+  level?: number;
+  department?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Employee Service Functions
 export const employeeService = {
   // Get all employees with filters
@@ -44,7 +66,7 @@ export const employeeService = {
 
     const params = new URLSearchParams();
     Object.entries(otherFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && value !== "all") {
         params.append(key, value.toString());
       }
     });
@@ -427,5 +449,73 @@ export const employeeService = {
     isProfileComplete?: boolean;
   }): Promise<Employee> {
     return this.updateEmployeeComprehensive(id, additionalData);
+  },
+
+  // Get departments for dropdown
+  async getDepartments(companyId: string): Promise<Department[]> {
+    try {
+      const response = await apiClient.getDepartmentsByCompany(companyId);
+      console.log('Departments response:', response); // Debug log
+      
+      if (response.success && response.data) {
+        return response.data.departments || [];
+      } else {
+        console.error('Failed to fetch departments:', response);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      return [];
+    }
+  },
+
+  // Get designations for dropdown
+  async getDesignations(companyId: string): Promise<Designation[]> {
+    try {
+      const response = await apiClient.getDesignationsByCompany(companyId);
+      console.log('Designations response:', response); // Debug log
+      
+      if (response.success && response.data) {
+        return response.data.designations || [];
+      } else {
+        console.error('Failed to fetch designations:', response);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching designations:', error);
+      return [];
+    }
+  },
+
+  // Get roles for dropdown
+  getRoles(): Array<{ value: string; label: string }> {
+    return [
+      { value: 'employee', label: 'Employee' },
+      { value: 'manager', label: 'Manager' }
+    ];
+  },
+
+  // Get managers for reporting manager dropdown
+  async getManagers(companyId: string): Promise<Employee[]> {
+    try {
+      const response = await this.getEmployees({ companyId, role: 'manager' });
+      return response.employees.filter(emp => emp.status === 'active');
+    } catch (error) {
+      console.error('Error fetching managers:', error);
+      return [];
+    }
+  },
+
+  // Get team members for a manager
+  async getTeamMembers(managerId: string, companyId: string): Promise<Employee[]> {
+    try {
+      const response = await this.getEmployees({ companyId });
+      return response.employees.filter(emp => 
+        emp.reportingManager?._id === managerId && emp.status === 'active'
+      );
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+      return [];
+    }
   },
 }; 

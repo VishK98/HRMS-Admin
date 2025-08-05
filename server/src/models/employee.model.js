@@ -68,7 +68,7 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    reportingTo: {
+    reportingManager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
     },
@@ -288,8 +288,9 @@ const employeeSchema = new mongoose.Schema(
     // System fields
     role: {
       type: String,
-      enum: ["employee", "manager", "admin"],
-      default: "employee",
+      required: true,
+      enum: ["employee", "manager"],
+      default: "employee"
     },
     status: {
       type: String,

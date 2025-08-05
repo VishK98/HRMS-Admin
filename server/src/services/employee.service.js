@@ -66,7 +66,7 @@ class EmployeeService {
     try {
       const employee = await Employee.findOne({ email: email.toLowerCase() })
         .populate("company", "name code")
-        .populate("reportingTo", "firstName lastName employeeId");
+        .populate("reportingManager", "firstName lastName employeeId");
 
       if (!employee) {
         throw new Error("Invalid email or password");
@@ -115,7 +115,7 @@ class EmployeeService {
     try {
       const employee = await Employee.findById(employeeId)
         .populate("company", "name code")
-        .populate("reportingTo", "firstName lastName employeeId");
+        .populate("reportingManager", "firstName lastName employeeId");
 
       if (!employee) {
         throw new Error("Employee not found");
@@ -150,7 +150,7 @@ class EmployeeService {
         "employeeId",
         "department",
         "designation",
-        "reportingTo",
+        "reportingManager",
         "joiningDate",
         "dateOfBirth",
         "gender",
@@ -222,7 +222,7 @@ class EmployeeService {
 
       const employees = await Employee.find(query)
         .populate("company", "name code")
-        .populate("reportingTo", "firstName lastName employeeId")
+        .populate("reportingManager", "firstName lastName employeeId")
         .select("-password")
         .sort({ createdAt: -1 });
 
@@ -240,7 +240,7 @@ class EmployeeService {
     try {
       const employee = await Employee.findById(employeeId)
         .populate("company", "name code")
-        .populate("reportingTo", "firstName lastName employeeId");
+        .populate("reportingManager", "firstName lastName employeeId");
 
       if (!employee) {
         throw new Error("Employee not found");

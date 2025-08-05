@@ -29,6 +29,9 @@ import {
   AlertTriangle,
   Save,
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { employeeService, Department, Designation } from "@/services/employeeService";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface EmployeeEditContentProps {
   editedEmployee: Employee;
@@ -51,6 +54,60 @@ export const EmployeeEditContent = ({
   onSave,
   onCancel,
 }: EmployeeEditContentProps) => {
+  const { user } = useAuth();
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [designations, setDesignations] = useState<Designation[]>([]);
+  const [managers, setManagers] = useState<Employee[]>([]);
+  const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch dynamic data on component mount
+  useEffect(() => {
+    if (user?.company?._id) {
+      fetchDynamicData();
+    }
+  }, [user]);
+
+  // Fetch team members when reporting manager changes
+  useEffect(() => {
+    if (editedEmployee.reportingManager?._id) {
+      fetchTeamMembers(editedEmployee.reportingManager._id);
+    } else {
+      setTeamMembers([]);
+    }
+  }, [editedEmployee.reportingManager?._id]);
+
+  const fetchDynamicData = async () => {
+    setLoading(true);
+    try {
+      const [departmentsData, designationsData, managersData] = await Promise.all([
+        employeeService.getDepartments(user!.company!._id),
+        employeeService.getDesignations(user!.company!._id),
+        employeeService.getManagers(user!.company!._id)
+      ]);
+
+      setDepartments(departmentsData);
+      setDesignations(designationsData);
+      setManagers(managersData);
+    } catch (error) {
+      console.error('Error fetching dynamic data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTeamMembers = async (managerId: string) => {
+    try {
+      const teamData = await employeeService.getTeamMembers(managerId, user!.company!._id);
+      setTeamMembers(teamData);
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+      setTeamMembers([]);
+    }
+  };
+
+  const roles = employeeService.getRoles();
+
   return (
     <div className="space-y-8">
       {/* Edit Header */}
@@ -279,34 +336,110 @@ export const EmployeeEditContent = ({
             <Label htmlFor="department" className="text-gray-800 font-medium">
               Department
             </Label>
-            <Input
-              id="department"
+            <Select
               value={editedEmployee.department || ""}
-              onChange={(e) => handleInputChange("department", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
+              onValueChange={(value) => handleInputChange("department", value)}
+              disabled={loading}
+            >
+              <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                <SelectValue placeholder={loading ? "Loading..." : "Select department"} />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem
+                    key={dept._id}
+                    value={dept.name}
+                    className="hover:bg-[#843C6D] hover:text-white"
+                  >
+                    {dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="designation" className="text-gray-800 font-medium">
               Designation
             </Label>
-            <Input
-              id="designation"
+            <Select
               value={editedEmployee.designation || ""}
-              onChange={(e) => handleInputChange("designation", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
+              onValueChange={(value) => handleInputChange("designation", value)}
+              disabled={loading}
+            >
+              <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                <SelectValue placeholder={loading ? "Loading..." : "Select designation"} />
+              </SelectTrigger>
+              <SelectContent>
+                {designations.map((designation) => (
+                  <SelectItem
+                    key={designation._id}
+                    value={designation.name}
+                    className="hover:bg-[#843C6D] hover:text-white"
+                  >
+                    {designation.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="role" className="text-gray-800 font-medium">
               Role
             </Label>
-            <Input
-              id="role"
+            <Select
               value={editedEmployee.role || ""}
-              onChange={(e) => handleInputChange("role", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
+              onValueChange={(value) => handleInputChange("role", value)}
+            >
+              <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                {roles.map((role) => (
+                  <SelectItem
+                    key={role.value}
+                    value={role.value}
+                    className="hover:bg-[#843C6D] hover:text-white"
+                  >
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="reportingManager" className="text-gray-800 font-medium">
+              Reporting Manager
+            </Label>
+            <Select
+              value={editedEmployee.reportingManager?._id || "none"}
+              onValueChange={(value) => {
+                if (value === "none") {
+                  handleInputChange("reportingManager", null);
+                } else {
+                  const selectedManager = managers.find(m => m._id === value);
+                  handleInputChange("reportingManager", selectedManager || null);
+                }
+              }}
+              disabled={loading}
+            >
+              <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                <SelectValue placeholder={loading ? "Loading..." : "Select reporting manager"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none" className="hover:bg-[#843C6D] hover:text-white">
+                  No Manager
+                </SelectItem>
+                {managers.map((manager) => (
+                  <SelectItem
+                    key={manager._id}
+                    value={manager._id}
+                    className="hover:bg-[#843C6D] hover:text-white"
+                  >
+                    {manager.firstName} {manager.lastName} ({manager.employeeId})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="joiningDate" className="text-gray-800 font-medium">
@@ -366,6 +499,34 @@ export const EmployeeEditContent = ({
             </Select>
           </div>
         </InfoCard>
+
+        {/* Team Information - Show team members if employee is a manager */}
+        {editedEmployee.role === 'manager' && (
+          <InfoCard icon={Users} title="Team Members">
+            <div className="space-y-2">
+              <Label className="text-gray-800 font-medium">
+                Direct Reports ({teamMembers.length})
+              </Label>
+              {teamMembers.length > 0 ? (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {teamMembers.map((member) => (
+                    <div key={member._id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{member.firstName} {member.lastName}</p>
+                        <p className="text-xs text-gray-600">{member.employeeId} • {member.designation}</p>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                        {member.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No team members assigned yet.</p>
+              )}
+            </div>
+          </InfoCard>
+        )}
 
         {/* Leave Balance */}
         <InfoCard icon={CalendarDays} title="Leave Balance">
