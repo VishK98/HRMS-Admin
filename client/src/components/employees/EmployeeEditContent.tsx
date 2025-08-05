@@ -57,6 +57,7 @@ export const EmployeeEditContent = ({
   const { user } = useAuth();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [designations, setDesignations] = useState<Designation[]>([]);
+  const [filteredDesignations, setFilteredDesignations] = useState<Designation[]>([]);
   const [managers, setManagers] = useState<Employee[]>([]);
   const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
@@ -68,14 +69,34 @@ export const EmployeeEditContent = ({
     }
   }, [user]);
 
+  // Filter designations when department changes
+  useEffect(() => {
+    if (editedEmployee.department && designations.length > 0) {
+      const filtered = designations.filter(designation => 
+        designation.department === editedEmployee.department
+      );
+      setFilteredDesignations(filtered);
+      
+      // Clear designation if current designation doesn't belong to selected department
+      if (editedEmployee.designation) {
+        const currentDesignation = designations.find(d => d.name === editedEmployee.designation);
+        if (currentDesignation && currentDesignation.department !== editedEmployee.department) {
+          handleInputChange("designation", "");
+        }
+      }
+    } else {
+      setFilteredDesignations(designations);
+    }
+  }, [editedEmployee.department, designations, editedEmployee.designation, handleInputChange]);
+
   // Fetch team members when reporting manager changes
   useEffect(() => {
-    if (editedEmployee.reportingManager?._id) {
-      fetchTeamMembers(editedEmployee.reportingManager._id);
+    if (editedEmployee.reportingManager?._id && user?.company?._id) {
+      fetchTeamMembers(editedEmployee.reportingManager._id, user.company._id);
     } else {
       setTeamMembers([]);
     }
-  }, [editedEmployee.reportingManager?._id]);
+  }, [editedEmployee.reportingManager?._id, user?.company?._id]);
 
   const fetchDynamicData = async () => {
     setLoading(true);
@@ -96,9 +117,9 @@ export const EmployeeEditContent = ({
     }
   };
 
-  const fetchTeamMembers = async (managerId: string) => {
+  const fetchTeamMembers = async (managerId: string, companyId: string) => {
     try {
-      const teamData = await employeeService.getTeamMembers(managerId, user!.company!._id);
+      const teamData = await employeeService.getTeamMembers(managerId, companyId);
       setTeamMembers(teamData);
     } catch (error) {
       console.error('Error fetching team members:', error);
@@ -345,15 +366,17 @@ export const EmployeeEditContent = ({
                 <SelectValue placeholder={loading ? "Loading..." : "Select department"} />
               </SelectTrigger>
               <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem
-                    key={dept._id}
-                    value={dept.name}
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    {dept.name}
-                  </SelectItem>
-                ))}
+                {departments
+                  .filter(dept => dept.name && dept.name.trim() !== '')
+                  .map((dept) => (
+                    <SelectItem
+                      key={dept._id}
+                      value={dept.name}
+                      className="hover:bg-[#843C6D] hover:text-white"
+                    >
+                      {dept.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -361,24 +384,42 @@ export const EmployeeEditContent = ({
             <Label htmlFor="designation" className="text-gray-800 font-medium">
               Designation
             </Label>
+            {editedEmployee.department && (
+              <p className="text-xs text-gray-500">
+                Showing designations for: <span className="font-medium">{editedEmployee.department}</span>
+              </p>
+            )}
             <Select
               value={editedEmployee.designation || ""}
               onValueChange={(value) => handleInputChange("designation", value)}
-              disabled={loading}
+              disabled={loading || !editedEmployee.department}
             >
               <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                <SelectValue placeholder={loading ? "Loading..." : "Select designation"} />
+                <SelectValue placeholder={
+                  loading ? "Loading..." : 
+                  !editedEmployee.department ? "Select department first" :
+                  filteredDesignations.length === 0 ? "No designations available" :
+                  "Select designation"
+                } />
               </SelectTrigger>
               <SelectContent>
-                {designations.map((designation) => (
-                  <SelectItem
-                    key={designation._id}
-                    value={designation.name}
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    {designation.name}
+                {filteredDesignations.length === 0 ? (
+                  <SelectItem value="no-designations" disabled className="text-gray-500">
+                    {editedEmployee.department ? "No designations available for this department" : "Please select a department first"}
                   </SelectItem>
-                ))}
+                ) : (
+                  filteredDesignations
+                    .filter(designation => designation.name && designation.name.trim() !== '')
+                    .map((designation) => (
+                      <SelectItem
+                        key={designation._id}
+                        value={designation.name}
+                        className="hover:bg-[#843C6D] hover:text-white"
+                      >
+                        {designation.name}
+                      </SelectItem>
+                    ))
+                )}
               </SelectContent>
             </Select>
           </div>
