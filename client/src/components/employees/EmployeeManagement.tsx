@@ -299,7 +299,7 @@ export const EmployeeManagement = () => {
                     <TableRow>
                       <TableHead>Employee</TableHead>
                       <TableHead>Contact</TableHead>
-                      <TableHead>Department</TableHead>
+                      <TableHead>Department & Role</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Join Date</TableHead>
                       <TableHead>Salary</TableHead>
@@ -330,7 +330,14 @@ export const EmployeeManagement = () => {
                         <TableCell>
                           <div className="space-y-1">
                             <p className="font-medium">{employee.department}</p>
-                            <p className="text-sm text-muted-foreground">{employee.designation}</p>
+                            <div className="text-sm text-muted-foreground">
+                              {employee.subcategory && (
+                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
+                                  {employee.subcategory}
+                                </span>
+                              )}
+                              {employee.designation}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
