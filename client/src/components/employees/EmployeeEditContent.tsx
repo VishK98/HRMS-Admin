@@ -384,260 +384,264 @@ export const EmployeeEditContent = ({
           </div>
         </InfoCard>
 
-        {/* Employment Information */}
-        <InfoCard icon={Building} title="Employment Information">
-          <div className="space-y-2">
-            <Label htmlFor="department" className="text-gray-800 font-medium">
-              Department
-            </Label>
-            <Select
-              value={editedEmployee.department || ""}
-              onValueChange={(value) => handleInputChange("department", value)}
-              disabled={loading}
-            >
-              <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                <SelectValue placeholder={loading ? "Loading..." : "Select department"} />
-              </SelectTrigger>
-              <SelectContent>
-                {departments
-                  .filter(dept => dept.name && dept.name.trim() !== '')
-                  .map((dept) => (
-                    <SelectItem
-                      key={dept._id}
-                      value={dept.name}
-                      className="hover:bg-[#843C6D] hover:text-white"
-                    >
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="designation" className="text-gray-800 font-medium">
-              Designation
-            </Label>
-            {editedEmployee.department && (
-              <p className="text-xs text-gray-500">
-                Showing designations for: <span className="font-medium">{editedEmployee.department}</span>
-              </p>
-            )}
-            <Select
-              value={editedEmployee.designation || ""}
-              onValueChange={(value) => handleInputChange("designation", value)}
-              disabled={loading || !editedEmployee.department}
-            >
-              <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                <SelectValue placeholder={
-                  loading ? "Loading..." : 
-                  !editedEmployee.department ? "Select department first" :
-                  filteredDesignations.length === 0 ? "No designations available" :
-                  "Select designation"
-                } />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredDesignations.length === 0 ? (
-                  <SelectItem value="no-designations" disabled className="text-gray-500">
-                    {editedEmployee.department ? "No designations available for this department" : "Please select a department first"}
-                  </SelectItem>
-                ) : (
-                  filteredDesignations
-                    .filter(designation => designation.name && designation.name.trim() !== '')
-                    .map((designation) => (
-                      <SelectItem
-                        key={designation._id}
-                        value={designation.name}
-                        className="hover:bg-[#843C6D] hover:text-white"
-                      >
-                        {designation.name} {designation.level ? `(Level ${designation.level})` : ''}
-                      </SelectItem>
-                    ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Subcategory - Only show if department has subcategories */}
-          {selectedDepartmentSubcategories.length > 0 && (
-            <div className="space-y-2">
-              <Label htmlFor="subcategory" className="text-gray-800 font-medium">
-                Subcategory
-              </Label>
-              <p className="text-xs text-gray-500">
-                Subcategories for: <span className="font-medium">{editedEmployee.department}</span>
-              </p>
-              <Select
-                value={editedEmployee.subcategory || "no-subcategory"}
-                onValueChange={(value) => {
-                  if (value === "no-subcategory") {
-                    handleInputChange("subcategory", "");
-                  } else {
-                    handleInputChange("subcategory", value);
-                  }
-                }}
-                disabled={loading}
-              >
-                <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                  <SelectValue placeholder="Select subcategory" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="no-subcategory" className="hover:bg-[#843C6D] hover:text-white">
-                    No Subcategory
-                  </SelectItem>
-                  {selectedDepartmentSubcategories
-                    .filter(subcategory => subcategory.name && subcategory.name.trim() !== '')
-                    .map((subcategory) => (
-                      <SelectItem
-                        key={subcategory._id}
-                        value={subcategory.name}
-                        className="hover:bg-[#843C6D] hover:text-white"
-                      >
-                        {subcategory.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="role" className="text-gray-800 font-medium">
-              Role
-            </Label>
-            <Select
-              value={editedEmployee.role || ""}
-              onValueChange={(value) => {
-                handleInputChange("role", value);
-                // Clear reporting manager if role is not employee
-                if (value !== "employee") {
-                  handleInputChange("reportingManager", null);
-                }
-              }}
-            >
-              <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map((role) => (
-                  <SelectItem
-                    key={role.value}
-                    value={role.value}
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    {role.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Reporting Manager - Only show for employees */}
-          {/* This field only appears when the role is set to "employee" */}
-          {editedEmployee.role === "employee" ? (
-            <div className="space-y-2">
-              <Label htmlFor="reportingManager" className="text-gray-800 font-medium">
-                Reporting Manager
-              </Label>
-              <Select
-                value={editedEmployee.reportingManager?._id || "none"}
-                onValueChange={(value) => {
-                  if (value === "none") {
-                    handleInputChange("reportingManager", null);
-                  } else {
-                    const selectedManager = managers.find(m => m._id === value);
-                    handleInputChange("reportingManager", selectedManager || null);
-                  }
-                }}
-                disabled={loading}
-              >
-                <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                  <SelectValue placeholder={loading ? "Loading..." : "Select reporting manager"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none" className="hover:bg-[#843C6D] hover:text-white">
-                    No Manager
-                  </SelectItem>
-                  {managers
-                    .filter(manager => manager.role === "manager" && manager.status === "active")
-                    .map((manager) => (
-                      <SelectItem
-                        key={manager._id}
-                        value={manager._id}
-                        className="hover:bg-[#843C6D] hover:text-white"
-                      >
-                        {manager.firstName} {manager.lastName} ({manager.employeeId})
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : editedEmployee.role ? (
-            <div className="space-y-2">
-              <Label className="text-gray-600 text-sm">
-                Reporting Manager
-              </Label>
-              <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border">
-                Reporting manager selection is only available for employees with "Employee" role.
-              </div>
-            </div>
-          ) : null}
-          <div className="space-y-2">
-            <Label htmlFor="joiningDate" className="text-gray-800 font-medium">
-              Joining Date
-            </Label>
-            <Input
-              id="joiningDate"
-              type="date"
-              value={
-                editedEmployee.joiningDate
-                  ? new Date(editedEmployee.joiningDate)
-                      .toISOString()
-                      .split("T")[0]
-                  : ""
-              }
-              onChange={(e) => handleInputChange("joiningDate", e.target.value)}
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="status" className="text-gray-800 font-medium">
-              Status
-            </Label>
-            <Select
-              value={editedEmployee.status}
-              onValueChange={(value) => handleInputChange("status", value)}
-            >
-              <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  value="active"
-                  className="hover:bg-[#843C6D] hover:text-white"
-                >
-                  Active
-                </SelectItem>
-                <SelectItem
-                  value="inactive"
-                  className="hover:bg-[#843C6D] hover:text-white"
-                >
-                  Inactive
-                </SelectItem>
-                <SelectItem
-                  value="terminated"
-                  className="hover:bg-[#843C6D] hover:text-white"
-                >
-                  Terminated
-                </SelectItem>
-                <SelectItem
-                  value="resigned"
-                  className="hover:bg-[#843C6D] hover:text-white"
-                >
-                  Resigned
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </InfoCard>
+                 {/* Employment Information */}
+         <InfoCard icon={Building} title="Employment Information">
+           <div className="space-y-2">
+             <Label htmlFor="department" className="text-gray-800 font-medium">
+               Department
+             </Label>
+             <Select
+               value={editedEmployee.department || ""}
+               onValueChange={(value) => handleInputChange("department", value)}
+               disabled={loading}
+             >
+               <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                 <SelectValue placeholder={loading ? "Loading..." : "Select department"} />
+               </SelectTrigger>
+               <SelectContent>
+                 {departments
+                   .filter(dept => dept.name && dept.name.trim() !== '')
+                   .map((dept) => (
+                     <SelectItem
+                       key={dept._id}
+                       value={dept.name}
+                       className="hover:bg-[#843C6D] hover:text-white"
+                     >
+                       {dept.name}
+                     </SelectItem>
+                   ))}
+               </SelectContent>
+             </Select>
+           </div>
+           
+           {/* Subcategory - Only show if department has subcategories */}
+           {selectedDepartmentSubcategories.length > 0 && (
+             <div className="space-y-2">
+               <Label htmlFor="subcategory" className="text-gray-800 font-medium">
+                 Subcategory
+               </Label>
+               <p className="text-xs text-gray-500">
+                 Subcategories for: <span className="font-medium">{editedEmployee.department}</span>
+               </p>
+               <Select
+                 value={editedEmployee.subcategory || "no-subcategory"}
+                 onValueChange={(value) => {
+                   if (value === "no-subcategory") {
+                     handleInputChange("subcategory", "");
+                   } else {
+                     handleInputChange("subcategory", value);
+                   }
+                 }}
+                 disabled={loading}
+               >
+                 <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                   <SelectValue placeholder="Select subcategory" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="no-subcategory" className="hover:bg-[#843C6D] hover:text-white">
+                     No Subcategory
+                   </SelectItem>
+                   {selectedDepartmentSubcategories
+                     .filter(subcategory => subcategory.name && subcategory.name.trim() !== '')
+                     .map((subcategory) => (
+                       <SelectItem
+                         key={subcategory._id}
+                         value={subcategory.name}
+                         className="hover:bg-[#843C6D] hover:text-white"
+                       >
+                         {subcategory.name}
+                       </SelectItem>
+                     ))}
+                 </SelectContent>
+               </Select>
+             </div>
+           )}
+           
+           <div className="space-y-2">
+             <Label htmlFor="designation" className="text-gray-800 font-medium">
+               Designation
+             </Label>
+             {editedEmployee.department && (
+               <p className="text-xs text-gray-500">
+                 Showing designations for: <span className="font-medium">{editedEmployee.department}</span>
+               </p>
+             )}
+             <Select
+               value={editedEmployee.designation || ""}
+               onValueChange={(value) => handleInputChange("designation", value)}
+               disabled={loading || !editedEmployee.department}
+             >
+               <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                 <SelectValue placeholder={
+                   loading ? "Loading..." : 
+                   !editedEmployee.department ? "Select department first" :
+                   filteredDesignations.length === 0 ? "No designations available" :
+                   "Select designation"
+                 } />
+               </SelectTrigger>
+               <SelectContent>
+                 {filteredDesignations.length === 0 ? (
+                   <SelectItem value="no-designations" disabled className="text-gray-500">
+                     {editedEmployee.department ? "No designations available for this department" : "Please select a department first"}
+                   </SelectItem>
+                 ) : (
+                   filteredDesignations
+                     .filter(designation => designation.name && designation.name.trim() !== '')
+                     .map((designation) => (
+                       <SelectItem
+                         key={designation._id}
+                         value={designation.name}
+                         className="hover:bg-[#843C6D] hover:text-white"
+                       >
+                         {designation.name} {designation.level ? `(Level ${designation.level})` : ''}
+                       </SelectItem>
+                     ))
+                 )}
+               </SelectContent>
+             </Select>
+           </div>
+           
+           <div className="space-y-2">
+             <Label htmlFor="role" className="text-gray-800 font-medium">
+               Role
+             </Label>
+             <Select
+               value={editedEmployee.role || ""}
+               onValueChange={(value) => {
+                 handleInputChange("role", value);
+                 // Clear reporting manager if role is not employee
+                 if (value !== "employee") {
+                   handleInputChange("reportingManager", null);
+                 }
+               }}
+             >
+               <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                 <SelectValue placeholder="Select role" />
+               </SelectTrigger>
+               <SelectContent>
+                 {roles.map((role) => (
+                   <SelectItem
+                     key={role.value}
+                     value={role.value}
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     {role.label}
+                   </SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+           </div>
+           
+           {/* Reporting Manager - Only show for employees */}
+           {/* This field only appears when the role is set to "employee" */}
+           {editedEmployee.role === "employee" ? (
+             <div className="space-y-2">
+               <Label htmlFor="reportingManager" className="text-gray-800 font-medium">
+                 Reporting Manager
+               </Label>
+               <Select
+                 value={editedEmployee.reportingManager?._id || "none"}
+                 onValueChange={(value) => {
+                   if (value === "none") {
+                     handleInputChange("reportingManager", null);
+                   } else {
+                     const selectedManager = managers.find(m => m._id === value);
+                     handleInputChange("reportingManager", selectedManager || null);
+                   }
+                 }}
+                 disabled={loading}
+               >
+                 <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                   <SelectValue placeholder={loading ? "Loading..." : "Select reporting manager"} />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="none" className="hover:bg-[#843C6D] hover:text-white">
+                     No Manager
+                   </SelectItem>
+                   {managers
+                     .filter(manager => manager.role === "manager" && manager.status === "active")
+                     .map((manager) => (
+                       <SelectItem
+                         key={manager._id}
+                         value={manager._id}
+                         className="hover:bg-[#843C6D] hover:text-white"
+                       >
+                         {manager.firstName} {manager.lastName} ({manager.employeeId})
+                       </SelectItem>
+                     ))}
+                 </SelectContent>
+               </Select>
+             </div>
+           ) : editedEmployee.role ? (
+             <div className="space-y-2">
+               <Label className="text-gray-600 text-sm">
+                 Reporting Manager
+               </Label>
+               <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border">
+                 Reporting manager selection is only available for employees with "Employee" role.
+               </div>
+             </div>
+           ) : null}
+           
+           <div className="space-y-2">
+             <Label htmlFor="joiningDate" className="text-gray-800 font-medium">
+               Joining Date
+             </Label>
+             <Input
+               id="joiningDate"
+               type="date"
+               value={
+                 editedEmployee.joiningDate
+                   ? new Date(editedEmployee.joiningDate)
+                       .toISOString()
+                       .split("T")[0]
+                   : ""
+               }
+               onChange={(e) => handleInputChange("joiningDate", e.target.value)}
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           
+           <div className="space-y-2">
+             <Label htmlFor="status" className="text-gray-800 font-medium">
+               Status
+             </Label>
+             <Select
+               value={editedEmployee.status}
+               onValueChange={(value) => handleInputChange("status", value)}
+             >
+               <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                 <SelectValue placeholder="Select status" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem
+                   value="active"
+                   className="hover:bg-[#843C6D] hover:text-white"
+                 >
+                   Active
+                 </SelectItem>
+                 <SelectItem
+                   value="inactive"
+                   className="hover:bg-[#843C6D] hover:text-white"
+                 >
+                   Inactive
+                 </SelectItem>
+                 <SelectItem
+                   value="terminated"
+                   className="hover:bg-[#843C6D] hover:text-white"
+                 >
+                   Terminated
+                 </SelectItem>
+                 <SelectItem
+                   value="resigned"
+                   className="hover:bg-[#843C6D] hover:text-white"
+                 >
+                   Resigned
+                 </SelectItem>
+               </SelectContent>
+             </Select>
+           </div>
+         </InfoCard>
 
         {/* Team Information - Show team members if employee is a manager */}
         {editedEmployee.role === 'manager' && (
