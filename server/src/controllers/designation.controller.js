@@ -4,12 +4,12 @@ const Designation = require("../models/designation.model");
 const getDesignationsByCompany = async (req, res) => {
   try {
     const { companyId } = req.params;
-    
-    const designations = await Designation.find({ 
-      companyId, 
-      isActive: true 
+
+    const designations = await Designation.find({
+      companyId,
+      isActive: true,
     }).sort({ createdAt: -1 });
-    
+
     res.status(200).json({
       success: true,
       data: { designations },
@@ -28,21 +28,33 @@ const getDesignationsByCompany = async (req, res) => {
 // Create a new designation
 const createDesignation = async (req, res) => {
   try {
+    console.log("createDesignation called with body:", req.body);
     const { name, description, level, department, companyId } = req.body;
-    
-    // Check if designation with same name already exists for this company
-    const existingDesignation = await Designation.findOne({ 
-      name, 
-      companyId 
+
+    console.log("Extracted data:", {
+      name,
+      description,
+      level,
+      department,
+      companyId,
     });
-    
+
+    // Check if designation with same name already exists for this company
+    const existingDesignation = await Designation.findOne({
+      name,
+      companyId,
+    });
+
+    console.log("Existing designation check:", existingDesignation);
+
     if (existingDesignation) {
+      console.log("Designation already exists");
       return res.status(400).json({
         success: false,
         message: "Designation with this name already exists",
       });
     }
-    
+
     const designation = new Designation({
       name,
       description,
@@ -50,9 +62,12 @@ const createDesignation = async (req, res) => {
       department,
       companyId,
     });
-    
+
+    console.log("Saving designation:", designation);
     await designation.save();
-    
+
+    console.log("Designation saved successfully:", designation);
+
     res.status(201).json({
       success: true,
       data: designation,
@@ -73,20 +88,19 @@ const updateDesignation = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    
-    const designation = await Designation.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
-    
+
+    const designation = await Designation.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
     if (!designation) {
       return res.status(404).json({
         success: false,
         message: "Designation not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       data: designation,
@@ -106,20 +120,20 @@ const updateDesignation = async (req, res) => {
 const deleteDesignation = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const designation = await Designation.findByIdAndUpdate(
       id,
       { isActive: false },
       { new: true }
     );
-    
+
     if (!designation) {
       return res.status(404).json({
         success: false,
         message: "Designation not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       message: "Designation deleted successfully",
@@ -138,16 +152,16 @@ const deleteDesignation = async (req, res) => {
 const getDesignationById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const designation = await Designation.findById(id);
-    
+
     if (!designation) {
       return res.status(404).json({
         success: false,
         message: "Designation not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       data: designation,
@@ -169,4 +183,4 @@ module.exports = {
   updateDesignation,
   deleteDesignation,
   getDesignationById,
-}; 
+};

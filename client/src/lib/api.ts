@@ -249,10 +249,13 @@ class ApiClient {
   }
 
   async createDesignation(designationData: any) {
-    return this.request('/designations', {
+    console.log("API createDesignation called with:", designationData);
+    const response = await this.request('/designations', {
       method: 'POST',
       body: JSON.stringify(designationData),
     });
+    console.log("API createDesignation response:", response);
+    return response;
   }
 
   async updateDesignation(designationId: string, updateData: any) {

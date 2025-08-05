@@ -4,12 +4,12 @@ const Department = require("../models/department.model");
 const getDepartmentsByCompany = async (req, res) => {
   try {
     const { companyId } = req.params;
-    
-    const departments = await Department.find({ 
-      companyId, 
-      isActive: true 
+
+    const departments = await Department.find({
+      companyId,
+      isActive: true,
     }).sort({ createdAt: -1 });
-    
+
     res.status(200).json({
       success: true,
       data: { departments },
@@ -29,20 +29,31 @@ const getDepartmentsByCompany = async (req, res) => {
 const createDepartment = async (req, res) => {
   try {
     const { name, description, manager, subCategories, companyId } = req.body;
-    
-    // Check if department with same name already exists for this company
-    const existingDepartment = await Department.findOne({ 
-      name, 
-      companyId 
+
+    console.log("Creating department with data:", {
+      name,
+      description,
+      manager,
+      companyId,
+      subCategories,
     });
-    
+
+    // Check if department with same name already exists for this company
+    const existingDepartment = await Department.findOne({
+      name,
+      companyId,
+    });
+
+    console.log("Existing department check:", existingDepartment);
+
     if (existingDepartment) {
+      console.log("Department with this name already exists");
       return res.status(400).json({
         success: false,
         message: "Department with this name already exists",
       });
     }
-    
+
     const department = new Department({
       name,
       description,
@@ -50,9 +61,9 @@ const createDepartment = async (req, res) => {
       subCategories: subCategories || [],
       companyId,
     });
-    
+
     await department.save();
-    
+
     res.status(201).json({
       success: true,
       data: department,
@@ -73,20 +84,40 @@ const updateDepartment = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    
-    const department = await Department.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
-    
+
+    console.log("Updating department with data:", { id, updateData });
+
+    // If name is being updated, check for duplicates
+    if (updateData.name) {
+      const existingDepartment = await Department.findOne({
+        name: updateData.name,
+        companyId: updateData.companyId,
+        _id: { $ne: id }, // Exclude current department
+      });
+
+      console.log("Existing department check for update:", existingDepartment);
+
+      if (existingDepartment) {
+        console.log("Department with this name already exists during update");
+        return res.status(400).json({
+          success: false,
+          message: "Department with this name already exists",
+        });
+      }
+    }
+
+    const department = await Department.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
     if (!department) {
       return res.status(404).json({
         success: false,
         message: "Department not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       data: department,
@@ -106,20 +137,20 @@ const updateDepartment = async (req, res) => {
 const deleteDepartment = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const department = await Department.findByIdAndUpdate(
       id,
       { isActive: false },
       { new: true }
     );
-    
+
     if (!department) {
       return res.status(404).json({
         success: false,
         message: "Department not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       message: "Department deleted successfully",
@@ -138,16 +169,16 @@ const deleteDepartment = async (req, res) => {
 const getDepartmentById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const department = await Department.findById(id);
-    
+
     if (!department) {
       return res.status(404).json({
         success: false,
         message: "Department not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       data: department,
@@ -168,36 +199,36 @@ const addSubCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description } = req.body;
-    
+
     const department = await Department.findById(id);
-    
+
     if (!department) {
       return res.status(404).json({
         success: false,
         message: "Department not found",
       });
     }
-    
+
     // Check if subcategory with same name already exists
     const existingSubCategory = department.subCategories.find(
-      sub => sub.name === name
+      (sub) => sub.name === name
     );
-    
+
     if (existingSubCategory) {
       return res.status(400).json({
         success: false,
         message: "Subcategory with this name already exists",
       });
     }
-    
+
     department.subCategories.push({
       name,
       description,
       isActive: true,
     });
-    
+
     await department.save();
-    
+
     res.status(200).json({
       success: true,
       data: department,
@@ -220,4 +251,4 @@ module.exports = {
   deleteDepartment,
   getDepartmentById,
   addSubCategory,
-}; 
+};

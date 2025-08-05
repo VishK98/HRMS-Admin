@@ -93,6 +93,7 @@ export const DesignationModal = ({
 
   useEffect(() => {
     if (designation && mode !== "add") {
+      console.log("Setting form data for edit:", designation);
       setFormData({
         name: designation.name,
         description: designation.description || "",
@@ -101,6 +102,7 @@ export const DesignationModal = ({
         isActive: designation.isActive,
       });
     } else {
+      console.log("Setting form data for add");
       setFormData({
         name: "",
         description: "",
@@ -130,8 +132,15 @@ export const DesignationModal = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    console.log("Form submitted with data:", formData);
+    console.log("Validation result:", validateForm());
+    
+    if (!validateForm()) {
+      console.log("Form validation failed");
+      return;
+    }
 
+    console.log("Creating designation data...");
     const designationData: Designation = {
       _id: designation?._id || "",
       name: formData.name!,
@@ -143,6 +152,7 @@ export const DesignationModal = ({
       updatedAt: new Date().toISOString(),
     };
 
+    console.log("Calling onSave with data:", designationData);
     onSave(designationData);
   };
 
@@ -224,7 +234,11 @@ export const DesignationModal = ({
               <Label htmlFor="department">Department</Label>
               <Select
                 value={formData.department}
-                onValueChange={(value) => setFormData({ ...formData, department: value })}
+                onValueChange={(value) => {
+                  const selectedDept = departments.find(dept => dept._id === value);
+                  console.log("Selected department:", selectedDept);
+                  setFormData({ ...formData, department: selectedDept?.name || "" });
+                }}
                 disabled={isViewMode}
               >
                 <SelectTrigger>
@@ -274,34 +288,35 @@ export const DesignationModal = ({
               </div>
             </div>
           )}
-        </form>
 
-        <DialogFooter>
-          {isViewMode ? (
-            <>
-              <Button variant="outline" onClick={onCancel}>
-                Close
-              </Button>
-              <Button onClick={() => onOpenChange(false)}>
-                Edit
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" onClick={onCancel}>
-                Cancel
-              </Button>
-              {isEditMode && onDelete && (
-                <Button variant="destructive" onClick={handleDelete}>
-                  Delete
+          {/* Form Actions */}
+          <div className="flex justify-end gap-2 pt-4">
+            {isViewMode ? (
+              <>
+                <Button variant="outline" onClick={onCancel}>
+                  Close
                 </Button>
-              )}
-              <Button type="submit">
-                {isAddMode ? "Create" : "Save Changes"}
-              </Button>
-            </>
-          )}
-        </DialogFooter>
+                <Button onClick={() => onOpenChange(false)}>
+                  Edit
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+                {isEditMode && onDelete && (
+                  <Button variant="destructive" onClick={handleDelete}>
+                    Delete
+                  </Button>
+                )}
+                <Button type="submit">
+                  {isAddMode ? "Create" : "Save Changes"}
+                </Button>
+              </>
+            )}
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

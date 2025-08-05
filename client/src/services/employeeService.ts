@@ -472,11 +472,14 @@ export const employeeService = {
   // Get designations for dropdown
   async getDesignations(companyId: string): Promise<Designation[]> {
     try {
+      console.log("Fetching designations for company:", companyId);
       const response = await apiClient.getDesignationsByCompany(companyId);
-      console.log('Designations response:', response); // Debug log
+      console.log("Designations response:", response);
       
       if (response.success && response.data) {
-        return response.data.designations || [];
+        const designations = response.data.designations || [];
+        console.log("Returning designations:", designations);
+        return designations;
       } else {
         console.error('Failed to fetch designations:', response);
         return [];

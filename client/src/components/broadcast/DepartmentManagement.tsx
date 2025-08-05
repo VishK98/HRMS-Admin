@@ -144,12 +144,14 @@ export const DepartmentManagement = () => {
         }
         setModalOpen(false);
       } else {
-        setError(response.message || "Failed to save department");
-        toast.error(response.message || "Failed to save department");
+        const errorMessage = response.message || "Failed to save department";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
-    } catch (err) {
-      setError("Failed to save department");
-      toast.error("Network error while saving department");
+    } catch (err: any) {
+      const errorMessage = err.message || "Failed to save department";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error saving department:", err);
     }
   };

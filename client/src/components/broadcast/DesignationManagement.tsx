@@ -126,17 +126,26 @@ export const DesignationManagement = () => {
   };
 
   const handleSaveDesignation = async (designation: Designation) => {
+    console.log("handleSaveDesignation called with:", designation);
+    console.log("Modal mode:", modalMode);
+    console.log("User company ID:", user?.company?._id);
+    
     try {
       let response;
       if (modalMode === "add") {
         // Create new designation
-        response = await apiClient.createDesignation({ ...designation, companyId: user!.company!._id });
+        const designationData = { ...designation, companyId: user!.company!._id };
+        console.log("Creating designation with data:", designationData);
+        response = await apiClient.createDesignation(designationData);
+        console.log("Create designation response:", response);
         if (response.success) {
           toast.success("Designation created successfully");
         }
       } else {
         // Update existing designation
+        console.log("Updating designation with data:", designation);
         response = await apiClient.updateDesignation(designation._id, designation);
+        console.log("Update designation response:", response);
         if (response.success) {
           toast.success("Designation updated successfully");
         }
@@ -154,6 +163,7 @@ export const DesignationManagement = () => {
         toast.error(response.message || "Failed to save designation");
       }
     } catch (err) {
+      console.error("Error in handleSaveDesignation:", err);
       setError("Failed to save designation");
       toast.error("Network error while saving designation");
       console.error("Error saving designation:", err);

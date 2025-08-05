@@ -38,7 +38,6 @@ export const DepartmentModal = ({
   const [formData, setFormData] = useState<Partial<Department>>({
     name: "",
     description: "",
-    manager: "",
     subCategories: [],
     isActive: true,
   });
@@ -56,7 +55,6 @@ export const DepartmentModal = ({
       setFormData({
         name: department.name,
         description: department.description || "",
-        manager: department.manager || "",
         subCategories: department.subCategories || [],
         isActive: department.isActive,
       });
@@ -64,7 +62,6 @@ export const DepartmentModal = ({
       setFormData({
         name: "",
         description: "",
-        manager: "",
         subCategories: [],
         isActive: true,
       });
@@ -94,7 +91,6 @@ export const DepartmentModal = ({
       _id: department?._id || "",
       name: formData.name!,
       description: formData.description,
-      manager: formData.manager,
       subCategories: formData.subCategories || [],
       isActive: formData.isActive!,
       createdAt: department?.createdAt || new Date().toISOString(),
@@ -201,27 +197,16 @@ export const DepartmentModal = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="manager">Manager</Label>
-              <Input
-                id="manager"
-                value={formData.manager}
-                onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-                placeholder="Enter manager name"
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Enter description"
                 disabled={isViewMode}
+                rows={3}
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Enter description"
-              disabled={isViewMode}
-              rows={3}
-            />
           </div>
 
           {/* Subcategories Section */}

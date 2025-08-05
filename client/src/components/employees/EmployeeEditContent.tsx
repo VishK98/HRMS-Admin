@@ -101,11 +101,16 @@ export const EmployeeEditContent = ({
   const fetchDynamicData = async () => {
     setLoading(true);
     try {
+      console.log("Fetching dynamic data for company:", user!.company!._id);
       const [departmentsData, designationsData, managersData] = await Promise.all([
         employeeService.getDepartments(user!.company!._id),
         employeeService.getDesignations(user!.company!._id),
         employeeService.getManagers(user!.company!._id)
       ]);
+
+      console.log("Fetched departments:", departmentsData);
+      console.log("Fetched designations:", designationsData);
+      console.log("Fetched managers:", managersData);
 
       setDepartments(departmentsData);
       setDesignations(designationsData);
@@ -416,7 +421,7 @@ export const EmployeeEditContent = ({
                         value={designation.name}
                         className="hover:bg-[#843C6D] hover:text-white"
                       >
-                        {designation.name}
+                        {designation.name} {designation.level ? `(Level ${designation.level})` : ''}
                       </SelectItem>
                     ))
                 )}
