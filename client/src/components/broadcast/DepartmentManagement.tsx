@@ -7,7 +7,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from "@/components/ui/table";
 import { 
-  Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal
+  Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal, RefreshCw
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ import { DepartmentModal } from "./DepartmentModal";
 import { Department } from "@/types/broadcast";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
+import { toast } from "sonner";
 
 export const DepartmentManagement = () => {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ export const DepartmentManagement = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [filteredDepartments, setFilteredDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Modal states
@@ -51,20 +53,29 @@ export const DepartmentManagement = () => {
     setError(null);
     
     try {
-      // Fetch departments from the API
+      console.log("Fetching departments for company:", user!.company!._id);
       const response = await apiClient.getDepartmentsByCompany(user!.company!._id);
       
       if (response.success) {
         setDepartments(response.data!.departments);
+        toast.success(`Loaded ${response.data!.departments?.length || 0} departments`);
       } else {
         setError(response.message || "Failed to fetch departments");
+        toast.error("Failed to fetch departments");
       }
     } catch (err) {
       setError("Failed to fetch departments");
+      toast.error("Network error while fetching departments");
       console.error("Error fetching departments:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const refreshDepartments = async () => {
+    setRefreshing(true);
+    await fetchDepartments();
+    setRefreshing(false);
   };
 
   const filterDepartments = () => {
@@ -97,6 +108,12 @@ export const DepartmentManagement = () => {
   };
 
   const handleAddDepartment = () => {
+    if (!user?.company?._id) {
+      setError("No company ID found. Please contact your administrator.");
+      toast.error("Company access required");
+      return;
+    }
+    
     setSelectedDepartment(null);
     setModalMode("add");
     setModalOpen(true);
@@ -108,9 +125,15 @@ export const DepartmentManagement = () => {
       if (modalMode === "add") {
         // Create new department
         response = await apiClient.createDepartment({ ...department, companyId: user!.company!._id });
+        if (response.success) {
+          toast.success("Department created successfully");
+        }
       } else {
         // Update existing department
         response = await apiClient.updateDepartment(department._id, department);
+        if (response.success) {
+          toast.success("Department updated successfully");
+        }
       }
       
       if (response.success) {
@@ -122,9 +145,11 @@ export const DepartmentManagement = () => {
         setModalOpen(false);
       } else {
         setError(response.message || "Failed to save department");
+        toast.error(response.message || "Failed to save department");
       }
     } catch (err) {
       setError("Failed to save department");
+      toast.error("Network error while saving department");
       console.error("Error saving department:", err);
     }
   };
@@ -136,11 +161,14 @@ export const DepartmentManagement = () => {
       if (response.success) {
         setDepartments(prev => prev.filter(dept => dept._id !== departmentId));
         setModalOpen(false);
+        toast.success("Department deleted successfully");
       } else {
         setError(response.message || "Failed to delete department");
+        toast.error(response.message || "Failed to delete department");
       }
     } catch (err) {
       setError("Failed to delete department");
+      toast.error("Network error while deleting department");
       console.error("Error deleting department:", err);
     }
   };
@@ -214,6 +242,15 @@ export const DepartmentManagement = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button 
+              variant="outline" 
+              onClick={refreshDepartments} 
+              disabled={refreshing}
+              className="gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </Button>
           </div>
 
           {/* Department Table */}

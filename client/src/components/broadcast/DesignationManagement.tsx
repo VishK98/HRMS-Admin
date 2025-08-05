@@ -7,7 +7,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from "@/components/ui/table";
 import { 
-  Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal
+  Plus, Search, Filter, Edit, Trash2, Eye, MoreHorizontal, RefreshCw
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ import { DesignationModal } from "./DesignationModal";
 import { Designation } from "@/types/broadcast";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
+import { toast } from "sonner";
 
 export const DesignationManagement = () => {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ export const DesignationManagement = () => {
   const [designations, setDesignations] = useState<Designation[]>([]);
   const [filteredDesignations, setFilteredDesignations] = useState<Designation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Modal states
@@ -51,21 +53,30 @@ export const DesignationManagement = () => {
     setError(null);
     
     try {
-      // Fetch designations from the API
+      console.log("Fetching designations for company:", user!.company!._id);
       const response = await apiClient.getDesignationsByCompany(user!.company!._id);
       
       if (response.success && response.data) {
         const data = response.data as { designations: Designation[] };
         setDesignations(data.designations || []);
+        toast.success(`Loaded ${data.designations?.length || 0} designations`);
       } else {
         setError(response.message || "Failed to fetch designations");
+        toast.error("Failed to fetch designations");
       }
     } catch (err) {
       setError("Failed to fetch designations");
+      toast.error("Network error while fetching designations");
       console.error("Error fetching designations:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const refreshDesignations = async () => {
+    setRefreshing(true);
+    await fetchDesignations();
+    setRefreshing(false);
   };
 
   const filterDesignations = () => {
@@ -104,6 +115,7 @@ export const DesignationManagement = () => {
     
     if (!user?.company?._id) {
       setError("No company ID found. Please contact your administrator.");
+      toast.error("Company access required");
       return;
     }
     
@@ -119,9 +131,15 @@ export const DesignationManagement = () => {
       if (modalMode === "add") {
         // Create new designation
         response = await apiClient.createDesignation({ ...designation, companyId: user!.company!._id });
+        if (response.success) {
+          toast.success("Designation created successfully");
+        }
       } else {
         // Update existing designation
         response = await apiClient.updateDesignation(designation._id, designation);
+        if (response.success) {
+          toast.success("Designation updated successfully");
+        }
       }
       
       if (response.success) {
@@ -133,9 +151,11 @@ export const DesignationManagement = () => {
         setModalOpen(false);
       } else {
         setError(response.message || "Failed to save designation");
+        toast.error(response.message || "Failed to save designation");
       }
     } catch (err) {
       setError("Failed to save designation");
+      toast.error("Network error while saving designation");
       console.error("Error saving designation:", err);
     }
   };
@@ -147,11 +167,14 @@ export const DesignationManagement = () => {
       if (response.success) {
         setDesignations(prev => prev.filter(des => des._id !== designationId));
         setModalOpen(false);
+        toast.success("Designation deleted successfully");
       } else {
         setError(response.message || "Failed to delete designation");
+        toast.error(response.message || "Failed to delete designation");
       }
     } catch (err) {
       setError("Failed to delete designation");
+      toast.error("Network error while deleting designation");
       console.error("Error deleting designation:", err);
     }
   };
@@ -225,6 +248,15 @@ export const DesignationManagement = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button 
+              variant="outline" 
+              onClick={refreshDesignations} 
+              disabled={refreshing}
+              className="gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </Button>
           </div>
 
           {/* Designation Table */}
