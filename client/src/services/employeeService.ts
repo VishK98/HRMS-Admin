@@ -501,8 +501,11 @@ export const employeeService = {
   // Get managers for reporting manager dropdown
   async getManagers(companyId: string): Promise<Employee[]> {
     try {
-      const response = await this.getEmployees({ companyId, role: 'manager' });
-      return response.employees.filter(emp => emp.status === 'active');
+      const response = await this.getEmployees({ companyId });
+      // Filter to only include active employees with manager role
+      return response.employees.filter(emp => 
+        emp.role === 'manager' && emp.status === 'active'
+      );
     } catch (error) {
       console.error('Error fetching managers:', error);
       return [];

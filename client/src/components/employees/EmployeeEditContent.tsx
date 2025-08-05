@@ -434,7 +434,13 @@ export const EmployeeEditContent = ({
             </Label>
             <Select
               value={editedEmployee.role || ""}
-              onValueChange={(value) => handleInputChange("role", value)}
+              onValueChange={(value) => {
+                handleInputChange("role", value);
+                // Clear reporting manager if role is not employee
+                if (value !== "employee") {
+                  handleInputChange("reportingManager", null);
+                }
+              }}
             >
               <SelectTrigger className="border-gray-200 focus:border-gray-800">
                 <SelectValue placeholder="Select role" />
@@ -452,41 +458,57 @@ export const EmployeeEditContent = ({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="reportingManager" className="text-gray-800 font-medium">
-              Reporting Manager
-            </Label>
-            <Select
-              value={editedEmployee.reportingManager?._id || "none"}
-              onValueChange={(value) => {
-                if (value === "none") {
-                  handleInputChange("reportingManager", null);
-                } else {
-                  const selectedManager = managers.find(m => m._id === value);
-                  handleInputChange("reportingManager", selectedManager || null);
-                }
-              }}
-              disabled={loading}
-            >
-              <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                <SelectValue placeholder={loading ? "Loading..." : "Select reporting manager"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none" className="hover:bg-[#843C6D] hover:text-white">
-                  No Manager
-                </SelectItem>
-                {managers.map((manager) => (
-                  <SelectItem
-                    key={manager._id}
-                    value={manager._id}
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    {manager.firstName} {manager.lastName} ({manager.employeeId})
+          
+          {/* Reporting Manager - Only show for employees */}
+          {/* This field only appears when the role is set to "employee" */}
+          {editedEmployee.role === "employee" ? (
+            <div className="space-y-2">
+              <Label htmlFor="reportingManager" className="text-gray-800 font-medium">
+                Reporting Manager
+              </Label>
+              <Select
+                value={editedEmployee.reportingManager?._id || "none"}
+                onValueChange={(value) => {
+                  if (value === "none") {
+                    handleInputChange("reportingManager", null);
+                  } else {
+                    const selectedManager = managers.find(m => m._id === value);
+                    handleInputChange("reportingManager", selectedManager || null);
+                  }
+                }}
+                disabled={loading}
+              >
+                <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                  <SelectValue placeholder={loading ? "Loading..." : "Select reporting manager"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none" className="hover:bg-[#843C6D] hover:text-white">
+                    No Manager
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                  {managers
+                    .filter(manager => manager.role === "manager" && manager.status === "active")
+                    .map((manager) => (
+                      <SelectItem
+                        key={manager._id}
+                        value={manager._id}
+                        className="hover:bg-[#843C6D] hover:text-white"
+                      >
+                        {manager.firstName} {manager.lastName} ({manager.employeeId})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : editedEmployee.role ? (
+            <div className="space-y-2">
+              <Label className="text-gray-600 text-sm">
+                Reporting Manager
+              </Label>
+              <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border">
+                Reporting manager selection is only available for employees with "Employee" role.
+              </div>
+            </div>
+          ) : null}
           <div className="space-y-2">
             <Label htmlFor="joiningDate" className="text-gray-800 font-medium">
               Joining Date
