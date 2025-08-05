@@ -74,24 +74,20 @@ export interface Employee {
     toDate: string;
     description?: string;
   }[];
-  skills?: string[];
-  team?: {
-    name: string;
-    lead?: {
-      _id: string;
-      firstName: string;
-      lastName: string;
-      employeeId: string;
-    };
-    members?: number;
-    projects?: string[];
+  skills?: {
+    technical?: string;
+    soft?: string;
+    languages?: string;
   };
+  team?: string;
   performance?: {
     rating?: number;
     lastReview?: string;
-    achievements?: string[];
-    goals?: string[];
+    achievements?: string;
+    goals?: string;
+    reviewDate?: string;
   };
+  notes?: string;
   leaveBalance?: {
     paid?: number;
     casual?: number;

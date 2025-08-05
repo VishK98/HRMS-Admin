@@ -19,7 +19,8 @@ import {
 import { EmployeeModal } from "./EmployeeModal";
 import { Employee } from "@/types/employee";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiClient } from "@/lib/api";
+import { employeeService } from "@/services/employeeService";
+import { toast } from "sonner";
 
 export const EmployeeManagement = () => {
   const { user } = useAuth();
@@ -52,14 +53,14 @@ export const EmployeeManagement = () => {
     setError(null);
     
     try {
-      // Fetch employees from the API
-      const response = await apiClient.request<{ employees: Employee[] }>(`/employees/company/${user!.company!._id}`);
+      // Fetch employees using the employee service
+      const response = await employeeService.getEmployees({
+        companyId: user!.company!._id,
+        status: statusFilter === "all" ? undefined : statusFilter,
+        search: searchTerm || undefined,
+      });
       
-      if (response.success) {
-        setEmployees(response.data!.employees);
-      } else {
-        setError(response.message || "Failed to fetch employees");
-      }
+      setEmployees(response.employees);
     } catch (err) {
       setError("Failed to fetch employees");
       console.error("Error fetching employees:", err);
@@ -117,22 +118,23 @@ export const EmployeeManagement = () => {
 
   const handleSaveEmployee = async (updatedEmployee: Employee) => {
     try {
-      // Call the API to save changes
-      const response = await apiClient.request<Employee>(`/employees/${updatedEmployee._id}`, {
-        method: 'PUT',
-        body: JSON.stringify(updatedEmployee)
-      });
+      // Use the employee service to update the employee
+      const response = await employeeService.updateEmployeeComprehensive(
+        updatedEmployee._id,
+        updatedEmployee
+      );
       
-      if (response.success) {
-        // Update the employee in the state
-        setEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response.data! : emp));
-        setFilteredEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response.data! : emp));
-        // Close modal after save
-        setModalOpen(false);
-      } else {
-        setError(response.message || "Failed to update employee");
-      }
+      // Update the employee in the state
+      setEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response : emp));
+      setFilteredEmployees(prev => prev.map(emp => emp._id === updatedEmployee._id ? response : emp));
+      
+      // Show success notification
+      toast.success("Employee updated successfully!");
+      
+      // Close modal after save
+      setModalOpen(false);
     } catch (err) {
+      toast.error("Failed to update employee");
       setError("Failed to update employee");
       console.error("Error updating employee:", err);
     }
@@ -140,21 +142,20 @@ export const EmployeeManagement = () => {
 
   const handleDeleteConfirm = async (employeeId: string) => {
     try {
-      // Call the API to delete the employee
-      const response = await apiClient.request(`/employees/${employeeId}/deactivate`, {
-        method: 'PUT'
-      });
+      // Use the employee service to deactivate the employee
+      await employeeService.updateEmployee(employeeId, { status: "terminated" });
       
-      if (response.success) {
-        // Remove the employee from the state
-        setEmployees(prev => prev.filter(emp => emp._id !== employeeId));
-        setFilteredEmployees(prev => prev.filter(emp => emp._id !== employeeId));
-        // Close modal after delete
-        setModalOpen(false);
-      } else {
-        setError(response.message || "Failed to delete employee");
-      }
+      // Update the employee status in the state
+      setEmployees(prev => prev.map(emp => emp._id === employeeId ? { ...emp, status: "terminated" } : emp));
+      setFilteredEmployees(prev => prev.map(emp => emp._id === employeeId ? { ...emp, status: "terminated" } : emp));
+      
+      // Show success notification
+      toast.success("Employee terminated successfully!");
+      
+      // Close modal after delete
+      setModalOpen(false);
     } catch (err) {
+      toast.error("Failed to terminate employee");
       setError("Failed to delete employee");
       console.error("Error deleting employee:", err);
     }

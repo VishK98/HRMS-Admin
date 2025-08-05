@@ -167,6 +167,8 @@ export const EmployeeModal = ({
             handleInputChange={handleInputChange}
             handleNestedInputChange={handleNestedInputChange}
             handleFileUpload={handleFileUpload}
+            onSave={handleSave}
+            onCancel={onCancel || (() => onOpenChange(false))}
           />
         );
       case "delete":
@@ -195,21 +197,6 @@ export const EmployeeModal = ({
         <div className="overflow-y-auto max-h-[calc(95vh-120px)] scrollbar-hide">
           {renderContent()}
         </div>
-
-        {/* Action Buttons for Edit Mode */}
-        {mode === "edit" && (
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={onCancel || (() => onOpenChange(false))} className="hover:bg-gray-100">
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90"
-            >
-              Save Changes
-            </Button>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );

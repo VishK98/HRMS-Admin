@@ -2,7 +2,9 @@ import { Employee } from "@/types/employee";
 import { InfoCard } from "./InfoCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "./FileUpload";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -20,6 +22,13 @@ import {
   Phone,
   IdCard,
   GraduationCap,
+  Heart,
+  Briefcase,
+  Award,
+  Target,
+  Users,
+  AlertTriangle,
+  Save,
 } from "lucide-react";
 
 interface EmployeeEditContentProps {
@@ -31,6 +40,8 @@ interface EmployeeEditContentProps {
     value: any
   ) => void;
   handleFileUpload?: (type: string, file: File | null) => void;
+  onSave?: () => void;
+  onCancel?: () => void;
 }
 
 export const EmployeeEditContent = ({
@@ -38,6 +49,8 @@ export const EmployeeEditContent = ({
   handleInputChange,
   handleNestedInputChange,
   handleFileUpload,
+  onSave,
+  onCancel,
 }: EmployeeEditContentProps) => {
   return (
     <div className="space-y-8">
@@ -833,6 +846,292 @@ export const EmployeeEditContent = ({
          </InfoCard>
        </div>
 
+      {/* Emergency Contact */}
+      <InfoCard icon={Phone} title="Emergency Contact">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="emergencyName" className="text-gray-800 font-medium">
+              Contact Name
+            </Label>
+            <Input
+              id="emergencyName"
+              value={editedEmployee.emergencyContact?.name || ""}
+              onChange={(e) =>
+                handleNestedInputChange(
+                  "emergencyContact",
+                  "name",
+                  e.target.value
+                )
+              }
+              className="border-gray-200 focus:border-gray-800"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="emergencyRelationship" className="text-gray-800 font-medium">
+              Relationship
+            </Label>
+            <Input
+              id="emergencyRelationship"
+              value={editedEmployee.emergencyContact?.relationship || ""}
+              onChange={(e) =>
+                handleNestedInputChange(
+                  "emergencyContact",
+                  "relationship",
+                  e.target.value
+                )
+              }
+              className="border-gray-200 focus:border-gray-800"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="emergencyPhone" className="text-gray-800 font-medium">
+              Contact Phone
+            </Label>
+            <Input
+              id="emergencyPhone"
+              value={editedEmployee.emergencyContact?.phone || ""}
+              onChange={(e) =>
+                handleNestedInputChange(
+                  "emergencyContact",
+                  "phone",
+                  e.target.value
+                )
+              }
+              className="border-gray-200 focus:border-gray-800"
+            />
+          </div>
+        </div>
+      </InfoCard>
+
+      {/* Work Experience */}
+      <InfoCard icon={Briefcase} title="Work Experience">
+        <div className="space-y-4">
+          {editedEmployee.workExperience?.map((exp, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-800 font-medium">Company</Label>
+                  <Input
+                    value={exp.company || ""}
+                    onChange={(e) => {
+                      const updatedExp = [...(editedEmployee.workExperience || [])];
+                      updatedExp[index] = { ...exp, company: e.target.value };
+                      handleInputChange("workExperience", updatedExp);
+                    }}
+                    className="border-gray-200 focus:border-gray-800"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-800 font-medium">Position</Label>
+                  <Input
+                    value={exp.position || ""}
+                    onChange={(e) => {
+                      const updatedExp = [...(editedEmployee.workExperience || [])];
+                      updatedExp[index] = { ...exp, position: e.target.value };
+                      handleInputChange("workExperience", updatedExp);
+                    }}
+                    className="border-gray-200 focus:border-gray-800"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-800 font-medium">From Date</Label>
+                  <Input
+                    type="date"
+                    value={exp.fromDate ? new Date(exp.fromDate).toISOString().split("T")[0] : ""}
+                    onChange={(e) => {
+                      const updatedExp = [...(editedEmployee.workExperience || [])];
+                      updatedExp[index] = { ...exp, fromDate: e.target.value };
+                      handleInputChange("workExperience", updatedExp);
+                    }}
+                    className="border-gray-200 focus:border-gray-800"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-800 font-medium">To Date</Label>
+                  <Input
+                    type="date"
+                    value={exp.toDate ? new Date(exp.toDate).toISOString().split("T")[0] : ""}
+                    onChange={(e) => {
+                      const updatedExp = [...(editedEmployee.workExperience || [])];
+                      updatedExp[index] = { ...exp, toDate: e.target.value };
+                      handleInputChange("workExperience", updatedExp);
+                    }}
+                    className="border-gray-200 focus:border-gray-800"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2 mt-4">
+                <Label className="text-gray-800 font-medium">Description</Label>
+                <Textarea
+                  value={exp.description || ""}
+                  onChange={(e) => {
+                    const updatedExp = [...(editedEmployee.workExperience || [])];
+                    updatedExp[index] = { ...exp, description: e.target.value };
+                    handleInputChange("workExperience", updatedExp);
+                  }}
+                  className="border-gray-200 focus:border-gray-800"
+                  rows={3}
+                />
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              const newExp = { company: "", position: "", fromDate: "", toDate: "", description: "" };
+              const updatedExp = [...(editedEmployee.workExperience || []), newExp];
+              handleInputChange("workExperience", updatedExp);
+            }}
+            className="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
+          >
+            + Add Work Experience
+          </button>
+        </div>
+      </InfoCard>
+
+      {/* Skills */}
+      <InfoCard icon={Award} title="Skills">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-gray-800 font-medium">Technical Skills</Label>
+            <Textarea
+              value={editedEmployee.skills?.technical || ""}
+              onChange={(e) =>
+                handleNestedInputChange("skills", "technical", e.target.value)
+              }
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter technical skills (e.g., JavaScript, React, Node.js)"
+              rows={3}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-gray-800 font-medium">Soft Skills</Label>
+            <Textarea
+              value={editedEmployee.skills?.soft || ""}
+              onChange={(e) =>
+                handleNestedInputChange("skills", "soft", e.target.value)
+              }
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter soft skills (e.g., Leadership, Communication, Teamwork)"
+              rows={3}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-gray-800 font-medium">Languages</Label>
+            <Textarea
+              value={editedEmployee.skills?.languages || ""}
+              onChange={(e) =>
+                handleNestedInputChange("skills", "languages", e.target.value)
+              }
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter languages known (e.g., English, Hindi, Spanish)"
+              rows={2}
+            />
+          </div>
+        </div>
+      </InfoCard>
+
+      {/* Performance */}
+      <InfoCard icon={Target} title="Performance">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-gray-800 font-medium">Achievements</Label>
+            <Textarea
+              value={editedEmployee.performance?.achievements || ""}
+              onChange={(e) =>
+                handleNestedInputChange("performance", "achievements", e.target.value)
+              }
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter achievements and accomplishments"
+              rows={3}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-gray-800 font-medium">Goals</Label>
+            <Textarea
+              value={editedEmployee.performance?.goals || ""}
+              onChange={(e) =>
+                handleNestedInputChange("performance", "goals", e.target.value)
+              }
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter performance goals and objectives"
+              rows={3}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-gray-800 font-medium">Rating</Label>
+              <Select
+                value={editedEmployee.performance?.rating?.toString() || ""}
+                onValueChange={(value) =>
+                  handleNestedInputChange("performance", "rating", Number(value))
+                }
+              >
+                <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                  <SelectValue placeholder="Select rating" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 - Poor</SelectItem>
+                  <SelectItem value="2">2 - Below Average</SelectItem>
+                  <SelectItem value="3">3 - Average</SelectItem>
+                  <SelectItem value="4">4 - Good</SelectItem>
+                  <SelectItem value="5">5 - Excellent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-800 font-medium">Review Date</Label>
+              <Input
+                type="date"
+                value={
+                  editedEmployee.performance?.reviewDate
+                    ? new Date(editedEmployee.performance.reviewDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                onChange={(e) =>
+                  handleNestedInputChange("performance", "reviewDate", e.target.value)
+                }
+                className="border-gray-200 focus:border-gray-800"
+              />
+            </div>
+          </div>
+        </div>
+      </InfoCard>
+
+      {/* Team Information */}
+      <InfoCard icon={Users} title="Team Information">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="team" className="text-gray-800 font-medium">
+              Team
+            </Label>
+            <Input
+              id="team"
+              value={editedEmployee.team || ""}
+              onChange={(e) => handleInputChange("team", e.target.value)}
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter team name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="employeeId" className="text-gray-800 font-medium">
+              Employee ID
+            </Label>
+            <Input
+              id="employeeId"
+              value={editedEmployee.employeeId || ""}
+              onChange={(e) => handleInputChange("employeeId", e.target.value)}
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter employee ID"
+            />
+          </div>
+        </div>
+      </InfoCard>
+
       {/* Documents */}
       <InfoCard icon={IdCard} title="Documents">
         <div className="grid grid-cols-5 gap-4">
@@ -880,7 +1179,82 @@ export const EmployeeEditContent = ({
           />
         </div>
       </InfoCard>
+
+      {/* Additional Information */}
+      <InfoCard icon={AlertTriangle} title="Additional Information">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-gray-800 font-medium">
+              Notes
+            </Label>
+            <Textarea
+              id="notes"
+              value={editedEmployee.notes || ""}
+              onChange={(e) => handleInputChange("notes", e.target.value)}
+              className="border-gray-200 focus:border-gray-800"
+              placeholder="Enter any additional notes about the employee"
+              rows={4}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="isProfileComplete" className="text-gray-800 font-medium">
+                Profile Complete
+              </Label>
+              <Select
+                value={editedEmployee.isProfileComplete?.toString() || "false"}
+                onValueChange={(value) => handleInputChange("isProfileComplete", value === "true")}
+              >
+                <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Complete</SelectItem>
+                  <SelectItem value="false">Incomplete</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastUpdated" className="text-gray-800 font-medium">
+                Last Updated
+              </Label>
+              <Input
+                id="lastUpdated"
+                type="datetime-local"
+                value={
+                  editedEmployee.updatedAt
+                    ? new Date(editedEmployee.updatedAt)
+                        .toISOString()
+                        .slice(0, 16)
+                    : ""
+                }
+                className="border-gray-200 focus:border-gray-800"
+                readOnly
+              />
+            </div>
+          </div>
+        </div>
+      </InfoCard>
+
       <div className="pb-1"></div>
+
+      {/* Update Button Section - Positioned after all fields */}
+      <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 bg-gray-50 -mx-6 px-6 py-4 rounded-b-lg">
+        <Button 
+          variant="outline" 
+          onClick={onCancel}
+          className="hover:bg-gray-100"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={onSave}
+          className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200 gap-2"
+        >
+          <Save className="w-4 h-4" />
+          Update Employee
+        </Button>
+      </div>
     </div>
   );
 };

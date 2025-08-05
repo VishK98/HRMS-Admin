@@ -161,6 +161,148 @@ const employeeSchema = new mongoose.Schema(
         type: String,
         trim: true,
       },
+      drivingLicense: {
+        type: String,
+        trim: true,
+      },
+      voterId: {
+        type: String,
+        trim: true,
+      },
+      relievingLetter: {
+        type: String,
+        trim: true,
+      },
+      experienceLetter: {
+        type: String,
+        trim: true,
+      },
+      lastPayslip: {
+        type: String,
+        trim: true,
+      },
+      passportPhoto: {
+        type: String,
+        trim: true,
+      },
+      offerLetter: {
+        type: String,
+        trim: true,
+      },
+    },
+    education: {
+      highestQualification: {
+        type: String,
+        trim: true,
+      },
+      institution: {
+        type: String,
+        trim: true,
+      },
+      yearOfCompletion: {
+        type: String,
+        trim: true,
+      },
+      percentage: {
+        type: Number,
+        min: 0,
+        max: 100,
+      },
+    },
+    workExperience: [{
+      company: {
+        type: String,
+        trim: true,
+      },
+      position: {
+        type: String,
+        trim: true,
+      },
+      fromDate: {
+        type: Date,
+      },
+      toDate: {
+        type: Date,
+      },
+      description: {
+        type: String,
+        trim: true,
+      },
+    }],
+    skills: {
+      technical: {
+        type: String,
+        trim: true,
+      },
+      soft: {
+        type: String,
+        trim: true,
+      },
+      languages: {
+        type: String,
+        trim: true,
+      },
+    },
+    performance: {
+      rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+      },
+      lastReview: {
+        type: Date,
+      },
+      achievements: {
+        type: String,
+        trim: true,
+      },
+      goals: {
+        type: String,
+        trim: true,
+      },
+      reviewDate: {
+        type: Date,
+      },
+    },
+    leaveBalance: {
+      paid: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      casual: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      sick: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      short: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      compensatory: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+      total: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },
+    team: {
+      type: String,
+      trim: true,
+    },
+    notes: {
+      type: String,
+      trim: true,
     },
 
     // System fields
