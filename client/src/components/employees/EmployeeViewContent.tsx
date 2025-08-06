@@ -328,12 +328,11 @@ export const EmployeeViewContent = ({
         {/* Education */}
         <InfoCard icon={GraduationCap} title="Education">
           <div className="space-y-3">
-            {renderField("Highest Qualification", employee.education?.highestQualification)}
-            {renderField("Institution", employee.education?.institution)}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderField("Year of Completion", employee.education?.yearOfCompletion)}
-              {renderField("Percentage", employee.education?.percentage ? `${employee.education.percentage}%` : undefined)}
-            </div>
+            {renderDocumentLink("Degree Certificate", employee.education?.degreeCertificate)}
+            {renderDocumentLink("Mark Sheet", employee.education?.markSheet)}
+            {renderDocumentLink("Transfer Certificate", employee.education?.transferCertificate)}
+            {renderDocumentLink("Character Certificate", employee.education?.characterCertificate)}
+            {renderDocumentLink("Other Certificates", employee.education?.otherCertificates)}
           </div>
         </InfoCard>
 
