@@ -210,7 +210,7 @@ class EmployeeController {
       for (const [fieldName, files] of Object.entries(uploadedFiles)) {
         if (files && files.length > 0) {
           const file = files[0];
-          const fileUrl = `/uploads/employees/${employeeId}/education/${file.filename}`;
+          const fileUrl = `/uploads/employees/${employeeId}/documents/${file.filename}`;
           educationUrls[fieldName] = fileUrl;
         }
       }
@@ -247,37 +247,13 @@ class EmployeeController {
         });
       }
 
-      // Determine file path based on document type
-      let filePath;
-      if (
-        [
-          "degreeCertificate",
-          "markSheet",
-          "transferCertificate",
-          "characterCertificate",
-          "otherCertificates",
-        ].includes(documentType)
-      ) {
-        filePath = `/uploads/employees/${employeeId}/education/${uploadedFile.filename}`;
-      } else {
-        filePath = `/uploads/employees/${employeeId}/documents/${uploadedFile.filename}`;
-      }
+      // All documents stored in documents folder
+      const filePath = `/uploads/employees/${employeeId}/documents/${uploadedFile.filename}`;
 
-      // Update employee with document URL
-      const updateData = {};
-      if (
-        [
-          "degreeCertificate",
-          "markSheet",
-          "transferCertificate",
-          "characterCertificate",
-          "otherCertificates",
-        ].includes(documentType)
-      ) {
-        updateData.education = { [documentType]: filePath };
-      } else {
-        updateData.documents = { [documentType]: filePath };
-      }
+      // Update employee with document URL - all documents stored in documents field
+      const updateData = {
+        documents: { [documentType]: filePath },
+      };
 
       const result = await employeeService.updateEmployeeProfile(
         employeeId,
