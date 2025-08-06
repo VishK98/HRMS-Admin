@@ -225,23 +225,15 @@ const employeeSchema = new mongoose.Schema(
     },
     // Education documents - all files stored as URLs
     education: {
-      degreeCertificate: {
+      intermediate: {
         type: String,
         trim: true,
       },
-      markSheet: {
+      undergraduate: {
         type: String,
         trim: true,
       },
-      transferCertificate: {
-        type: String,
-        trim: true,
-      },
-      characterCertificate: {
-        type: String,
-        trim: true,
-      },
-      otherCertificates: {
+      postgraduate: {
         type: String,
         trim: true,
       },

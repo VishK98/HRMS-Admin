@@ -210,7 +210,7 @@ class EmployeeController {
       for (const [fieldName, files] of Object.entries(uploadedFiles)) {
         if (files && files.length > 0) {
           const file = files[0];
-          const fileUrl = `/uploads/employees/${employeeId}/documents/${file.filename}`;
+          const fileUrl = `/uploads/employees/${employeeId}/education/${file.filename}`;
           educationUrls[fieldName] = fileUrl;
         }
       }
@@ -284,11 +284,9 @@ class EmployeeController {
       let filePath;
       if (
         [
-          "degreeCertificate",
-          "markSheet",
-          "transferCertificate",
-          "characterCertificate",
-          "otherCertificates",
+          "intermediate",
+          "undergraduate",
+          "postgraduate",
         ].includes(documentType)
       ) {
         filePath = employee.education?.[documentType];
@@ -308,11 +306,9 @@ class EmployeeController {
       const updateData = {};
       if (
         [
-          "degreeCertificate",
-          "markSheet",
-          "transferCertificate",
-          "characterCertificate",
-          "otherCertificates",
+          "intermediate",
+          "undergraduate",
+          "postgraduate",
         ].includes(documentType)
       ) {
         updateData.education = { [documentType]: null };

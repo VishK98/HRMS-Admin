@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
 require("dotenv").config();
+const fs = require("fs"); // Added for file system operations
 
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/user.routes");
@@ -52,6 +53,22 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Serve static files (uploaded documents)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+// Specific route to serve employee documents and education files
+app.get("/uploads/employees/:employeeId/:folder/:filename", (req, res) => {
+  const { employeeId, folder, filename } = req.params;
+  const filePath = path.join(__dirname, "../uploads/employees", employeeId, folder, filename);
+  
+  // Check if file exists
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({
+      success: false,
+      message: "File not found"
+    });
+  }
+});
 
 // Health check endpoint
 app.get("/health", (req, res) => {

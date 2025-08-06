@@ -12,21 +12,23 @@ const ensureUploadsDir = (dirPath) => {
 // Configure storage with dynamic destination
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Determine upload path based on route and document type
-    let uploadPath = "uploads/";
+    // All uploads should go to employee structure
+    let uploadPath = "uploads/employees/";
 
-    if (req.route?.path?.includes("employees")) {
-      uploadPath += "employees/";
-
-      // Add employee ID to path if available
-      if (req.params.employeeId) {
-        uploadPath += req.params.employeeId + "/";
-      }
-
-      // Always store in documents folder for employee uploads
-      uploadPath += "documents/";
+    // Add employee ID to path if available
+    if (req.params.employeeId) {
+      uploadPath += req.params.employeeId + "/";
     } else {
-      uploadPath += "general/";
+      // If no employee ID, use a default folder
+      uploadPath += "temp/";
+    }
+
+    // Check if this is an education upload
+    if (req.route?.path?.includes("education")) {
+      uploadPath += "education/";
+    } else {
+      // All other documents go to documents folder
+      uploadPath += "documents/";
     }
 
     ensureUploadsDir(uploadPath);
@@ -97,7 +99,6 @@ const uploadEducationFields = upload.fields([
   { name: "intermediate", maxCount: 1 },
   { name: "undergraduate", maxCount: 1 },
   { name: "postgraduate", maxCount: 1 },
-  { name: "other", maxCount: 1 },
 ]);
 
 // Generic upload fields for any field name
