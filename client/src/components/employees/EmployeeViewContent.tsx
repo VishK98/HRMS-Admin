@@ -47,6 +47,11 @@ export const EmployeeViewContent = ({
   const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Debug: Log employee data to see what's being passed
+  console.log('EmployeeViewContent - Employee data:', employee);
+  console.log('EmployeeViewContent - Department:', employee.department);
+  console.log('EmployeeViewContent - Subcategory:', employee.subcategory);
+
   // Fetch dynamic data on component mount
   useEffect(() => {
     if (user?.company?._id) {
@@ -116,13 +121,20 @@ export const EmployeeViewContent = ({
     );
   };
 
-  const renderField = (label: string, value: any, Icon?: any) => (
-    <div className="flex items-center gap-2 text-sm">
-      {Icon && <Icon className="w-4 h-4 text-gray-500" />}
-      <span className="font-medium text-gray-700">{label}:</span>
-      <span className="text-gray-900">{value || "Not specified"}</span>
-    </div>
-  );
+  const renderField = (label: string, value: any, Icon?: any) => {
+    // Debug: Log field values
+    if (label === "Department" || label === "Subcategory") {
+      console.log(`renderField - ${label}:`, value);
+    }
+    
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+        <span className="font-medium text-gray-700">{label}:</span>
+        <span className="text-gray-900 break-words">{value || "Not specified"}</span>
+      </div>
+    );
+  };
 
   const renderDocumentLink = (label: string, url: string) => {
     if (!url) return null;
@@ -184,32 +196,39 @@ export const EmployeeViewContent = ({
           </div>
         </InfoCard>
 
-        {/* Employment Information */}
-        <InfoCard icon={Building} title="Employment Information">
-          <div className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderField("Employee ID", employee.employeeId)}
-              {renderField("Department", employee.department)}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderField("Designation", employee.designation)}
-              {renderField("Subcategory", employee.subcategory)}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderField("Joining Date", formatDate(employee.joiningDate), CalendarDays)}
-              {renderField("Team", employee.team, Users2)}
-            </div>
-            {employee.reportingManager && (
-              <div className="flex items-center gap-2 text-sm">
-                <Users className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">Reporting Manager:</span>
-                <span className="text-gray-900">
-                  {managers.find(m => m._id === employee.reportingManager)?.firstName} {managers.find(m => m._id === employee.reportingManager)?.lastName}
-                </span>
-              </div>
-            )}
-          </div>
-        </InfoCard>
+                 {/* Employment Information */}
+         <InfoCard icon={Building} title="Employment Information">
+           <div className="space-y-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               {renderField("Employee ID", employee.employeeId)}
+               {renderField("Designation", employee.designation)}
+             </div>
+             <div className="flex items-center gap-2 text-sm">
+               <span className="font-medium text-gray-700">Department:</span>
+               <span className="text-gray-900 break-words">
+                 {employee.department}
+                 {employee.subcategory && (
+                   <span className="text-gray-600 ml-2">
+                     ({employee.subcategory})
+                   </span>
+                 )}
+               </span>
+             </div>
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               {renderField("Joining Date", formatDate(employee.joiningDate), CalendarDays)}
+               {renderField("Team", employee.team, Users2)}
+             </div>
+             {employee.reportingManager && (
+               <div className="flex items-center gap-2 text-sm">
+                 <Users className="w-4 h-4 text-gray-500" />
+                 <span className="font-medium text-gray-700">Reporting Manager:</span>
+                 <span className="text-gray-900">
+                   {managers.find(m => m._id === employee.reportingManager)?.firstName} {managers.find(m => m._id === employee.reportingManager)?.lastName}
+                 </span>
+               </div>
+             )}
+           </div>
+         </InfoCard>
 
         {/* Team Members */}
         <InfoCard icon={Users2} title="Team Members">

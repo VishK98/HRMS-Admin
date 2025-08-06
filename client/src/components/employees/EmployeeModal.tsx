@@ -12,6 +12,7 @@ import { EmployeeViewContent } from "./EmployeeViewContent";
 import { EmployeeEditContent } from "./EmployeeEditContent";
 import { EmployeeDeleteContent } from "./EmployeeDeleteContent";
 import { employeeService } from "@/services/employeeService";
+import { toast } from "sonner";
 
 interface EmployeeModalProps {
   open: boolean;
@@ -56,11 +57,13 @@ export const EmployeeModal = ({
         // Updating existing employee
         if (onSave && editedEmployee) {
           await onSave(editedEmployee);
+          toast.success('Employee details updated successfully!');
         }
       }
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving employee:', error);
+      toast.error('Failed to update employee details');
     }
   };
 
@@ -95,12 +98,16 @@ export const EmployeeModal = ({
   const handleFileUpload = async (type: string, file: File | null) => {
     if (!editedEmployee || !editedEmployee._id) {
       console.error('No employee selected for file upload');
+      toast.error('No employee selected for file upload');
       return;
     }
 
     try {
       if (file) {
         console.log(`Uploading file for ${type}:`, file.name);
+        
+        // Show loading toast
+        const loadingToast = toast.loading(`Uploading ${type} document...`);
         
         let updatedEmployee: Employee;
         
@@ -117,6 +124,7 @@ export const EmployeeModal = ({
           updatedEmployee = await employeeService.uploadEducationDocument(editedEmployee._id, type, file);
         } else {
           console.error(`Unknown file type: ${type}`);
+          toast.error(`Unknown file type: ${type}`);
           return;
         }
         
@@ -133,6 +141,11 @@ export const EmployeeModal = ({
         });
         
         console.log(`File uploaded successfully for ${type}`);
+        
+        // Dismiss loading toast and show success toast
+        toast.dismiss(loadingToast);
+        toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} document uploaded successfully!`);
+        
       } else {
         // Handle file removal - this would need a delete endpoint on the server
         console.log(`File removed for ${type}`);
@@ -155,11 +168,15 @@ export const EmployeeModal = ({
           
           return prev;
         });
+        
+        toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} document removed successfully!`);
       }
     } catch (error) {
       console.error(`Error uploading file for ${type}:`, error);
-      // You might want to show a toast notification here
-      alert(`Error uploading file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Dismiss any loading toast and show error toast
+      toast.dismiss();
+      toast.error(`Failed to upload ${type} document: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

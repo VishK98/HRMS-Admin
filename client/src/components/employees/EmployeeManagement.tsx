@@ -195,7 +195,26 @@ export const EmployeeManagement = () => {
         sanitizedEmployee
       );
 
-      // Continue with success logic...
+      // ✅ Update the employee in the local state
+      setEmployees((prev) =>
+        prev.map((emp) =>
+          emp._id === updatedEmployee._id ? { ...emp, ...updatedEmployee } : emp
+        )
+      );
+      
+      // ✅ Update filtered employees as well
+      setFilteredEmployees((prev) =>
+        prev.map((emp) =>
+          emp._id === updatedEmployee._id ? { ...emp, ...updatedEmployee } : emp
+        )
+      );
+
+      // ✅ Show success toast
+      toast.success("Employee details updated successfully!");
+
+      // ✅ Close the modal
+      setModalOpen(false);
+      
     } catch (err) {
       console.error("❌ Error updating employee:", err);
       toast.error("Failed to update employee");
