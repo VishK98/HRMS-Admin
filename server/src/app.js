@@ -16,6 +16,9 @@ const designationRoutes = require("./routes/designation.routes");
 const departmentRoutes = require("./routes/department.routes");
 const holidayRoutes = require("./routes/holiday.routes");
 const announcementRoutes = require("./routes/announcement.routes");
+const companyRoutes = require("./routes/company.routes");
+const systemRoutes = require("./routes/system.routes");
+const analyticsRoutes = require("./routes/analytics.routes");
 
 // Debug: Log route loading
 console.log("Loading routes...");
@@ -57,15 +60,21 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Specific route to serve employee documents and education files
 app.get("/uploads/employees/:employeeId/:folder/:filename", (req, res) => {
   const { employeeId, folder, filename } = req.params;
-  const filePath = path.join(__dirname, "../uploads/employees", employeeId, folder, filename);
-  
+  const filePath = path.join(
+    __dirname,
+    "../uploads/employees",
+    employeeId,
+    folder,
+    filename
+  );
+
   // Check if file exists
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
   } else {
     res.status(404).json({
       success: false,
-      message: "File not found"
+      message: "File not found",
     });
   }
 });
@@ -89,6 +98,9 @@ app.use("/api/designations", designationRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/holidays", holidayRoutes);
 app.use("/api/announcements", announcementRoutes);
+app.use("/api/companies", companyRoutes);
+app.use("/api/system", systemRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

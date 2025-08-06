@@ -60,91 +60,23 @@ export const AttendanceDashboard = () => {
 
   const fetchRegularizationRequests = async () => {
     try {
-      // For admin dashboard, we might want to show all requests for the company
-      // or just the requests for the current admin user if they are also an employee
-      // For now, we'll use mock data since we don't have a specific endpoint for this
-      // In a real implementation, you would fetch from the API:
-      // const response = await apiClient.getCompanyRegularizationRequests(startDate, endDate);
-      // setRegularizationRequests(response.data);
+      // Get current month dates for regularization requests
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
       
-      // Mock data for demonstration
-      const mockRequests: RegularizationRequest[] = [
-        {
-          _id: "1",
-          employee: {
-            _id: "emp1",
-            firstName: "John",
-            lastName: "Doe",
-            employeeId: "EMP001"
-          },
-          date: new Date().toISOString(),
-          reason: "Late due to traffic",
-          status: "pending",
-          requestedAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          reportingManager: {
-            _id: "mgr1",
-            firstName: "Sarah",
-            lastName: "Johnson",
-            employeeId: "MGR001"
-          },
-          managerAction: "pending", // pending, approved, rejected
-          managerActionDate: null,
-          managerComment: null
-        },
-        {
-          _id: "2",
-          employee: {
-            _id: "emp2",
-            firstName: "Mike",
-            lastName: "Wilson",
-            employeeId: "EMP002"
-          },
-          date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-          reason: "Medical appointment",
-          status: "approved",
-          requestedAt: new Date(Date.now() - 86400000).toISOString(),
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          updatedAt: new Date(Date.now() - 43200000).toISOString(),
-          reportingManager: {
-            _id: "mgr1",
-            firstName: "Sarah",
-            lastName: "Johnson",
-            employeeId: "MGR001"
-          },
-          managerAction: "approved",
-          managerActionDate: new Date(Date.now() - 43200000).toISOString(),
-          managerComment: "Approved - Valid medical reason"
-        },
-        {
-          _id: "3",
-          employee: {
-            _id: "emp3",
-            firstName: "Lisa",
-            lastName: "Brown",
-            employeeId: "EMP003"
-          },
-          date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-          reason: "Personal emergency",
-          status: "rejected",
-          requestedAt: new Date(Date.now() - 172800000).toISOString(),
-          createdAt: new Date(Date.now() - 172800000).toISOString(),
-          updatedAt: new Date(Date.now() - 86400000).toISOString(),
-          reportingManager: {
-            _id: "mgr2",
-            firstName: "David",
-            lastName: "Smith",
-            employeeId: "MGR002"
-          },
-          managerAction: "rejected",
-          managerActionDate: new Date(Date.now() - 86400000).toISOString(),
-          managerComment: "Rejected - No supporting documents provided"
-        }
-      ];
-      setRegularizationRequests(mockRequests);
+      // Fetch real regularization requests from API
+      const response = await apiClient.getCompanyRegularizationRequests(startDate, endDate);
+      if (response.success && response.data) {
+        setRegularizationRequests(response.data);
+      } else {
+        // Fallback to empty array if no data
+        setRegularizationRequests([]);
+      }
     } catch (err) {
       console.error("Error fetching regularization requests:", err);
+      // Fallback to empty array on error
+      setRegularizationRequests([]);
     }
   };
 

@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const userService = require('../services/user.service');
+const User = require("../models/user.model");
+const Employee = require("../models/employee.model");
 
 class UserController {
   async login(req, res) {
@@ -180,6 +182,147 @@ class UserController {
       res.status(400).json({
         success: false,
         message: error.message || 'Profile update failed'
+      });
+    }
+  }
+
+  // Get user statistics for super admin
+  async getUserStats(req, res) {
+    try {
+      // Get total users across all companies
+      const totalUsers = await Employee.countDocuments();
+      
+      // Get active users
+      const activeUsers = await Employee.countDocuments({ status: "active" });
+      
+      // Get inactive users
+      const inactiveUsers = await Employee.countDocuments({ status: "inactive" });
+      
+      // Get users by role
+      const usersByRole = await Employee.aggregate([
+        {
+          $group: {
+            _id: "$role",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      // Get users by department
+      const usersByDepartment = await Employee.aggregate([
+        {
+          $match: {
+            department: { $exists: true, $ne: "" },
+          },
+        },
+        {
+          $group: {
+            _id: "$department",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { count: -1 },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
+
+      // Get recent users (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const recentUsers = await Employee.countDocuments({
+        createdAt: { $gte: thirtyDaysAgo },
+      });
+
+      // Get users by company
+      const usersByCompany = await Employee.aggregate([
+        {
+          $lookup: {
+            from: "companies",
+            localField: "company",
+            foreignField: "_id",
+            as: "companyInfo",
+          },
+        },
+        {
+          $unwind: "$companyInfo",
+        },
+        {
+          $group: {
+            _id: "$companyInfo.name",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { count: -1 },
+        },
+      ]);
+
+      const stats = {
+        totalUsers,
+        activeUsers,
+        inactiveUsers,
+        recentUsers,
+        usersByRole,
+        usersByDepartment,
+        usersByCompany,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: stats,
+      });
+    } catch (error) {
+      console.error("Error in getUserStats:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch user statistics",
+      });
+    }
+  }
+
+  // Get all users (for super admin)
+  async getAllUsers(req, res) {
+    try {
+      const users = await Employee.find()
+        .select('firstName lastName email status role department company createdAt')
+        .populate('company', 'name code')
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        data: users,
+      });
+    } catch (error) {
+      console.error("Error in getAllUsers:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch users",
+      });
+    }
+  }
+
+  // Initialize super admin user
+  async initSuperAdmin(req, res) {
+    try {
+      const superAdmin = await userService.createSuperAdmin();
+      
+      res.status(200).json({
+        success: true,
+        message: 'Super admin initialized successfully',
+        data: {
+          email: superAdmin.email,
+          role: superAdmin.role
+        }
+      });
+    } catch (error) {
+      console.error("Error in initSuperAdmin:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to initialize super admin'
       });
     }
   }

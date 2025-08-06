@@ -395,6 +395,48 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // Super Admin Dashboard endpoints
+  async getCompanyStats() {
+    return this.request('/companies/stats');
+  }
+
+  async getUserStats() {
+    return this.request('/auth/stats');
+  }
+
+  async getSystemHealth() {
+    return this.request('/system/health');
+  }
+
+  async getAllCompanies() {
+    return this.request('/companies/all');
+  }
+
+  async getAllUsers() {
+    return this.request('/auth/all');
+  }
+
+  // Analytics endpoints
+  async getAnalyticsOverview(timeRange: string) {
+    return this.request(`/analytics/overview?timeRange=${timeRange}`);
+  }
+
+  async getUserAnalytics(timeRange: string) {
+    return this.request(`/analytics/users?timeRange=${timeRange}`);
+  }
+
+  async getCompanyAnalytics(timeRange: string) {
+    return this.request(`/analytics/companies?timeRange=${timeRange}`);
+  }
+
+  async getSystemAnalytics(timeRange: string) {
+    return this.request(`/analytics/system?timeRange=${timeRange}`);
+  }
+
+  async getActivityAnalytics(timeRange: string) {
+    return this.request(`/analytics/activities?timeRange=${timeRange}`);
+  }
 }
 
 export const apiClient = new ApiClient(); 

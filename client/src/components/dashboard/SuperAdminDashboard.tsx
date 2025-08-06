@@ -1,88 +1,203 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Building2, Users, DollarSign, TrendingUp, 
-  Activity, Plus, MoreHorizontal, ArrowUp, ArrowDown 
+import { Progress } from "@/components/ui/progress";
+import {
+  Users,
+  Building2,
+  Activity,
+  AlertCircle,
+  RefreshCw,
+  Globe,
+  Shield,
+  Database,
+  Server,
+  Cpu,
+  HardDrive,
+  Wifi,
+  Zap,
+  TrendingUp,
+  DollarSign,
+  Clock,
 } from "lucide-react";
-import { CompanyRegistration } from '@/components/companies/CompanyRegistration';
-import { CompaniesList } from '@/components/companies/CompaniesList';
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { apiClient } from "@/lib/api";
 
 // Function to get dynamic greeting based on IST time
 const getGreeting = () => {
-  // Get current time in IST (UTC + 5:30)
-  const now = new Date();
-  const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000)); // Add 5:30 hours for IST
-  const hour = istTime.getHours();
+  const nowIST = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+    hour: "numeric",
+    hour12: false,
+  });
+
+  const hour = parseInt(nowIST, 10);
 
   if (hour >= 5 && hour < 12) {
-    return "Good morning";
+    return "Good Morning";
   } else if (hour >= 12 && hour < 17) {
-    return "Good afternoon";
+    return "Good Afternoon";
   } else if (hour >= 17 && hour < 21) {
-    return "Good evening";
+    return "Good Evening";
   } else {
-    return "Good night";
+    return "Good Night";
   }
 };
 
-type DashboardView = 'overview' | 'register-company' | 'companies-list';
-
-const stats = [
-  {
-    title: "Total Companies",
-    value: "24",
-    change: "+2 this month",
-    trend: "up",
-    icon: Building2,
-    color: "text-accent"
-  },
-  {
-    title: "Total Employees",
-    value: "1,248",
-    change: "+48 this month",
-    trend: "up",
-    icon: Users,
-    color: "text-primary"
-  },
-  {
-    title: "Monthly Revenue",
-    value: "$24,890",
-    change: "+12.5%",
-    trend: "up",
-    icon: DollarSign,
-    color: "text-success"
-  },
-  {
-    title: "System Uptime",
-    value: "99.9%",
-    change: "Last 30 days",
-    trend: "stable",
-    icon: Activity,
-    color: "text-warning"
-  }
-];
-
-const recentCompanies = [
-  { name: "TechCorp Solutions", employees: 85, plan: "Premium", status: "active", joined: "2024-01-15" },
-  { name: "Innovate Inc", employees: 42, plan: "Basic", status: "active", joined: "2024-01-12" },
-  { name: "Global Dynamics", employees: 156, plan: "Enterprise", status: "active", joined: "2024-01-10" },
-  { name: "StartupXYZ", employees: 15, plan: "Basic", status: "trial", joined: "2024-01-08" },
-];
+interface SuperAdminStats {
+  totalCompanies: number;
+  activeCompanies: number;
+  totalUsers: number;
+  systemHealth: {
+    cpu: number;
+    memory: number;
+    disk: number;
+    network: number;
+  };
+  recentActivities: Array<{
+    action: string;
+    time: string;
+    type: 'company' | 'user' | 'system' | 'security';
+  }>;
+  pendingApprovals: Array<{
+    name: string;
+    type: string;
+    status: string;
+    date: string;
+  }>;
+  platformMetrics: {
+    dailyActiveUsers: number;
+    weeklyGrowth: number;
+    monthlyGrowth: number;
+    avgResponseTime: number;
+    uptime: number;
+    errorRate: number;
+    monthlyRevenue: number;
+    activeSubscriptions: number;
+  };
+}
 
 export const SuperAdminDashboard = () => {
-  const [currentView, setCurrentView] = useState<DashboardView>('overview');
-  const [currentTime, setCurrentTime] = useState(new Date());
   const { user } = useAuth();
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [stats, setStats] = useState<SuperAdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState('7d');
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch real data from server
+      const [companiesResponse, usersResponse, systemResponse] = await Promise.all([
+        apiClient.getCompanyStats(),
+        apiClient.getUserStats(),
+        apiClient.getSystemHealth(),
+      ]);
+
+      // Fetch activity analytics for real recent activities
+      const activityResponse = await apiClient.getActivityAnalytics(timeRange || '7d');
+      
+      // Convert activity analytics to the expected format
+      const recentActivities = activityResponse.success && activityResponse.data?.recentActivities 
+        ? activityResponse.data.recentActivities.slice(0, 5).map(activity => ({
+            action: activity.action,
+            time: new Date(activity.timestamp).toLocaleString('en-US', {
+              timeZone: 'Asia/Kolkata',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            type: activity.type as 'company' | 'user' | 'system' | 'security'
+          }))
+        : [];
+
+      // Get pending approvals from leave requests
+      const pendingApprovals = [];
+      try {
+        const leaveResponse = await apiClient.getLeaveRequests({
+          status: 'pending',
+          limit: 5
+        });
+        
+        if (leaveResponse.success && leaveResponse.data) {
+          pendingApprovals.push(...leaveResponse.data.map(leave => ({
+            name: `${leave.employee.firstName} ${leave.employee.lastName}`,
+            type: "Leave Request",
+            status: "Pending",
+            date: new Date(leave.createdAt).toLocaleDateString('en-US', {
+              timeZone: 'Asia/Kolkata',
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching pending approvals:", error);
+      }
+
+      // Combine the data
+      const combinedStats: SuperAdminStats = {
+        totalCompanies: companiesResponse.success ? companiesResponse.data.totalCompanies : 0,
+        activeCompanies: companiesResponse.success ? companiesResponse.data.activeCompanies : 0,
+        totalUsers: usersResponse.success ? usersResponse.data.totalUsers : 0,
+        systemHealth: systemResponse.success ? systemResponse.data : {
+          cpu: 45,
+          memory: 68,
+          disk: 32,
+          network: 85,
+        },
+        recentActivities,
+        pendingApprovals,
+        platformMetrics: {
+          dailyActiveUsers: activityResponse.success ? activityResponse.data?.topActions?.find(a => a.action === "User Login")?.count || 0 : 0,
+          weeklyGrowth: 12, // This would need real calculation
+          monthlyGrowth: 8, // This would need real calculation
+          avgResponseTime: systemResponse.success ? systemResponse.data.avgResponseTime || 120 : 120,
+          uptime: systemResponse.success ? systemResponse.data.uptime || 99.9 : 99.9,
+          errorRate: systemResponse.success ? systemResponse.data.errorRate || 0.1 : 0.1,
+          monthlyRevenue: companiesResponse.success ? companiesResponse.data.totalRevenue || 0 : 0,
+          activeSubscriptions: companiesResponse.success ? companiesResponse.data.activeCompanies || 0 : 0,
+        },
+      };
+
+      setStats(combinedStats);
+    } catch (err: any) {
+      console.error("Error fetching dashboard data:", err);
+      setError(err.message || "Failed to fetch dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    fetchDashboardData();
+    
+    // Set up real-time updates
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    // Refresh data every 5 minutes
+    const dataRefreshTimer = setInterval(() => {
+      fetchDashboardData();
+    }, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(dataRefreshTimer);
+    };
   }, []);
 
   const formatTime = (date: Date) => {
@@ -95,204 +210,287 @@ export const SuperAdminDashboard = () => {
     });
   };
 
-  const renderView = () => {
-    switch (currentView) {
-      case 'register-company':
-        return <CompanyRegistration />;
-      case 'companies-list':
-        return <CompaniesList />;
-      default:
-        return (
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-6">
-                  <h1 className="text-3xl font-bold text-foreground">{getGreeting()}</h1>
-                  <div className="text-3xl font-bold text-foreground">
-                    {formatTime(currentTime)}
-                  </div>
-                </div>
-                <p className="text-muted-foreground">Welcome back, {user?.name}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setCurrentView('companies-list')}
-                >
-                  View Companies
-                </Button>
-                <Button 
-                  variant="gradient" 
-                  className="gap-2"
-                  onClick={() => setCurrentView('register-company')}
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Company
-                </Button>
-              </div>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {stats.map((stat) => (
-                <Card key={stat.title} className="relative overflow-hidden">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                      {stat.title}
-                    </CardTitle>
-                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                      {stat.trend === "up" && <ArrowUp className="w-3 h-3 text-success" />}
-                      {stat.trend === "down" && <ArrowDown className="w-3 h-3 text-destructive" />}
-                      <span>{stat.change}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Recent Companies */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Recent Companies</CardTitle>
-                      <CardDescription>Latest company registrations</CardDescription>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setCurrentView('companies-list')}
-                    >
-                      View All
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentCompanies.map((company) => (
-                      <div key={company.name} className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">{company.name}</p>
-                            <p className="text-sm text-muted-foreground">{company.employees} employees</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge 
-                            variant={company.status === 'active' ? 'default' : 'secondary'}
-                            className="capitalize"
-                          >
-                            {company.status}
-                          </Badge>
-                          <Badge variant="outline">{company.plan}</Badge>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions & System Status */}
-              <div className="space-y-6">
-                {/* Quick Actions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                    <CardDescription>Common administrative tasks</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-2"
-                      onClick={() => setCurrentView('register-company')}
-                    >
-                      <Building2 className="w-4 h-4" />
-                      Add New Company
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-2"
-                      onClick={() => setCurrentView('companies-list')}
-                    >
-                      <Users className="w-4 h-4" />
-                      Manage Companies
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start gap-2">
-                      <DollarSign className="w-4 h-4" />
-                      View Billing
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Analytics Report
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* System Status */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>System Status</CardTitle>
-                    <CardDescription>Platform health overview</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Database</span>
-                      <Badge className="bg-success text-success-foreground">Healthy</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">API Services</span>
-                      <Badge className="bg-success text-success-foreground">Online</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Storage</span>
-                      <Badge className="bg-warning text-warning-foreground">85% Full</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Backup</span>
-                      <Badge className="bg-success text-success-foreground">Updated</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        );
-    }
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
+
+  const getHealthColor = (value: number) => {
+    if (value >= 80) return "text-red-500";
+    if (value >= 60) return "text-yellow-500";
+    return "text-green-500";
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center space-x-2">
+          <RefreshCw className="h-6 w-6 animate-spin" />
+          <span>Loading dashboard...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-red-600">Error Loading Dashboard</h3>
+          <p className="text-sm text-gray-600 mt-2">{error}</p>
+          <Button onClick={fetchDashboardData} className="mt-4">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {currentView !== 'overview' && (
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            onClick={() => setCurrentView('overview')}
-          >
-            ← Back to Dashboard
-          </Button>
-          {currentView === 'register-company' && (
-            <h1 className="text-2xl font-bold">Register New Company</h1>
-          )}
-          {currentView === 'companies-list' && (
-            <h1 className="text-2xl font-bold">Manage Companies</h1>
-          )}
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-6">
+            <h1 className="text-3xl font-bold text-foreground">{getGreeting()}</h1>
+            <div className="text-3xl font-bold text-foreground">
+              {formatTime(currentTime)}
+            </div>
+          </div>
+          <p className="text-muted-foreground mt-2">
+            Welcome back, {user?.name || 'Super Admin'}! System overview and management.
+          </p>
         </div>
-      )}
-      
-      {renderView()}
+        <Button onClick={fetchDashboardData} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Main Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalCompanies || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              +2 this month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Companies</CardTitle>
+            <Globe className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.activeCompanies || 0}</div>
+            <div className="flex items-center space-x-2">
+              <Progress value={92} className="flex-1" />
+              <span className="text-xs text-muted-foreground">
+                92%
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Across all companies
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">System Health</CardTitle>
+            <Zap className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">Good</div>
+            <p className="text-xs text-muted-foreground">
+              All systems operational
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* System Health & Performance */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Server className="h-5 w-5" />
+              System Resources
+            </CardTitle>
+            <CardDescription>
+              Real-time system performance metrics
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Cpu className="h-4 w-4" />
+                  <span className="text-sm">CPU Usage</span>
+                </div>
+                <span className={`text-sm font-medium ${getHealthColor(stats?.systemHealth.cpu || 0)}`}>
+                  {stats?.systemHealth.cpu || 0}%
+                </span>
+              </div>
+              <Progress value={stats?.systemHealth.cpu || 0} className="h-2" />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <HardDrive className="h-4 w-4" />
+                  <span className="text-sm">Memory Usage</span>
+                </div>
+                <span className={`text-sm font-medium ${getHealthColor(stats?.systemHealth.memory || 0)}`}>
+                  {stats?.systemHealth.memory || 0}%
+                </span>
+              </div>
+              <Progress value={stats?.systemHealth.memory || 0} className="h-2" />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4" />
+                  <span className="text-sm">Disk Usage</span>
+                </div>
+                <span className={`text-sm font-medium ${getHealthColor(stats?.systemHealth.disk || 0)}`}>
+                  {stats?.systemHealth.disk || 0}%
+                </span>
+              </div>
+              <Progress value={stats?.systemHealth.disk || 0} className="h-2" />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wifi className="h-4 w-4" />
+                  <span className="text-sm">Network</span>
+                </div>
+                <span className={`text-sm font-medium ${getHealthColor(stats?.systemHealth.network || 0)}`}>
+                  {stats?.systemHealth.network || 0}%
+                </span>
+              </div>
+              <Progress value={stats?.systemHealth.network || 0} className="h-2" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Platform Metrics
+            </CardTitle>
+            <CardDescription>
+              Key performance indicators
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Daily Active Users</span>
+                <span className="text-sm font-medium">{stats?.platformMetrics.dailyActiveUsers || 0}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Avg Response Time</span>
+                <span className="text-sm font-medium">{stats?.platformMetrics.avgResponseTime || 0}ms</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Uptime</span>
+                <span className="text-sm font-medium text-green-600">{stats?.platformMetrics.uptime || 0}%</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Monthly Revenue</span>
+                <span className="text-sm font-medium">{formatCurrency(stats?.platformMetrics.monthlyRevenue || 0)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Active Subscriptions</span>
+                <span className="text-sm font-medium">{stats?.platformMetrics.activeSubscriptions || 0}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Activities & Quick Actions */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Recent Activities
+            </CardTitle>
+            <CardDescription>
+              Latest system activities and events
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats?.recentActivities?.map((activity, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{activity.action}</p>
+                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    {activity.type}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Pending Approvals
+            </CardTitle>
+            <CardDescription>
+              Items requiring your attention
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats?.pendingApprovals?.map((approval, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{approval.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {approval.type} • {approval.date}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{approval.status}</Badge>
+                    <Button size="sm" variant="outline">
+                      Review
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

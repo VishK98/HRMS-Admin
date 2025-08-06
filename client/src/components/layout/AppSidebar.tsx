@@ -36,9 +36,11 @@ const superAdminItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Companies", url: "/companies", icon: Building2 },
   { title: "User Management", url: "/users", icon: Users },
+  { title: "System Health", url: "/system", icon: Shield },
+  { title: "Security", url: "/security", icon: Shield },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Billing & Plans", url: "/billing", icon: IndianRupee },
   { title: "System Settings", url: "/system-settings", icon: Settings },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
 ];
 
 const adminItems = [

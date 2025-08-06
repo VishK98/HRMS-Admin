@@ -398,13 +398,15 @@ export const EmployeeManagement = () => {
                         </TableCell>
                         <TableCell>
                           <div className="space-y-1">
-                            <p className="font-medium">{employee.department}</p>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{employee.department}</p>
                               {employee.subcategory && (
-                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">
+                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                                   {employee.subcategory}
                                 </span>
                               )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
                               {employee.designation}
                             </div>
                           </div>

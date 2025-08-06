@@ -95,4 +95,11 @@ router.get('/companies', authenticate, requireSuperAdmin, userController.getAllC
 router.get('/companies/:companyId', authenticate, requireSuperAdmin, userController.getCompanyById);
 router.get('/companies/:companyId/users', authenticate, requireSuperAdmin, userController.getUsersByCompany);
 
+// Super admin routes
+router.get("/stats", authenticate, requireSuperAdmin, userController.getUserStats);
+router.get("/all", authenticate, requireSuperAdmin, userController.getAllUsers);
+
+// Initialize super admin (public route for first-time setup)
+router.post("/init-super-admin", userController.initSuperAdmin);
+
 module.exports = router; 

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
@@ -14,6 +15,7 @@ import Broadcast from "./pages/Broadcast";
 import Settings from "./pages/Settings";
 import Payroll from "./pages/Payroll";
 import Calendar from "./pages/Calendar";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,7 @@ const ProtectedApp = () => {
   return (
     <AppLayout>
       <Routes>
+        <Route path="/login" element={<LoginForm />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/employees" element={<Employees />} />
         <Route path="/attendance" element={<Attendance />} />
@@ -44,6 +47,42 @@ const ProtectedApp = () => {
         <Route path="/broadcast" element={<Broadcast />} />
         <Route path="/payroll" element={<Payroll />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/analytics" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <Analytics />
+          </ProtectedRoute>
+        } />
+        {/* Super Admin Only Routes */}
+        <Route path="/companies" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <div>Companies Management (Coming Soon)</div>
+          </ProtectedRoute>
+        } />
+        <Route path="/users" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <div>User Management (Coming Soon)</div>
+          </ProtectedRoute>
+        } />
+        <Route path="/system" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <div>System Health (Coming Soon)</div>
+          </ProtectedRoute>
+        } />
+        <Route path="/security" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <div>Security (Coming Soon)</div>
+          </ProtectedRoute>
+        } />
+        <Route path="/billing" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <div>Billing & Plans (Coming Soon)</div>
+          </ProtectedRoute>
+        } />
+        <Route path="/system-settings" element={
+          <ProtectedRoute requiredRole="super_admin">
+            <div>System Settings (Coming Soon)</div>
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppLayout>

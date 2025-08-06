@@ -54,86 +54,57 @@ export const LeaveReports = () => {
   });
   const [showReportOptions, setShowReportOptions] = useState(false);
 
-  // Mock data for now - will be replaced with API calls
+  // Fetch real leave reports data
   useEffect(() => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockData: LeaveReport[] = [
-        {
-          id: "1",
-          employeeName: "John Doe",
-          employeeId: "EMP001",
-          leaveType: "Annual Leave",
-          startDate: "2025-08-05",
-          endDate: "2025-08-07",
-          days: 3,
-          status: "approved",
-          reason: "Family vacation",
-          submittedDate: "2025-08-01",
-          approvedBy: "Admin User",
-          approvedDate: "2025-08-02"
-        },
-        {
-          id: "2",
-          employeeName: "Jane Smith",
-          employeeId: "EMP002",
-          leaveType: "Sick Leave",
-          startDate: "2025-08-03",
-          endDate: "2025-08-03",
-          days: 1,
-          status: "approved",
-          reason: "Medical appointment",
-          submittedDate: "2025-07-30",
-          approvedBy: "Admin User",
-          approvedDate: "2025-07-31"
-        },
-        {
-          id: "3",
-          employeeName: "Mike Johnson",
-          employeeId: "EMP003",
-          leaveType: "Personal Leave",
-          startDate: "2025-08-10",
-          endDate: "2025-08-12",
-          days: 3,
-          status: "rejected",
-          reason: "Personal emergency",
-          submittedDate: "2025-08-01",
-          approvedBy: "Admin User",
-          approvedDate: "2025-08-02",
-          comments: "Insufficient notice period"
-        },
-        {
-          id: "4",
-          employeeName: "Sarah Wilson",
-          employeeId: "EMP004",
-          leaveType: "Annual Leave",
-          startDate: "2025-08-15",
-          endDate: "2025-08-20",
-          days: 6,
-          status: "pending",
-          reason: "Summer vacation",
-          submittedDate: "2025-08-02"
-        },
-        {
-          id: "5",
-          employeeName: "David Brown",
-          employeeId: "EMP005",
-          leaveType: "Sick Leave",
-          startDate: "2025-08-04",
-          endDate: "2025-08-05",
-          days: 2,
-          status: "approved",
-          reason: "Not feeling well",
-          submittedDate: "2025-08-03",
-          approvedBy: "Admin User",
-          approvedDate: "2025-08-03"
+    const fetchLeaveReports = async () => {
+      setLoading(true);
+      try {
+        // Get current month dates
+        const now = new Date();
+        const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        
+        // Fetch leave requests from API
+        const response = await apiClient.getLeaveRequests({
+          startDate,
+          endDate,
+          limit: 100 // Get more records for reporting
+        });
+        
+        if (response.success && response.data) {
+          // Convert API data to LeaveReport format
+          const reports: LeaveReport[] = response.data.map(leave => ({
+            id: leave._id,
+            employeeName: `${leave.employee.firstName} ${leave.employee.lastName}`,
+            employeeId: leave.employee.employeeId,
+            leaveType: leave.leaveType.charAt(0).toUpperCase() + leave.leaveType.slice(1) + " Leave",
+            startDate: new Date(leave.startDate).toISOString().split('T')[0],
+            endDate: new Date(leave.endDate).toISOString().split('T')[0],
+            days: leave.days,
+            status: leave.status,
+            reason: leave.reason,
+            submittedDate: new Date(leave.submittedDate).toISOString().split('T')[0],
+            approvedBy: leave.approvedBy ? "Admin User" : "",
+            approvedDate: leave.approvedDate ? new Date(leave.approvedDate).toISOString().split('T')[0] : "",
+            comments: leave.comments || ""
+          }));
+          
+          setLeaveReports(reports);
+          setFilteredReports(reports);
+        } else {
+          setLeaveReports([]);
+          setFilteredReports([]);
         }
-      ];
-      setLeaveReports(mockData);
-      setFilteredReports(mockData);
-      setLoading(false);
-    }, 1000);
+      } catch (error) {
+        console.error("Error fetching leave reports:", error);
+        setLeaveReports([]);
+        setFilteredReports([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchLeaveReports();
   }, []);
 
   // Filter reports when search term or filters change
