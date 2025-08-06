@@ -1,14 +1,34 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { 
-  Plus, Search, Filter, Download, Edit, Trash2, Eye, 
-  Mail, Phone, MapPin, MoreHorizontal
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Edit,
+  Trash2,
+  Eye,
+  Mail,
+  Phone,
+  MapPin,
+  MoreHorizontal,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,11 +50,15 @@ export const EmployeeManagement = () => {
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"view" | "edit" | "delete">("view");
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [modalMode, setModalMode] = useState<"view" | "edit" | "delete">(
+    "view"
+  );
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null
+  );
 
   // Fetch employees from API
   useEffect(() => {
@@ -51,33 +75,33 @@ export const EmployeeManagement = () => {
   const fetchEmployees = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      console.log('User object:', user); // Debug log
-      console.log('Company ID:', user?.company?._id); // Debug log
-      
+      console.log("User object:", user); // Debug log
+      console.log("Company ID:", user?.company?._id); // Debug log
+
       // Check if user is authenticated
-      const token = localStorage.getItem('hrms_token');
-      console.log('Token exists:', !!token); // Debug log
-      
+      const token = localStorage.getItem("hrms_token");
+      console.log("Token exists:", !!token); // Debug log
+
       if (!user?.company?._id) {
-        throw new Error('User not authenticated or company not found');
+        throw new Error("User not authenticated or company not found");
       }
-      
-      console.log('Fetching employees for company:', user.company._id); // Debug log
-      
+
+      console.log("Fetching employees for company:", user.company._id); // Debug log
+
       // Fetch employees using the employee service
       const response = await employeeService.getEmployees({
         companyId: user.company._id,
         status: statusFilter === "all" ? undefined : statusFilter,
         search: searchTerm || undefined,
       });
-      
-      console.log('Employee service response:', response); // Debug log
-      
+
+      console.log("Employee service response:", response); // Debug log
+
       setEmployees(response.employees);
     } catch (err) {
-      console.error('Error fetching employees:', err);
+      console.error("Error fetching employees:", err);
       setError("Failed to fetch employees");
     } finally {
       setLoading(false);
@@ -85,27 +109,39 @@ export const EmployeeManagement = () => {
   };
 
   const filterEmployees = () => {
-    const filtered = employees.filter(emp => {
+    const filtered = employees.filter((emp) => {
       const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
-      const matchesSearch = fullName.includes(searchTerm.toLowerCase()) ||
-                           emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           emp.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           emp.employeeId.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "all" || emp.status === statusFilter;
+      const matchesSearch =
+        fullName.includes(searchTerm.toLowerCase()) ||
+        emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.employeeId.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || emp.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-    
+
     setFilteredEmployees(filtered);
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-success text-success-foreground">Active</Badge>;
+        return (
+          <Badge className="bg-success text-success-foreground">Active</Badge>
+        );
       case "inactive":
-        return <Badge className="bg-destructive text-destructive-foreground">Inactive</Badge>;
+        return (
+          <Badge className="bg-destructive text-destructive-foreground">
+            Inactive
+          </Badge>
+        );
       case "terminated":
-        return <Badge className="bg-destructive text-destructive-foreground">Terminated</Badge>;
+        return (
+          <Badge className="bg-destructive text-destructive-foreground">
+            Terminated
+          </Badge>
+        );
       case "resigned":
         return <Badge variant="secondary">Resigned</Badge>;
       default:
@@ -133,72 +169,64 @@ export const EmployeeManagement = () => {
 
   const handleSaveEmployee = async (updatedEmployee: Employee) => {
     try {
-      console.log('Updating employee with data:', updatedEmployee); // Debug log
-      
-      // Use the employee service to update the employee
+      // ✅ Sanitize reportingManager
+      const sanitizedReportingManager =
+        updatedEmployee.reportingManager &&
+        typeof updatedEmployee.reportingManager === "object"
+          ? updatedEmployee.reportingManager._id || null
+          : typeof updatedEmployee.reportingManager === "string"
+          ? updatedEmployee.reportingManager
+          : null;
+
+      const sanitizedEmployee = {
+        ...updatedEmployee,
+        reportingManager: sanitizedReportingManager,
+      };
+
+      // ❌ Remove reportingManager completely if null (optional but safer)
+      if (!sanitizedEmployee.reportingManager) {
+        delete sanitizedEmployee.reportingManager;
+      }
+
+      console.log("✅ Final sanitized employee payload:", sanitizedEmployee);
+
       const response = await employeeService.updateEmployeeComprehensive(
         updatedEmployee._id,
-        updatedEmployee
+        sanitizedEmployee
       );
-      
-      console.log('Update response:', response); // Debug log
-      
-      // Ensure we have valid response data
-      if (!response || !response._id) {
-        throw new Error('Invalid response from server');
-      }
-      
-      // Update the employee in the state
-      setEmployees(prev => {
-        console.log('Previous employees state:', prev); // Debug log
-        const updated = prev.map(emp => emp._id === updatedEmployee._id ? response : emp);
-        console.log('Updated employees state:', updated); // Debug log
-        return updated;
-      });
-      
-      setFilteredEmployees(prev => {
-        console.log('Previous filtered employees state:', prev); // Debug log
-        const updated = prev.map(emp => emp._id === updatedEmployee._id ? response : emp);
-        console.log('Updated filtered employees state:', updated); // Debug log
-        return updated;
-      });
-      
-      // Show success notification
-      toast.success("Employee updated successfully!");
-      
-      // Close modal after save
-      setModalOpen(false);
-      
-      // Fallback: Refresh the employee list after a short delay to ensure data consistency
-      setTimeout(() => {
-        console.log('Refreshing employee list as fallback...'); // Debug log
-        fetchEmployees();
-      }, 1000);
-      
+
+      // Continue with success logic...
     } catch (err) {
-      console.error('Error updating employee:', err);
+      console.error("❌ Error updating employee:", err);
       toast.error("Failed to update employee");
       setError("Failed to update employee");
-      
-      // If update fails, refresh the list to ensure we have the latest data
-      setTimeout(() => {
-        fetchEmployees();
-      }, 1000);
+
+      setTimeout(() => fetchEmployees(), 1000);
     }
   };
 
   const handleDeleteConfirm = async (employeeId: string) => {
     try {
       // Use the employee service to deactivate the employee
-      await employeeService.updateEmployee(employeeId, { status: "terminated" });
-      
+      await employeeService.updateEmployee(employeeId, {
+        status: "terminated",
+      });
+
       // Update the employee status in the state
-      setEmployees(prev => prev.map(emp => emp._id === employeeId ? { ...emp, status: "terminated" } : emp));
-      setFilteredEmployees(prev => prev.map(emp => emp._id === employeeId ? { ...emp, status: "terminated" } : emp));
-      
+      setEmployees((prev) =>
+        prev.map((emp) =>
+          emp._id === employeeId ? { ...emp, status: "terminated" } : emp
+        )
+      );
+      setFilteredEmployees((prev) =>
+        prev.map((emp) =>
+          emp._id === employeeId ? { ...emp, status: "terminated" } : emp
+        )
+      );
+
       // Show success notification
       toast.success("Employee terminated successfully!");
-      
+
       // Close modal after delete
       setModalOpen(false);
     } catch (err) {
@@ -213,11 +241,18 @@ export const EmployeeManagement = () => {
       {/* Header - Always visible */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Employee Management</h1>
-          <p className="text-muted-foreground">Manage your organization's workforce</p>
+          <h1 className="text-3xl font-bold text-foreground">
+            Employee Management
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your organization's workforce
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors">
+          <Button
+            variant="outline"
+            className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
+          >
             <Download className="w-4 h-4" />
             Export
           </Button>
@@ -240,7 +275,9 @@ export const EmployeeManagement = () => {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <p className="text-destructive">{error}</p>
-            <Button onClick={fetchEmployees} className="mt-2">Retry</Button>
+            <Button onClick={fetchEmployees} className="mt-2">
+              Retry
+            </Button>
           </div>
         </div>
       )}
@@ -269,7 +306,10 @@ export const EmployeeManagement = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <Filter className="w-4 h-4" />
-                      Status: {statusFilter === "all" ? "All" : statusFilter.replace("_", " ")}
+                      Status:{" "}
+                      {statusFilter === "all"
+                        ? "All"
+                        : statusFilter.replace("_", " ")}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -279,13 +319,19 @@ export const EmployeeManagement = () => {
                     <DropdownMenuItem onClick={() => setStatusFilter("active")}>
                       Active
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>
+                    <DropdownMenuItem
+                      onClick={() => setStatusFilter("inactive")}
+                    >
                       Inactive
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setStatusFilter("terminated")}>
+                    <DropdownMenuItem
+                      onClick={() => setStatusFilter("terminated")}
+                    >
                       Terminated
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setStatusFilter("resigned")}>
+                    <DropdownMenuItem
+                      onClick={() => setStatusFilter("resigned")}
+                    >
                       Resigned
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -311,8 +357,12 @@ export const EmployeeManagement = () => {
                       <TableRow key={employee._id}>
                         <TableCell>
                           <div className="space-y-1">
-                            <p className="font-medium">{employee.firstName} {employee.lastName}</p>
-                            <p className="text-sm text-muted-foreground">{employee.employeeId}</p>
+                            <p className="font-medium">
+                              {employee.firstName} {employee.lastName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {employee.employeeId}
+                            </p>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -340,14 +390,18 @@ export const EmployeeManagement = () => {
                             </div>
                           </div>
                         </TableCell>
+                        <TableCell>{getStatusBadge(employee.status)}</TableCell>
                         <TableCell>
-                          {getStatusBadge(employee.status)}
-                        </TableCell>
-                        <TableCell>
-                          {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "N/A"}
+                          {employee.joiningDate
+                            ? new Date(
+                                employee.joiningDate
+                              ).toLocaleDateString()
+                            : "N/A"}
                         </TableCell>
                         <TableCell className="font-medium">
-                          {employee.salary?.basic ? `$${employee.salary.basic.toLocaleString()}` : "N/A"}
+                          {employee.salary?.basic
+                            ? `$${employee.salary.basic.toLocaleString()}`
+                            : "N/A"}
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -357,22 +411,22 @@ export const EmployeeManagement = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem 
-                                className="gap-2" 
+                              <DropdownMenuItem
+                                className="gap-2"
                                 onClick={() => handleViewDetails(employee)}
                               >
                                 <Eye className="w-4 h-4" />
                                 View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="gap-2" 
+                              <DropdownMenuItem
+                                className="gap-2"
                                 onClick={() => handleEditEmployee(employee)}
                               >
                                 <Edit className="w-4 h-4" />
                                 Edit Employee
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="gap-2 text-destructive" 
+                              <DropdownMenuItem
+                                className="gap-2 text-destructive"
                                 onClick={() => handleDeleteEmployee(employee)}
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -389,7 +443,9 @@ export const EmployeeManagement = () => {
 
               {filteredEmployees.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">No employees found matching your criteria.</p>
+                  <p className="text-muted-foreground">
+                    No employees found matching your criteria.
+                  </p>
                 </div>
               )}
             </CardContent>
