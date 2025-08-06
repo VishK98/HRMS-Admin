@@ -35,6 +35,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { EmployeeModal } from '@/components/employees/EmployeeModal';
+import { EmployeeViewContent } from '@/components/employees/EmployeeViewContent';
 import { ReportingManagerSelector } from '@/components/employees/ReportingManagerSelector';
 import { employeeService, Employee, EmployeeFilters } from '@/services/employeeService';
 
@@ -481,7 +482,7 @@ export default function EmployeeManagement() {
       )}
 
       {/* Employee Modal */}
-      {modalOpen && (
+      {modalOpen && modalMode !== 'view' && (
         <EmployeeModal
           open={modalOpen}
           onOpenChange={setModalOpen}
@@ -491,6 +492,24 @@ export default function EmployeeManagement() {
           onSave={handleSaveEmployee}
           onDelete={handleDeleteEmployeeConfirm}
         />
+      )}
+
+      {/* Employee View Modal */}
+      {modalOpen && modalMode === 'view' && selectedEmployee && (
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Employee Details</DialogTitle>
+            </DialogHeader>
+            <EmployeeViewContent
+              employee={selectedEmployee}
+              onEdit={() => {
+                setModalMode('edit');
+              }}
+              onClose={() => setModalOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Reporting Manager Selector */}

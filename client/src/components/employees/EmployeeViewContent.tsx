@@ -1,499 +1,404 @@
 import { Employee } from "@/types/employee";
 import { InfoCard } from "./InfoCard";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  IndianRupee,
-  Building,
   User,
-  IdCard,
-  CreditCard,
-  Users,
-  UserCheck,
-  UserX,
-  Star,
-  Award,
-  Target,
-  TrendingUp,
-  Shield,
-  Heart,
-  Briefcase,
-  GraduationCap,
-  BedDouble,
-  Crown,
-  Users2,
+  Building,
   CalendarDays,
+  IndianRupee,
+  CreditCard,
+  MapPin,
+  Phone,
+  IdCard,
+  GraduationCap,
+  Heart,
+  Users,
+  Eye,
+  ExternalLink,
+  Mail,
+  Clock,
+  Shield,
   FileText,
-  GraduationCap as GraduationCapIcon,
+  Users2,
+  StickyNote,
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { employeeService, Department, Designation } from "@/services/employeeService";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface EmployeeViewContentProps {
   employee: Employee;
-  teamMembers?: Employee[]; // For showing team members if employee is a manager
+  onEdit?: () => void;
+  onClose?: () => void;
 }
 
-export const EmployeeViewContent = ({ employee, teamMembers = [] }: EmployeeViewContentProps) => {
+export const EmployeeViewContent = ({
+  employee,
+  onEdit,
+  onClose,
+}: EmployeeViewContentProps) => {
+  const { user } = useAuth();
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [designations, setDesignations] = useState<Designation[]>([]);
+  const [managers, setManagers] = useState<Employee[]>([]);
+  const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch dynamic data on component mount
+  useEffect(() => {
+    if (user?.company?._id) {
+      fetchDynamicData();
+    }
+  }, [user]);
+
+  const fetchDynamicData = async () => {
+    if (!user?.company?._id) {
+      console.warn("No company ID available for fetching dynamic data");
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const [deptsData, desigsData, managersData, teamData] = await Promise.all([
+        employeeService.getDepartments(user.company._id),
+        employeeService.getDesignations(user.company._id),
+        employeeService.getManagers(user.company._id),
+        employeeService.getTeamMembers(employee._id, user.company._id),
+      ]);
+      setDepartments(deptsData || []);
+      setDesignations(desigsData || []);
+      setManagers(managersData || []);
+      setTeamMembers(teamData || []);
+    } catch (error) {
+      console.error("Error fetching dynamic data:", error);
+      // Set empty arrays to prevent undefined errors
+      setDepartments([]);
+      setDesignations([]);
+      setManagers([]);
+      setTeamMembers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (date: string | Date) => {
+    if (!date) return "Not specified";
+    return new Date(date).toLocaleDateString();
+  };
+
+  const formatCurrency = (amount: number) => {
+    if (!amount) return "Not specified";
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(amount);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      active: { variant: "default" as const, text: "Active" },
+      inactive: { variant: "secondary" as const, text: "Inactive" },
+      terminated: { variant: "destructive" as const, text: "Terminated" },
+      resigned: { variant: "destructive" as const, text: "Resigned" },
+    };
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
+    return <Badge variant={config.variant}>{config.text}</Badge>;
+  };
+
+  const getRoleBadge = (role: string) => {
+    return (
+      <Badge variant={role === "manager" ? "default" : "secondary"}>
+        {role === "manager" ? "Manager" : "Employee"}
+      </Badge>
+    );
+  };
+
+  const renderField = (label: string, value: any, Icon?: any) => (
+    <div className="flex items-center gap-2 text-sm">
+      {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+      <span className="font-medium text-gray-700">{label}:</span>
+      <span className="text-gray-900">{value || "Not specified"}</span>
+    </div>
+  );
+
+  const renderDocumentLink = (label: string, url: string) => {
+    if (!url) return null;
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        <FileText className="w-4 h-4 text-gray-500" />
+        <span className="font-medium text-gray-700">{label}:</span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          View Document
+          <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#843C6D]"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
-      {/* Employee Header */}
+      {/* View Header */}
       <div className="relative bg-gradient-to-r from-[#521138] to-[#843C6D] rounded-lg px-4 py-3 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-bold">
-              {employee.firstName.toUpperCase()} {employee.lastName.toUpperCase()}
-            </h3>
-            <p className="text-white/80 text-sm">{employee.email}</p>
-            {employee.reportingManager && (
-              <p className="text-white/70 text-xs">
-                Reports to: {employee.reportingManager.firstName} {employee.reportingManager.lastName}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              className={`${
-                employee.status === "active"
-                  ? "bg-green-500 text-white"
-                  : employee.status === "inactive"
-                  ? "bg-red-500 text-white"
-                  : "bg-yellow-500 text-white"
-              } border-0 text-xs`}
-            >
-              {employee.status}
-            </Badge>
-          </div>
-        </div>
+        <h3 className="text-lg font-bold">Employee Details</h3>
+        <p className="text-white/80 text-xs">
+          View detailed information about the employee
+        </p>
       </div>
 
-      {/* Quick Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <InfoCard icon={Users} title="Department">
-          <p className="text-gray-900 font-semibold">{employee.department || "Not assigned"}</p>
-        </InfoCard>
-        <InfoCard icon={Briefcase} title="Designation">
-          <p className="text-gray-900 font-semibold">{employee.designation || "Not assigned"}</p>
-        </InfoCard>
-        <InfoCard icon={Calendar} title="Joining Date">
-          <p className="text-gray-900 font-semibold">
-            {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "Not provided"}
-          </p>
-        </InfoCard>
-        <InfoCard icon={UserCheck} title="Employee ID">
-          <p className="text-gray-900 font-semibold">{employee.employeeId || employee._id}</p>
-        </InfoCard>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
         {/* Personal Information */}
         <InfoCard icon={User} title="Personal Information">
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">{employee.email}</span>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("First Name", employee.firstName)}
+              {renderField("Last Name", employee.lastName)}
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">{employee.phone}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Email", employee.email, Mail)}
+              {renderField("Phone", employee.phone, Phone)}
             </div>
-            {employee.dateOfBirth && (
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800">
-                  {new Date(employee.dateOfBirth).toLocaleDateString()}
-                </span>
-              </div>
-            )}
-            {employee.gender && (
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800 capitalize">{employee.gender}</span>
-              </div>
-            )}
-            {employee.maritalStatus && (
-              <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800 capitalize">{employee.maritalStatus}</span>
-              </div>
-            )}
-            {employee.bloodGroup && (
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800">{employee.bloodGroup}</span>
-              </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Gender", employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1))}
+              {renderField("Date of Birth", formatDate(employee.dateOfBirth), CalendarDays)}
+            </div>
+            <div className="flex items-center gap-4">
+              {getStatusBadge(employee.status)}
+              {getRoleBadge(employee.role)}
+            </div>
           </div>
         </InfoCard>
 
         {/* Employment Information */}
         <InfoCard icon={Building} title="Employment Information">
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <Building className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">{employee.department || "Not assigned"}</span>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Employee ID", employee.employeeId)}
+              {renderField("Department", employee.department)}
             </div>
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">{employee.designation || "Not assigned"}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Designation", employee.designation)}
+              {renderField("Subcategory", employee.subcategory)}
             </div>
-            {employee.role && (
-              <div className="flex items-center gap-2">
-                <Crown className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800 capitalize">{employee.role}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">
-                {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : "Not provided"}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <UserCheck className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800 capitalize">{employee.status}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Joining Date", formatDate(employee.joiningDate), CalendarDays)}
+              {renderField("Team", employee.team, Users2)}
             </div>
             {employee.reportingManager && (
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800">
-                  Manager: {employee.reportingManager.firstName} {employee.reportingManager.lastName}
+              <div className="flex items-center gap-2 text-sm">
+                <Users className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700">Reporting Manager:</span>
+                <span className="text-gray-900">
+                  {managers.find(m => m._id === employee.reportingManager)?.firstName} {managers.find(m => m._id === employee.reportingManager)?.lastName}
                 </span>
               </div>
             )}
           </div>
         </InfoCard>
 
-        {/* Team Members (if employee is a manager) */}
-        {teamMembers.length > 0 && (
-          <InfoCard icon={Users2} title="Team Members">
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-800 font-medium">Direct Reports ({teamMembers.length})</span>
-              </div>
-              {teamMembers.map((member) => (
-                <div key={member._id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <div>
-                    <p className="text-gray-900 font-medium">
-                      {member.firstName} {member.lastName}
-                    </p>
-                    <p className="text-gray-600 text-xs">{member.designation || "Not assigned"}</p>
+        {/* Team Members */}
+        <InfoCard icon={Users2} title="Team Members">
+          <div className="space-y-3">
+            {teamMembers.length > 0 ? (
+              <div className="space-y-2">
+                {teamMembers.map((member) => (
+                  <div key={member._id} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-gradient-to-br from-[#521138] to-[#843C6D] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        {member.firstName.charAt(0)}{member.lastName.charAt(0)}
+                      </div>
+                      <span className="text-sm font-medium">
+                        {member.firstName} {member.lastName}
+                      </span>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      {member.designation || 'Employee'}
+                    </Badge>
                   </div>
-                  <Badge
-                    className={`${
-                      member.status === "active"
-                        ? "bg-green-500 text-white"
-                        : member.status === "inactive"
-                        ? "bg-red-500 text-white"
-                        : "bg-yellow-500 text-white"
-                    } border-0 text-xs`}
-                  >
-                    {member.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </InfoCard>
-        )}
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 text-center py-4">
+                No team members assigned
+              </div>
+            )}
+          </div>
+        </InfoCard>
 
-        {/* Performance Information */}
-        <InfoCard icon={TrendingUp} title="Performance Information">
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">Rating: {employee.performance?.rating || "Not rated"}</span>
+        {/* Leave Balance */}
+        <InfoCard icon={CalendarDays} title="Leave Balance">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              {renderField("Paid Leave", employee.leaveBalance?.paid)}
+              {renderField("Casual Leave", employee.leaveBalance?.casual)}
             </div>
-            <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">Achievements: {employee.performance?.achievements?.length || 0}</span>
+            <div className="grid grid-cols-2 gap-3">
+              {renderField("Sick Leave", employee.leaveBalance?.sick)}
+              {renderField("Short Leave", employee.leaveBalance?.short)}
             </div>
-            <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-gray-600" />
-              <span className="text-gray-800">Goals: {employee.performance?.goals?.length || 0}</span>
+            <div className="grid grid-cols-2 gap-3">
+              {renderField("Compensatory", employee.leaveBalance?.compensatory)}
+              {renderField("Total", employee.leaveBalance?.total)}
             </div>
           </div>
         </InfoCard>
 
-        {/* Leave Balance Information */}
-        {employee.leaveBalance && (
-          <InfoCard icon={CalendarDays} title="Leave Balance">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-1.5 bg-gray-50 rounded">
-                <p className="font-medium text-gray-800">Paid Leave</p>
-                <p className="text-gray-900 font-bold">{employee.leaveBalance.paid || 0} days</p>
-              </div>
-              <div className="p-1.5 bg-gray-50 rounded">
-                <p className="font-medium text-gray-800">Casual Leave</p>
-                <p className="text-gray-900 font-bold">{employee.leaveBalance.casual || 0} days</p>
-              </div>
-              <div className="p-1.5 bg-gray-50 rounded">
-                <p className="font-medium text-gray-800">Sick Leave</p>
-                <p className="text-gray-900 font-bold">{employee.leaveBalance.sick || 0} days</p>
-              </div>
-              <div className="p-1.5 bg-gray-50 rounded">
-                <p className="font-medium text-gray-800">Short Leave</p>
-                <p className="text-gray-900 font-bold">{employee.leaveBalance.short || 0} days</p>
-              </div>
-              <div className="p-1.5 bg-gray-50 rounded">
-                <p className="font-medium text-gray-800">Comp Off</p>
-                <p className="text-gray-900 font-bold">{employee.leaveBalance.compensatory || 0} days</p>
-              </div>
-              <div className="p-1.5 bg-gray-50 rounded">
-                <p className="font-medium text-gray-800">Total Leave</p>
-                <p className="text-gray-900 font-bold">{employee.leaveBalance.total || 0} days</p>
-              </div>
-            </div>
-          </InfoCard>
-        )}
-
         {/* Salary Information */}
-        {employee.salary && (
-          <InfoCard icon={IndianRupee} title="Salary Information">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Basic Salary:</span>
-                <span className="text-gray-900 font-semibold">₹{employee.salary.basic?.toLocaleString() || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">HRA:</span>
-                <span className="text-gray-900 font-semibold">₹{employee.salary.hra?.toLocaleString() || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">DA:</span>
-                <span className="text-gray-900 font-semibold">₹{employee.salary.da?.toLocaleString() || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Special Allowance:</span>
-                <span className="text-gray-900 font-semibold">₹{employee.salary.specialAllowance?.toLocaleString() || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Transport Allowance:</span>
-                <span className="text-gray-900 font-semibold">₹{employee.salary.transportAllowance?.toLocaleString() || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Medical Allowance:</span>
-                <span className="text-gray-900 font-semibold">₹{employee.salary.medicalAllowance?.toLocaleString() || 0}</span>
-              </div>
-              <div className="border-t pt-2 mt-2">
-                <div className="flex justify-between font-bold">
-                  <span className="text-gray-800">Total:</span>
-                  <span className="text-gray-900">
-                    ₹{(
-                      (employee.salary.basic || 0) +
-                      (employee.salary.hra || 0) +
-                      (employee.salary.da || 0) +
-                      (employee.salary.specialAllowance || 0) +
-                      (employee.salary.transportAllowance || 0) +
-                      (employee.salary.medicalAllowance || 0)
-                    ).toLocaleString()}
-                  </span>
-                </div>
+        <InfoCard icon={IndianRupee} title="Salary Information">
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Basic Salary", formatCurrency(employee.salary?.basic))}
+              {renderField("HRA", formatCurrency(employee.salary?.hra))}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("DA", formatCurrency(employee.salary?.da))}
+              {renderField("Allowances", formatCurrency(employee.salary?.allowances))}
+            </div>
+            <div className="pt-2 border-t">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <IndianRupee className="w-4 h-4 text-green-600" />
+                <span className="text-gray-700">Total Salary:</span>
+                <span className="text-green-600">
+                  {formatCurrency(
+                    (employee.salary?.basic || 0) +
+                    (employee.salary?.hra || 0) +
+                    (employee.salary?.da || 0) +
+                    (employee.salary?.allowances || 0)
+                  )}
+                </span>
               </div>
             </div>
-          </InfoCard>
-        )}
+          </div>
+        </InfoCard>
 
-        {/* Bank Details */}
-        <InfoCard icon={CreditCard} title="Bank Details">
-          {employee.bankDetails ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Bank Name:</span>
-                <span className="text-gray-900 font-semibold">{employee.bankDetails.bankName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Account Number:</span>
-                <span className="text-gray-900 font-semibold">{employee.bankDetails.accountNumber}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">IFSC Code:</span>
-                <span className="text-gray-900 font-semibold">{employee.bankDetails.ifscCode}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Branch:</span>
-                <span className="text-gray-900 font-semibold">{employee.bankDetails.branchName}</span>
-              </div>
+        {/* Emergency Contact */}
+        <InfoCard icon={Heart} title="Emergency Contact">
+          <div className="space-y-3">
+            {renderField("Name", employee.emergencyContact?.name)}
+            {renderField("Relationship", employee.emergencyContact?.relationship)}
+            {renderField("Phone", employee.emergencyContact?.phone, Phone)}
+          </div>
+        </InfoCard>
+
+        {/* Permanent Address */}
+        <InfoCard icon={MapPin} title="Permanent Address">
+          <div className="space-y-3">
+            {renderField("Street", employee.address?.permanentAddress?.street)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("City", employee.address?.permanentAddress?.city)}
+              {renderField("State", employee.address?.permanentAddress?.state)}
             </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Bank details not provided</p>
-          )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Zip Code", employee.address?.permanentAddress?.zipCode)}
+              {renderField("Country", employee.address?.permanentAddress?.country)}
+            </div>
+          </div>
         </InfoCard>
 
         {/* Current Address */}
         <InfoCard icon={MapPin} title="Current Address">
-          {employee.address ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-gray-600 mt-0.5" />
-                <div>
-                  <p className="text-gray-900">{employee.address.street}</p>
-                  <p className="text-gray-600">
-                    {employee.address.city}, {employee.address.state} {employee.address.zipCode}
-                  </p>
-                  <p className="text-gray-600">{employee.address.country}</p>
-                </div>
-              </div>
+          <div className="space-y-3">
+            {renderField("Street", employee.address?.street)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("City", employee.address?.city)}
+              {renderField("State", employee.address?.state)}
             </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Address not provided</p>
-          )}
-        </InfoCard>
-
-        {/* Permanent Address */}
-        {employee.address?.permanentAddress && (
-          <InfoCard icon={MapPin} title="Permanent Address">
-            <div className="space-y-2 text-sm">
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-gray-600 mt-0.5" />
-                <div>
-                  <p className="text-gray-900">{employee.address.permanentAddress.street}</p>
-                  <p className="text-gray-600">
-                    {employee.address.permanentAddress.city}, {employee.address.permanentAddress.state} {employee.address.permanentAddress.zipCode}
-                  </p>
-                  <p className="text-gray-600">{employee.address.permanentAddress.country}</p>
-                </div>
-              </div>
-            </div>
-          </InfoCard>
-        )}
-
-        {/* Emergency Contact */}
-        <InfoCard icon={Phone} title="Emergency Contact">
-          {employee.emergencyContact ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-900">{employee.emergencyContact.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-900">{employee.emergencyContact.phone}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <UserCheck className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-900">{employee.emergencyContact.relationship}</span>
-              </div>
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Emergency contact not provided</p>
-          )}
-        </InfoCard>
-
-        {/* Documents */}
-        <InfoCard icon={IdCard} title="Documents">
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Aadhar</p>
-              <p className="text-gray-900">{employee.documents?.aadhar ? "Uploaded" : "Not provided"}</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">PAN</p>
-              <p className="text-gray-900">{employee.documents?.pan ? "Uploaded" : "Not provided"}</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Passport</p>
-              <p className="text-gray-900">{employee.documents?.passport ? "Uploaded" : "Not provided"}</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Driving License</p>
-              <p className="text-gray-900">{employee.documents?.drivingLicense ? "Uploaded" : "Not provided"}</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Voter ID</p>
-              <p className="text-gray-900">{employee.documents?.voterId ? "Uploaded" : "Not provided"}</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Relieving Letter</p>
-              <p className="text-gray-900">Not provided</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Experience Letter</p>
-              <p className="text-gray-900">Not provided</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Last Month Payslip</p>
-              <p className="text-gray-900">Not provided</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Passport Size Photo</p>
-              <p className="text-gray-900">Not provided</p>
-            </div>
-            <div className="p-1.5 bg-gray-50 rounded">
-              <p className="font-medium text-gray-800">Offer Letter</p>
-              <p className="text-gray-900">Not provided</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Zip Code", employee.address?.zipCode)}
+              {renderField("Country", employee.address?.country)}
             </div>
           </div>
         </InfoCard>
 
         {/* Education */}
         <InfoCard icon={GraduationCap} title="Education">
-          {employee.education ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <GraduationCapIcon className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-900 font-semibold">{employee.education.highestQualification}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Building className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-900">{employee.education.institution}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-600" />
-                <span className="text-gray-900">Completed: {employee.education.yearOfCompletion}</span>
-              </div>
-              {employee.education.percentage && (
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-gray-600" />
-                  <span className="text-gray-900">Percentage: {employee.education.percentage}%</span>
-                </div>
-              )}
+          <div className="space-y-3">
+            {renderField("Highest Qualification", employee.education?.highestQualification)}
+            {renderField("Institution", employee.education?.institution)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Year of Completion", employee.education?.yearOfCompletion)}
+              {renderField("Percentage", employee.education?.percentage ? `${employee.education.percentage}%` : undefined)}
             </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Education details not provided</p>
-          )}
+          </div>
         </InfoCard>
 
-        {/* Skills */}
-        <InfoCard icon={Target} title="Skills">
-          {employee.skills && employee.skills.length > 0 ? (
-            <div className="flex flex-wrap gap-1">
-              {employee.skills.map((skill, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {skill}
-                </Badge>
-              ))}
+        {/* Bank Details */}
+        <InfoCard icon={CreditCard} title="Bank Details">
+          <div className="space-y-3">
+            {renderField("Account Number", employee.bankDetails?.accountNumber)}
+            {renderField("Bank Name", employee.bankDetails?.bankName)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("IFSC Code", employee.bankDetails?.ifscCode)}
+              {renderField("Branch", employee.bankDetails?.branch)}
             </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Skills not provided</p>
-          )}
+          </div>
         </InfoCard>
 
-        {/* Work Experience */}
-        <InfoCard icon={Briefcase} title="Work Experience" className="lg:col-span-2">
-          {employee.workExperience && employee.workExperience.length > 0 ? (
-            <div className="space-y-3">
-              {employee.workExperience.map((exp, index) => (
-                <div key={index} className="border-l-2 border-gray-200 pl-4">
-                  <h4 className="font-semibold text-gray-900">{exp.company}</h4>
-                  <p className="text-sm text-gray-600">{exp.position}</p>
-                  <p className="text-xs text-gray-500">
-                    {exp.fromDate} - {exp.toDate || "Present"}
-                  </p>
-                  <p className="text-sm text-gray-700 mt-1">{exp.description}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm">Work experience not provided</p>
-          )}
+        {/* Documents */}
+        <InfoCard icon={IdCard} title="Documents">
+          <div className="space-y-3">
+            {renderDocumentLink("Aadhar Card", employee.documents?.aadhar)}
+            {renderDocumentLink("PAN Card", employee.documents?.pan)}
+            {renderDocumentLink("Passport", employee.documents?.passport)}
+            {renderDocumentLink("Driving License", employee.documents?.drivingLicense)}
+            {renderDocumentLink("Voter ID", employee.documents?.voterId)}
+            {renderDocumentLink("Relieving Letter", employee.documents?.relievingLetter)}
+            {renderDocumentLink("Experience Letter", employee.documents?.experienceLetter)}
+            {renderDocumentLink("Last Payslip", employee.documents?.lastPayslip)}
+            {renderDocumentLink("Passport Photo", employee.documents?.passportPhoto)}
+            {renderDocumentLink("Offer Letter", employee.documents?.offerLetter)}
+          </div>
+        </InfoCard>
+
+        {/* Additional Information */}
+        <InfoCard icon={StickyNote} title="Additional Information">
+          <div className="space-y-3">
+            {renderField("Profile Complete", employee.isProfileComplete ? "Yes" : "No")}
+            {renderField("Last Login", formatDate(employee.lastLogin), Clock)}
+            {renderField("Created At", formatDate(employee.createdAt), CalendarDays)}
+            {renderField("Updated At", formatDate(employee.updatedAt), CalendarDays)}
+            {employee.notes && (
+              <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
+                <span className="font-medium text-gray-700">Notes:</span>
+                <div className="mt-1">{employee.notes}</div>
+              </div>
+            )}
+          </div>
         </InfoCard>
       </div>
 
-      {/* Bottom Padding */}
-      <div className="pb-1"></div>
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-3 pt-6 border-t">
+        {onEdit && (
+          <Button
+            onClick={onEdit}
+            className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90"
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Edit Employee
+          </Button>
+        )}
+        {onClose && (
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        )}
+      </div>
     </div>
   );
 }; 
