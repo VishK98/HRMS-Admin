@@ -119,12 +119,16 @@ export const EmployeeEditContent = ({
 
   // Fetch team members when reporting manager changes
   useEffect(() => {
-    if (editedEmployee.reportingManager?._id && user?.company?._id) {
-      fetchTeamMembers(editedEmployee.reportingManager._id, user.company._id);
+    const managerId = typeof editedEmployee.reportingManager === 'string' 
+      ? editedEmployee.reportingManager 
+      : editedEmployee.reportingManager?._id;
+    
+    if (managerId && user?.company?._id) {
+      fetchTeamMembers(managerId, user.company._id);
     } else {
       setTeamMembers([]);
     }
-  }, [editedEmployee.reportingManager?._id, user?.company?._id]);
+  }, [editedEmployee.reportingManager, user?.company?._id]);
 
   const fetchDynamicData = async () => {
     setLoading(true);
@@ -152,7 +156,7 @@ export const EmployeeEditContent = ({
 
   const fetchTeamMembers = async (managerId: string, companyId: string) => {
     try {
-      const teamData = await employeeService.getTeamMembers(managerId, companyId);
+      const teamData = await employeeService.getTeamMembersForManager(managerId, companyId);
       setTeamMembers(teamData);
     } catch (error) {
       console.error('Error fetching team members:', error);
@@ -161,6 +165,14 @@ export const EmployeeEditContent = ({
   };
 
   const roles = employeeService.getRoles();
+
+  // Helper function to get reporting manager ID
+  const getReportingManagerId = () => {
+    if (typeof editedEmployee.reportingManager === 'string') {
+      return editedEmployee.reportingManager;
+    }
+    return editedEmployee.reportingManager?._id || "none";
+  };
 
   return (
     <div className="space-y-8">
@@ -540,13 +552,13 @@ export const EmployeeEditContent = ({
                  Reporting Manager
                </Label>
                <Select
-                 value={editedEmployee.reportingManager?._id || "none"}
+                 value={getReportingManagerId()}
                  onValueChange={(value) => {
                    if (value === "none") {
                      handleInputChange("reportingManager", null);
                    } else {
-                     const selectedManager = managers.find(m => m._id === value);
-                     handleInputChange("reportingManager", selectedManager || null);
+                     // Store only the ID, not the entire object
+                     handleInputChange("reportingManager", value);
                    }
                  }}
                  disabled={loading}

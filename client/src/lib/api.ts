@@ -53,6 +53,49 @@ class ApiClient {
     }
   }
 
+  // Method for FormData uploads (without Content-Type header)
+  async uploadRequest<T>(
+    endpoint: string,
+    formData: FormData,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const token = localStorage.getItem('hrms_token');
+    
+    const config: RequestInit = {
+      ...options,
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+        // Don't set Content-Type for FormData, let browser set it with boundary
+        ...options.headers,
+      },
+    };
+
+    console.log('Making upload request to:', url); // Debug log
+
+    try {
+      const response = await fetch(url, config);
+      const data = await response.json();
+
+      console.log('Upload response status:', response.status); // Debug log
+      console.log('Upload response data:', data); // Debug log
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Upload failed');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Upload request error:', error); // Debug log
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Network error');
+    }
+  }
+
   // Auth endpoints
   async login(email: string, password: string) {
     return this.request('/auth/login', {

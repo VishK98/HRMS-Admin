@@ -75,9 +75,14 @@ const employeeSchema = new mongoose.Schema(
     reportingManager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
+      default: null,
     },
     joiningDate: {
       type: Date,
+    },
+    team: {
+      type: String,
+      trim: true,
     },
     salary: {
       basic: {
@@ -137,6 +142,29 @@ const employeeSchema = new mongoose.Schema(
         trim: true,
         default: "India",
       },
+      permanentAddress: {
+        street: {
+          type: String,
+          trim: true,
+        },
+        city: {
+          type: String,
+          trim: true,
+        },
+        state: {
+          type: String,
+          trim: true,
+        },
+        zipCode: {
+          type: String,
+          trim: true,
+        },
+        country: {
+          type: String,
+          trim: true,
+          default: "India",
+        },
+      },
     },
     emergencyContact: {
       name: {
@@ -152,6 +180,7 @@ const employeeSchema = new mongoose.Schema(
         trim: true,
       },
     },
+    // Document uploads - all files stored as URLs
     documents: {
       aadhar: {
         type: String,
@@ -194,58 +223,27 @@ const employeeSchema = new mongoose.Schema(
         trim: true,
       },
     },
+    // Education documents - all files stored as URLs
     education: {
-      highestQualification: {
+      degreeCertificate: {
         type: String,
         trim: true,
       },
-      institution: {
+      markSheet: {
         type: String,
         trim: true,
       },
-      yearOfCompletion: {
+      transferCertificate: {
         type: String,
         trim: true,
       },
-      percentage: {
-        type: Number,
-        min: 0,
-        max: 100,
-      },
-    },
-    skills: {
-      technical: {
+      characterCertificate: {
         type: String,
         trim: true,
       },
-      soft: {
+      otherCertificates: {
         type: String,
         trim: true,
-      },
-      languages: {
-        type: String,
-        trim: true,
-      },
-    },
-    performance: {
-      rating: {
-        type: Number,
-        min: 1,
-        max: 5,
-      },
-      lastReview: {
-        type: Date,
-      },
-      achievements: {
-        type: String,
-        trim: true,
-      },
-      goals: {
-        type: String,
-        trim: true,
-      },
-      reviewDate: {
-        type: Date,
       },
     },
     leaveBalance: {
@@ -280,10 +278,6 @@ const employeeSchema = new mongoose.Schema(
         min: 0,
       },
     },
-    team: {
-      type: String,
-      trim: true,
-    },
     notes: {
       type: String,
       trim: true,
@@ -294,7 +288,7 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["employee", "manager"],
-      default: "employee"
+      default: "employee",
     },
     status: {
       type: String,
@@ -327,8 +321,14 @@ employeeSchema.index({ email: 1 });
 employeeSchema.index({ company: 1 });
 employeeSchema.index({ employeeId: 1 });
 
-// Hash password before saving
+// Clean up reportingManager field before saving
 employeeSchema.pre("save", async function (next) {
+  // Clean up reportingManager if it's an empty object or invalid
+  if (this.reportingManager && (typeof this.reportingManager === 'object' && Object.keys(this.reportingManager).length === 0)) {
+    this.reportingManager = null;
+  }
+  
+  // Hash password if modified
   if (!this.isModified("password")) return next();
 
   try {
@@ -338,6 +338,15 @@ employeeSchema.pre("save", async function (next) {
   } catch (error) {
     next(error);
   }
+});
+
+// Clean up reportingManager field before updating
+employeeSchema.pre("findOneAndUpdate", function(next) {
+  const update = this.getUpdate();
+  if (update.reportingManager && (typeof update.reportingManager === 'object' && Object.keys(update.reportingManager).length === 0)) {
+    update.reportingManager = null;
+  }
+  next();
 });
 
 // Compare password method

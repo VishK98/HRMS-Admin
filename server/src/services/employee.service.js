@@ -121,12 +121,13 @@ class EmployeeService {
         throw new Error("Employee not found");
       }
 
+      // Return employee without password
       const employeeResponse = employee.toObject();
       delete employeeResponse.password;
 
       return {
         success: true,
-        data: { employee: employeeResponse },
+        data: employeeResponse,
       };
     } catch (error) {
       throw error;
@@ -141,59 +142,102 @@ class EmployeeService {
         throw new Error("Employee not found");
       }
 
-      // Update fields - expanded to include all employee fields
-      const allowedFields = [
-        "firstName",
-        "lastName",
-        "email",
-        "phone",
-        "employeeId",
-        "department",
-        "designation",
-        "subcategory",
-        "reportingManager",
-        "joiningDate",
-        "dateOfBirth",
-        "gender",
-        "maritalStatus",
-        "bloodGroup",
-        "salary",
-        "bankDetails",
-        "address",
-        "emergencyContact",
-        "documents",
-        "education",
-        "skills",
-        "team",
-        "performance",
-        "notes",
-        "leaveBalance",
-        "status",
-        "isProfileComplete",
-        "role",
-        "lastLogin",
-      ];
+      // Clean up reportingManager if it's an empty object
+      if (
+        updateData.reportingManager &&
+        typeof updateData.reportingManager === "object" &&
+        Object.keys(updateData.reportingManager).length === 0
+      ) {
+        updateData.reportingManager = null;
+      }
 
-      allowedFields.forEach((field) => {
-        if (updateData[field] !== undefined) {
-          employee[field] = updateData[field];
+      // Update fields
+      Object.keys(updateData).forEach((key) => {
+        if (updateData[key] !== undefined) {
+          if (
+            typeof updateData[key] === "object" &&
+            !Array.isArray(updateData[key])
+          ) {
+            // Handle nested objects
+            employee[key] = { ...employee[key], ...updateData[key] };
+          } else {
+            employee[key] = updateData[key];
+          }
         }
       });
 
-      // Mark profile as complete if all required fields are filled
-      if (employee.department && employee.designation && employee.joiningDate) {
-        employee.isProfileComplete = true;
-      }
+      // Update timestamp
+      employee.updatedAt = new Date();
+
+      // Check if profile is complete
+      employee.isProfileComplete = this.checkProfileCompleteness(employee);
 
       await employee.save();
 
+      // Return updated employee without password
       const employeeResponse = employee.toObject();
       delete employeeResponse.password;
 
       return {
         success: true,
         message: "Employee profile updated successfully",
-        data: { employee: employeeResponse },
+        data: employeeResponse,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Update employee documents
+  async updateEmployeeDocuments(employeeId, documentUrls) {
+    try {
+      const employee = await Employee.findById(employeeId);
+      if (!employee) {
+        throw new Error("Employee not found");
+      }
+
+      // Update documents
+      employee.documents = { ...employee.documents, ...documentUrls };
+      employee.updatedAt = new Date();
+
+      await employee.save();
+
+      // Return updated employee without password
+      const employeeResponse = employee.toObject();
+      delete employeeResponse.password;
+
+      return {
+        success: true,
+        message: "Documents updated successfully",
+        data: employeeResponse,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Update employee education documents
+  async updateEmployeeEducation(employeeId, educationUrls) {
+    try {
+      const employee = await Employee.findById(employeeId);
+      if (!employee) {
+        throw new Error("Employee not found");
+      }
+
+      // Update education documents
+      employee.education = { ...employee.education, ...educationUrls };
+      employee.updatedAt = new Date();
+
+      await employee.save();
+
+      // Return updated employee without password
+      const employeeResponse = employee.toObject();
+      delete employeeResponse.password;
+
+      return {
+        success: true,
+        message: "Education documents updated successfully",
+        data: employeeResponse,
       };
     } catch (error) {
       throw error;
@@ -206,11 +250,14 @@ class EmployeeService {
       const query = { company: companyId };
 
       // Apply filters
+      if (filters.department) {
+        query.department = { $regex: new RegExp(filters.department, "i") };
+      }
       if (filters.status) {
         query.status = filters.status;
       }
-      if (filters.department) {
-        query.department = { $regex: new RegExp(filters.department, "i") };
+      if (filters.role) {
+        query.role = filters.role;
       }
       if (filters.search) {
         query.$or = [
@@ -221,22 +268,44 @@ class EmployeeService {
         ];
       }
 
+      const page = parseInt(filters.page) || 1;
+      const limit = parseInt(filters.limit) || 10;
+      const skip = (page - 1) * limit;
+
       const employees = await Employee.find(query)
         .populate("company", "name code")
         .populate("reportingManager", "firstName lastName employeeId")
-        .select("-password")
+        .skip(skip)
+        .limit(limit)
         .sort({ createdAt: -1 });
+
+      const total = await Employee.countDocuments(query);
+
+      // Remove passwords from response
+      const employeesResponse = employees.map((emp) => {
+        const empObj = emp.toObject();
+        delete empObj.password;
+        return empObj;
+      });
 
       return {
         success: true,
-        data: { employees },
+        data: {
+          employees: employeesResponse,
+          pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalItems: total,
+            itemsPerPage: limit,
+          },
+        },
       };
     } catch (error) {
       throw error;
     }
   }
 
-  // Get employee by ID (admin function)
+  // Get employee by ID
   async getEmployeeById(employeeId) {
     try {
       const employee = await Employee.findById(employeeId)
@@ -247,19 +316,20 @@ class EmployeeService {
         throw new Error("Employee not found");
       }
 
+      // Return employee without password
       const employeeResponse = employee.toObject();
       delete employeeResponse.password;
 
       return {
         success: true,
-        data: { employee: employeeResponse },
+        data: employeeResponse,
       };
     } catch (error) {
       throw error;
     }
   }
 
-  // Deactivate employee (admin function)
+  // Deactivate employee
   async deactivateEmployee(employeeId) {
     try {
       const employee = await Employee.findById(employeeId);
@@ -268,18 +338,24 @@ class EmployeeService {
       }
 
       employee.status = "inactive";
+      employee.updatedAt = new Date();
       await employee.save();
+
+      // Return employee without password
+      const employeeResponse = employee.toObject();
+      delete employeeResponse.password;
 
       return {
         success: true,
         message: "Employee deactivated successfully",
+        data: employeeResponse,
       };
     } catch (error) {
       throw error;
     }
   }
 
-  // Generate unique employee ID
+  // Generate employee ID
   generateEmployeeId() {
     const year = new Date().getFullYear();
     const random = Math.floor(Math.random() * 10000)
@@ -288,7 +364,7 @@ class EmployeeService {
     return `EMP${year}${random}`;
   }
 
-  // Get employee statistics (admin function)
+  // Get employee statistics
   async getEmployeeStats(companyId) {
     try {
       const stats = await Employee.aggregate([
@@ -303,23 +379,82 @@ class EmployeeService {
             inactiveEmployees: {
               $sum: { $cond: [{ $eq: ["$status", "inactive"] }, 1, 0] },
             },
-            completeProfiles: {
-              $sum: { $cond: ["$isProfileComplete", 1, 0] },
+            managers: {
+              $sum: { $cond: [{ $eq: ["$role", "manager"] }, 1, 0] },
             },
-            incompleteProfiles: {
-              $sum: { $cond: ["$isProfileComplete", 0, 1] },
+            employees: {
+              $sum: { $cond: [{ $eq: ["$role", "employee"] }, 1, 0] },
             },
           },
         },
       ]);
 
+      const departmentStats = await Employee.aggregate([
+        {
+          $match: {
+            company: companyId,
+            department: { $exists: true, $ne: "" },
+          },
+        },
+        {
+          $group: {
+            _id: "$department",
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { count: -1 } },
+      ]);
+
+      const statusStats = await Employee.aggregate([
+        { $match: { company: companyId } },
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const result = stats[0] || {
+        totalEmployees: 0,
+        activeEmployees: 0,
+        inactiveEmployees: 0,
+        managers: 0,
+        employees: 0,
+      };
+
       return {
         success: true,
-        data: { stats: stats[0] || {} },
+        data: {
+          ...result,
+          departmentStats,
+          statusStats,
+        },
       };
     } catch (error) {
       throw error;
     }
+  }
+
+  // Check if employee profile is complete
+  checkProfileCompleteness(employee) {
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "gender",
+      "dateOfBirth",
+      "employeeId",
+      "department",
+      "designation",
+      "joiningDate",
+    ];
+
+    return requiredFields.every((field) => {
+      const value = employee[field];
+      return value !== undefined && value !== null && value !== "";
+    });
   }
 }
 

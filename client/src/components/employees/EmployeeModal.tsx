@@ -11,6 +11,7 @@ import { Employee } from "@/types/employee";
 import { EmployeeViewContent } from "./EmployeeViewContent";
 import { EmployeeEditContent } from "./EmployeeEditContent";
 import { EmployeeDeleteContent } from "./EmployeeDeleteContent";
+import { employeeService } from "@/services/employeeService";
 
 interface EmployeeModalProps {
   open: boolean;
@@ -91,42 +92,74 @@ export const EmployeeModal = ({
     });
   };
 
-  const handleFileUpload = (type: string, file: File | null) => {
-    // Handle file upload logic here
-    // You can implement file upload to server or store file info
-    console.log(`File upload for ${type}:`, file);
-    
-    // For now, we'll store file info in the employee data
-    if (file) {
-      setEditedEmployee((prev) => {
-        if (!prev) return null;
+  const handleFileUpload = async (type: string, file: File | null) => {
+    if (!editedEmployee || !editedEmployee._id) {
+      console.error('No employee selected for file upload');
+      return;
+    }
+
+    try {
+      if (file) {
+        console.log(`Uploading file for ${type}:`, file.name);
         
-        // Determine which section this file belongs to
+        let updatedEmployee: Employee;
+        
+        // Determine which section this file belongs to and upload accordingly
         if (type === "aadhar" || type === "pan" || type === "passport" || 
-            type === "drivingLicense" || type === "voterId") {
-          return {
-            ...prev,
-            documents: {
-              ...(prev.documents || {}),
-              [type]: {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                lastModified: file.lastModified,
-              },
-            },
-          };
+            type === "drivingLicense" || type === "voterId" || type === "relievingLetter" ||
+            type === "experienceLetter" || type === "lastPayslip" || type === "passportPhoto" ||
+            type === "offerLetter") {
+          // Upload to documents endpoint
+          updatedEmployee = await employeeService.uploadDocument(editedEmployee._id, type, file);
         } else if (type === "intermediate" || type === "undergraduate" || 
                    type === "postgraduate" || type === "other") {
-          // For education documents, we'll store them in a separate state
-          // This avoids type conflicts with the existing Employee interface
-          console.log(`Education document uploaded: ${type}`, file);
-          // You can implement server upload here
-          return prev;
+          // Upload to education endpoint
+          updatedEmployee = await employeeService.uploadEducationDocument(editedEmployee._id, type, file);
+        } else {
+          console.error(`Unknown file type: ${type}`);
+          return;
         }
         
-        return prev;
-      });
+        // Update the edited employee with the response from server
+        setEditedEmployee(prev => {
+          if (prev && updatedEmployee) {
+            // Preserve the _id from the original employee
+            return {
+              ...updatedEmployee,
+              _id: prev._id || updatedEmployee._id
+            };
+          }
+          return updatedEmployee;
+        });
+        
+        console.log(`File uploaded successfully for ${type}`);
+      } else {
+        // Handle file removal - this would need a delete endpoint on the server
+        console.log(`File removed for ${type}`);
+        
+        // For now, just update the local state to remove the file
+        setEditedEmployee((prev) => {
+          if (!prev) return null;
+          
+          if (type === "aadhar" || type === "pan" || type === "passport" || 
+              type === "drivingLicense" || type === "voterId" || type === "relievingLetter" ||
+              type === "experienceLetter" || type === "lastPayslip" || type === "passportPhoto" ||
+              type === "offerLetter") {
+            const newDocuments = { ...(prev.documents || {}) };
+            delete newDocuments[type];
+            return {
+              ...prev,
+              documents: newDocuments,
+            };
+          }
+          
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error(`Error uploading file for ${type}:`, error);
+      // You might want to show a toast notification here
+      alert(`Error uploading file: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

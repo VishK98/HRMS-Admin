@@ -106,6 +106,8 @@ export default function EmployeeManagement() {
   };
 
   const handleEditEmployee = (employee: Employee) => {
+    console.log('handleEditEmployee called with employee:', employee);
+    console.log('Employee ID:', employee._id);
     setSelectedEmployee(employee);
     setModalMode('edit');
     setModalOpen(true);
@@ -125,12 +127,21 @@ export default function EmployeeManagement() {
 
   const handleSaveEmployee = async (updatedEmployee: Employee) => {
     try {
+      console.log('handleSaveEmployee called with:', {
+        modalMode,
+        selectedEmployee,
+        selectedEmployeeId: selectedEmployee?._id,
+        updatedEmployee
+      });
+      
       if (modalMode === 'edit' && selectedEmployee) {
         // Updating existing employee
-        await employeeService.updateEmployee(selectedEmployee._id, updatedEmployee);
+        console.log('Updating employee with ID:', selectedEmployee._id);
+        await employeeService.updateEmployeeComprehensive(selectedEmployee._id, updatedEmployee);
         toast.success('Employee updated successfully');
       } else if (modalMode === 'edit' && !selectedEmployee) {
         // Creating new employee
+        console.log('Creating new employee');
         await employeeService.createEmployee(updatedEmployee);
         toast.success('Employee created successfully');
       }
