@@ -172,33 +172,33 @@ export const EmployeeEditContent = ({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Personal Information */}
-        <InfoCard icon={User} title="Personal Information">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-gray-800 font-medium">
-                First Name
-              </Label>
-              <Input
-                id="firstName"
-                value={editedEmployee.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-gray-800 font-medium">
-                Last Name
-              </Label>
-              <Input
-                id="lastName"
-                value={editedEmployee.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-          </div>
+             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+         {/* Personal Information */}
+         <InfoCard icon={User} title="Personal Information">
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="firstName" className="text-gray-800 font-medium">
+                 First Name
+               </Label>
+               <Input
+                 id="firstName"
+                 value={editedEmployee.firstName}
+                 onChange={(e) => handleInputChange("firstName", e.target.value)}
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="lastName" className="text-gray-800 font-medium">
+                 Last Name
+               </Label>
+               <Input
+                 id="lastName"
+                 value={editedEmployee.lastName}
+                 onChange={(e) => handleInputChange("lastName", e.target.value)}
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-gray-800 font-medium">
               Email
@@ -222,60 +222,60 @@ export const EmployeeEditContent = ({
               className="border-gray-200 focus:border-gray-800"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dateOfBirth" className="text-gray-800 font-medium">
-                Date of Birth
-              </Label>
-              <Input
-                id="dateOfBirth"
-                type="date"
-                value={
-                  editedEmployee.dateOfBirth
-                    ? new Date(editedEmployee.dateOfBirth)
-                        .toISOString()
-                        .split("T")[0]
-                    : ""
-                }
-                onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gender" className="text-gray-800 font-medium">
-                Gender
-              </Label>
-              <Select
-                value={editedEmployee.gender}
-                onValueChange={(value) => handleInputChange("gender", value)}
-              >
-                <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    value="male"
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    Male
-                  </SelectItem>
-                  <SelectItem
-                    value="female"
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    Female
-                  </SelectItem>
-                  <SelectItem
-                    value="other"
-                    className="hover:bg-[#843C6D] hover:text-white"
-                  >
-                    Other
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="dateOfBirth" className="text-gray-800 font-medium">
+                 Date of Birth
+               </Label>
+               <Input
+                 id="dateOfBirth"
+                 type="date"
+                 value={
+                   editedEmployee.dateOfBirth
+                     ? new Date(editedEmployee.dateOfBirth)
+                         .toISOString()
+                         .split("T")[0]
+                     : ""
+                 }
+                 onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="gender" className="text-gray-800 font-medium">
+                 Gender
+               </Label>
+               <Select
+                 value={editedEmployee.gender}
+                 onValueChange={(value) => handleInputChange("gender", value)}
+               >
+                 <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                   <SelectValue placeholder="Select gender" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem
+                     value="male"
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     Male
+                   </SelectItem>
+                   <SelectItem
+                     value="female"
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     Female
+                   </SelectItem>
+                   <SelectItem
+                     value="other"
+                     className="hover:bg-[#843C6D] hover:text-white"
+                   >
+                     Other
+                   </SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+           </div>
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label
                 htmlFor="maritalStatus"
@@ -671,108 +671,108 @@ export const EmployeeEditContent = ({
           </InfoCard>
         )}
 
-        {/* Leave Balance */}
-        <InfoCard icon={CalendarDays} title="Leave Balance">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-gray-800 font-medium">Paid Leave</Label>
-              <Input
-                type="number"
-                value={editedEmployee.leaveBalance?.paid || ""}
-                onChange={(e) =>
-                  handleNestedInputChange(
-                    "leaveBalance",
-                    "paid",
-                    Number(e.target.value)
-                  )
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-gray-800 font-medium">Casual Leave</Label>
-              <Input
-                type="number"
-                value={editedEmployee.leaveBalance?.casual || ""}
-                onChange={(e) =>
-                  handleNestedInputChange(
-                    "leaveBalance",
-                    "casual",
-                    Number(e.target.value)
-                  )
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-gray-800 font-medium">Sick Leave</Label>
-              <Input
-                type="number"
-                value={editedEmployee.leaveBalance?.sick || ""}
-                onChange={(e) =>
-                  handleNestedInputChange(
-                    "leaveBalance",
-                    "sick",
-                    Number(e.target.value)
-                  )
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-gray-800 font-medium">Short Leave</Label>
-              <Input
-                type="number"
-                value={editedEmployee.leaveBalance?.short || ""}
-                onChange={(e) =>
-                  handleNestedInputChange(
-                    "leaveBalance",
-                    "short",
-                    Number(e.target.value)
-                  )
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-gray-800 font-medium">Comp Off</Label>
-              <Input
-                type="number"
-                value={editedEmployee.leaveBalance?.compensatory || ""}
-                onChange={(e) =>
-                  handleNestedInputChange(
-                    "leaveBalance",
-                    "compensatory",
-                    Number(e.target.value)
-                  )
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-gray-800 font-medium">Total Leave</Label>
-              <Input
-                type="number"
-                value={editedEmployee.leaveBalance?.total || ""}
-                onChange={(e) =>
-                  handleNestedInputChange(
-                    "leaveBalance",
-                    "total",
-                    Number(e.target.value)
-                  )
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-          </div>
-        </InfoCard>
+                 {/* Leave Balance */}
+         <InfoCard icon={CalendarDays} title="Leave Balance">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <Label className="text-gray-800 font-medium">Paid Leave</Label>
+               <Input
+                 type="number"
+                 value={editedEmployee.leaveBalance?.paid || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange(
+                     "leaveBalance",
+                     "paid",
+                     Number(e.target.value)
+                   )
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label className="text-gray-800 font-medium">Casual Leave</Label>
+               <Input
+                 type="number"
+                 value={editedEmployee.leaveBalance?.casual || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange(
+                     "leaveBalance",
+                     "casual",
+                     Number(e.target.value)
+                   )
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label className="text-gray-800 font-medium">Sick Leave</Label>
+               <Input
+                 type="number"
+                 value={editedEmployee.leaveBalance?.sick || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange(
+                     "leaveBalance",
+                     "sick",
+                     Number(e.target.value)
+                   )
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label className="text-gray-800 font-medium">Short Leave</Label>
+               <Input
+                 type="number"
+                 value={editedEmployee.leaveBalance?.short || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange(
+                     "leaveBalance",
+                     "short",
+                     Number(e.target.value)
+                   )
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label className="text-gray-800 font-medium">Comp Off</Label>
+               <Input
+                 type="number"
+                 value={editedEmployee.leaveBalance?.compensatory || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange(
+                     "leaveBalance",
+                     "compensatory",
+                     Number(e.target.value)
+                   )
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label className="text-gray-800 font-medium">Total Leave</Label>
+               <Input
+                 type="number"
+                 value={editedEmployee.leaveBalance?.total || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange(
+                     "leaveBalance",
+                     "total",
+                     Number(e.target.value)
+                   )
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
+         </InfoCard>
       </div>
 
-               {/* Salary Information and Emergency Contact Row */}
-       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-         {/* Salary Information */}
-         <InfoCard icon={IndianRupee} title="Salary Information">
-           <div className="grid grid-cols-2 gap-4">
+                               {/* Salary Information and Emergency Contact Row */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+          {/* Salary Information */}
+          <InfoCard icon={IndianRupee} title="Salary Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
              <div className="space-y-2">
                <Label
                  htmlFor="basicSalary"
@@ -954,24 +954,24 @@ export const EmployeeEditContent = ({
           </InfoCard>
        </div>
 
-       {/* Permanent Address, Current Address, Education, Bank Details Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Permanent Address */}
-        <InfoCard icon={MapPin} title="Permanent Address">
-          <div className="space-y-2">
-            <Label htmlFor="permanentStreet" className="text-gray-800 font-medium">
-              Street
-            </Label>
-            <Input
-              id="permanentStreet"
-              value={editedEmployee.address?.permanentAddress?.street || ""}
-              onChange={(e) =>
-                handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, street: e.target.value })
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+               {/* Permanent Address, Current Address, Education, Bank Details Row */}
+       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+         {/* Permanent Address */}
+         <InfoCard icon={MapPin} title="Permanent Address">
+           <div className="space-y-2">
+             <Label htmlFor="permanentStreet" className="text-gray-800 font-medium">
+               Street
+             </Label>
+             <Input
+               id="permanentStreet"
+               value={editedEmployee.address?.permanentAddress?.street || ""}
+               onChange={(e) =>
+                 handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, street: e.target.value })
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="permanentCity" className="text-gray-800 font-medium">
                 City
@@ -999,52 +999,52 @@ export const EmployeeEditContent = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="permanentZipCode" className="text-gray-800 font-medium">
-                Zip Code
-              </Label>
-              <Input
-                id="permanentZipCode"
-                value={editedEmployee.address?.permanentAddress?.zipCode || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, zipCode: e.target.value })
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="permanentCountry" className="text-gray-800 font-medium">
-                Country
-              </Label>
-              <Input
-                id="permanentCountry"
-                value={editedEmployee.address?.permanentAddress?.country || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, country: e.target.value })
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-          </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="permanentZipCode" className="text-gray-800 font-medium">
+                 Zip Code
+               </Label>
+               <Input
+                 id="permanentZipCode"
+                 value={editedEmployee.address?.permanentAddress?.zipCode || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, zipCode: e.target.value })
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="permanentCountry" className="text-gray-800 font-medium">
+                 Country
+               </Label>
+               <Input
+                 id="permanentCountry"
+                 value={editedEmployee.address?.permanentAddress?.country || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "permanentAddress", { ...editedEmployee.address?.permanentAddress, country: e.target.value })
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
         </InfoCard>
 
-        {/* Current Address */}
-        <InfoCard icon={MapPin} title="Current Address">
-          <div className="space-y-2">
-            <Label htmlFor="currentStreet" className="text-gray-800 font-medium">
-              Street
-            </Label>
-            <Input
-              id="currentStreet"
-              value={editedEmployee.address?.street || ""}
-              onChange={(e) =>
-                handleNestedInputChange("address", "street", e.target.value)
-              }
-              className="border-gray-200 focus:border-gray-800"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+                 {/* Current Address */}
+         <InfoCard icon={MapPin} title="Current Address">
+           <div className="space-y-2">
+             <Label htmlFor="currentStreet" className="text-gray-800 font-medium">
+               Street
+             </Label>
+             <Input
+               id="currentStreet"
+               value={editedEmployee.address?.street || ""}
+               onChange={(e) =>
+                 handleNestedInputChange("address", "street", e.target.value)
+               }
+               className="border-gray-200 focus:border-gray-800"
+             />
+           </div>
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="currentCity" className="text-gray-800 font-medium">
                 City
@@ -1072,54 +1072,59 @@ export const EmployeeEditContent = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentZipCode" className="text-gray-800 font-medium">
-                Zip Code
-              </Label>
-              <Input
-                id="currentZipCode"
-                value={editedEmployee.address?.zipCode || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "zipCode", e.target.value)
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currentCountry" className="text-gray-800 font-medium">
-                Country
-              </Label>
-              <Input
-                id="currentCountry"
-                value={editedEmployee.address?.country || ""}
-                onChange={(e) =>
-                  handleNestedInputChange("address", "country", e.target.value)
-                }
-                className="border-gray-200 focus:border-gray-800"
-              />
-            </div>
-          </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="currentZipCode" className="text-gray-800 font-medium">
+                 Zip Code
+               </Label>
+               <Input
+                 id="currentZipCode"
+                 value={editedEmployee.address?.zipCode || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "zipCode", e.target.value)
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="currentCountry" className="text-gray-800 font-medium">
+                 Country
+               </Label>
+               <Input
+                 id="currentCountry"
+                 value={editedEmployee.address?.country || ""}
+                 onChange={(e) =>
+                   handleNestedInputChange("address", "country", e.target.value)
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+               />
+             </div>
+           </div>
         </InfoCard>
       </div>
 
-      {/* Education and Bank Details Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Education */}
-        <InfoCard icon={GraduationCap} title="Education">
-          <div className="grid grid-cols-2 gap-4">
-            <FileUpload
-              label="Intermediate Certificate (10+2)"
-              icon="education"
-              onFileChange={(file) => handleFileUpload?.("intermediate", file)}
-            />
-            <FileUpload
-              label="Undergraduate Certificate (UG)"
-              icon="education"
-              onFileChange={(file) => handleFileUpload?.("undergraduate", file)}
-            />
-            <div className="col-start-1 col-end-3 flex justify-center">
-              <div className="w-1/2">
+             {/* Education and Bank Details Row */}
+       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+                           {/* Education */}
+           <InfoCard icon={GraduationCap} title="Education">
+             <div className="flex flex-col items-center justify-center min-h-[200px] space-y-6 p-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full max-w-md">
+                <div className="p-2">
+                  <FileUpload
+                    label="Intermediate Certificate (10+2)"
+                    icon="education"
+                    onFileChange={(file) => handleFileUpload?.("intermediate", file)}
+                  />
+                </div>
+                <div className="p-2">
+                  <FileUpload
+                    label="Undergraduate Certificate (UG)"
+                    icon="education"
+                    onFileChange={(file) => handleFileUpload?.("undergraduate", file)}
+                  />
+                </div>
+              </div>
+              <div className="w-full max-w-md p-2">
                 <FileUpload
                   label="Postgraduate Certificate (PG)"
                   icon="education"
@@ -1129,8 +1134,7 @@ export const EmployeeEditContent = ({
                 />
               </div>
             </div>
-          </div>
-        </InfoCard>
+          </InfoCard>
 
         {/* Bank Details */}
         <InfoCard icon={CreditCard} title="Bank Details">
@@ -1208,9 +1212,9 @@ export const EmployeeEditContent = ({
         </InfoCard>
       </div>
 
-                    {/* Documents */}
-      <InfoCard icon={IdCard} title="Documents">
-        <div className="grid grid-cols-5 gap-4">
+                                         {/* Documents */}
+       <InfoCard icon={IdCard} title="Documents">
+         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           <FileUpload
             label="Aadhar Card"
             onFileChange={(file) => handleFileUpload?.("aadhar", file)}
@@ -1272,43 +1276,43 @@ export const EmployeeEditContent = ({
               rows={4}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="isProfileComplete" className="text-gray-800 font-medium">
-                Profile Complete
-              </Label>
-              <Select
-                value={editedEmployee.isProfileComplete?.toString() || "false"}
-                onValueChange={(value) => handleInputChange("isProfileComplete", value === "true")}
-              >
-                <SelectTrigger className="border-gray-200 focus:border-gray-800">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="true">Complete</SelectItem>
-                  <SelectItem value="false">Incomplete</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastUpdated" className="text-gray-800 font-medium">
-                Last Updated
-              </Label>
-              <Input
-                id="lastUpdated"
-                type="datetime-local"
-                value={
-                  editedEmployee.updatedAt
-                    ? new Date(editedEmployee.updatedAt)
-                        .toISOString()
-                        .slice(0, 16)
-                    : ""
-                }
-                className="border-gray-200 focus:border-gray-800"
-                readOnly
-              />
-            </div>
-          </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="isProfileComplete" className="text-gray-800 font-medium">
+                 Profile Complete
+               </Label>
+               <Select
+                 value={editedEmployee.isProfileComplete?.toString() || "false"}
+                 onValueChange={(value) => handleInputChange("isProfileComplete", value === "true")}
+               >
+                 <SelectTrigger className="border-gray-200 focus:border-gray-800">
+                   <SelectValue placeholder="Select status" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="true">Complete</SelectItem>
+                   <SelectItem value="false">Incomplete</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="lastUpdated" className="text-gray-800 font-medium">
+                 Last Updated
+               </Label>
+               <Input
+                 id="lastUpdated"
+                 type="datetime-local"
+                 value={
+                   editedEmployee.updatedAt
+                     ? new Date(editedEmployee.updatedAt)
+                         .toISOString()
+                         .slice(0, 16)
+                     : ""
+                 }
+                 className="border-gray-200 focus:border-gray-800"
+                 readOnly
+               />
+             </div>
+           </div>
         </div>
       </InfoCard>
 
