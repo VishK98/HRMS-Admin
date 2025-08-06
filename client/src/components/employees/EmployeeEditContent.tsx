@@ -44,6 +44,7 @@ interface EmployeeEditContentProps {
   handleFileUpload?: (type: string, file: File | null) => void;
   onSave?: () => void;
   onCancel?: () => void;
+  onFilesSelected?: (files: { [key: string]: File }) => void;
 }
 
 export const EmployeeEditContent = ({
@@ -53,6 +54,7 @@ export const EmployeeEditContent = ({
   handleFileUpload,
   onSave,
   onCancel,
+  onFilesSelected,
 }: EmployeeEditContentProps) => {
   const { user } = useAuth();
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -62,6 +64,7 @@ export const EmployeeEditContent = ({
   const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedDepartmentSubcategories, setSelectedDepartmentSubcategories] = useState<Array<{ _id: string; name: string }>>([]);
+  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});
 
   // Fetch dynamic data on component mount
   useEffect(() => {
@@ -172,6 +175,30 @@ export const EmployeeEditContent = ({
       return editedEmployee.reportingManager;
     }
     return editedEmployee.reportingManager?._id || "none";
+  };
+
+  const handleFileSelection = (type: string, file: File | null) => {
+    if (file) {
+      setSelectedFiles(prev => ({
+        ...prev,
+        [type]: file
+      }));
+    } else {
+      setSelectedFiles(prev => {
+        const newFiles = { ...prev };
+        delete newFiles[type];
+        return newFiles;
+      });
+    }
+    
+    // Notify parent component about selected files
+    if (onFilesSelected) {
+      const updatedFiles = file 
+        ? { ...selectedFiles, [type]: file }
+        : { ...selectedFiles };
+      if (!file) delete updatedFiles[type];
+      onFilesSelected(updatedFiles);
+    }
   };
 
   return (
@@ -1031,14 +1058,14 @@ export const EmployeeEditContent = ({
                   <FileUpload
                     label="Intermediate Certificate (10+2)"
                     icon="education"
-                    onFileChange={(file) => handleFileUpload?.("intermediate", file)}
+                    onFileChange={(file) => handleFileSelection("intermediate", file)}
                   />
                 </div>
                 <div className="p-2">
                   <FileUpload
                     label="Undergraduate Certificate (UG)"
                     icon="education"
-                    onFileChange={(file) => handleFileUpload?.("undergraduate", file)}
+                    onFileChange={(file) => handleFileSelection("undergraduate", file)}
                   />
                 </div>
               </div>
@@ -1047,7 +1074,7 @@ export const EmployeeEditContent = ({
                   label="Postgraduate Certificate (PG)"
                   icon="education"
                   onFileChange={(file) =>
-                    handleFileUpload?.("postgraduate", file)
+                    handleFileSelection("postgraduate", file)
                   }
                 />
               </div>
@@ -1135,45 +1162,45 @@ export const EmployeeEditContent = ({
          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           <FileUpload
             label="Aadhar Card"
-            onFileChange={(file) => handleFileUpload?.("aadhar", file)}
+            onFileChange={(file) => handleFileSelection("aadhar", file)}
           />
           <FileUpload
             label="PAN Card"
-            onFileChange={(file) => handleFileUpload?.("pan", file)}
+            onFileChange={(file) => handleFileSelection("pan", file)}
           />
           <FileUpload
             label="Passport"
-            onFileChange={(file) => handleFileUpload?.("passport", file)}
+            onFileChange={(file) => handleFileSelection("passport", file)}
           />
           <FileUpload
             label="Driving License"
-            onFileChange={(file) => handleFileUpload?.("drivingLicense", file)}
+            onFileChange={(file) => handleFileSelection("drivingLicense", file)}
           />
           <FileUpload
             label="Voter ID"
-            onFileChange={(file) => handleFileUpload?.("voterId", file)}
+            onFileChange={(file) => handleFileSelection("voterId", file)}
           />
           <FileUpload
             label="Relieving Letter"
-            onFileChange={(file) => handleFileUpload?.("relievingLetter", file)}
+            onFileChange={(file) => handleFileSelection("relievingLetter", file)}
           />
           <FileUpload
             label="Experience Letter"
             onFileChange={(file) =>
-              handleFileUpload?.("experienceLetter", file)
+              handleFileSelection("experienceLetter", file)
             }
           />
           <FileUpload
             label="Last Month Payslip"
-            onFileChange={(file) => handleFileUpload?.("lastPayslip", file)}
+            onFileChange={(file) => handleFileSelection("lastPayslip", file)}
           />
           <FileUpload
             label="Passport Size Photo"
-            onFileChange={(file) => handleFileUpload?.("passportPhoto", file)}
+            onFileChange={(file) => handleFileSelection("passportPhoto", file)}
           />
           <FileUpload
             label="Offer Letter"
-            onFileChange={(file) => handleFileUpload?.("offerLetter", file)}
+            onFileChange={(file) => handleFileSelection("offerLetter", file)}
           />
         </div>
       </InfoCard>

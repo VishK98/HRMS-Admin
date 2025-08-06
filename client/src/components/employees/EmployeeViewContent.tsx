@@ -21,6 +21,7 @@ import {
   FileText,
   Users2,
   StickyNote,
+  AlertTriangle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { employeeService, Department, Designation } from "@/services/employeeService";
@@ -138,15 +139,20 @@ export const EmployeeViewContent = ({
 
   const renderDocumentLink = (label: string, url: string) => {
     if (!url) return null;
+    
+    // Get the base URL from the current window location
+    const baseUrl = window.location.origin;
+    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    
     return (
       <div className="flex items-center gap-2 text-sm">
         <FileText className="w-4 h-4 text-gray-500" />
         <span className="font-medium text-gray-700">{label}:</span>
         <a
-          href={url}
+          href={fullUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline"
         >
           View Document
           <ExternalLink className="w-3 h-3" />
@@ -181,13 +187,19 @@ export const EmployeeViewContent = ({
               {renderField("First Name", employee.firstName)}
               {renderField("Last Name", employee.lastName)}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-2">
               {renderField("Email", employee.email, Mail)}
+            </div>
+            <div className="space-y-2">
               {renderField("Phone", employee.phone, Phone)}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderField("Gender", employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1))}
               {renderField("Date of Birth", formatDate(employee.dateOfBirth), CalendarDays)}
+              {renderField("Gender", employee.gender?.charAt(0).toUpperCase() + employee.gender?.slice(1))}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Marital Status", employee.maritalStatus?.charAt(0).toUpperCase() + employee.maritalStatus?.slice(1))}
+              {renderField("Blood Group", employee.bloodGroup)}
             </div>
             <div className="flex items-center gap-4">
               {getStatusBadge(employee.status)}
@@ -196,87 +208,71 @@ export const EmployeeViewContent = ({
           </div>
         </InfoCard>
 
-                 {/* Employment Information */}
-         <InfoCard icon={Building} title="Employment Information">
-           <div className="space-y-4">
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               {renderField("Employee ID", employee.employeeId)}
-               {renderField("Designation", employee.designation)}
-             </div>
-             <div className="flex items-center gap-2 text-sm">
-               <span className="font-medium text-gray-700">Department:</span>
-               <span className="text-gray-900 break-words">
-                 {employee.department}
-                 {employee.subcategory && (
-                   <span className="text-gray-600 ml-2">
-                     ({employee.subcategory})
-                   </span>
-                 )}
-               </span>
-             </div>
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               {renderField("Joining Date", formatDate(employee.joiningDate), CalendarDays)}
-               {renderField("Team", employee.team, Users2)}
-             </div>
-             {employee.reportingManager && (
-               <div className="flex items-center gap-2 text-sm">
-                 <Users className="w-4 h-4 text-gray-500" />
-                 <span className="font-medium text-gray-700">Reporting Manager:</span>
-                 <span className="text-gray-900">
-                   {managers.find(m => m._id === employee.reportingManager)?.firstName} {managers.find(m => m._id === employee.reportingManager)?.lastName}
-                 </span>
-               </div>
-             )}
-           </div>
-         </InfoCard>
-
-        {/* Team Members */}
-        <InfoCard icon={Users2} title="Team Members">
-          <div className="space-y-3">
-            {teamMembers.length > 0 ? (
-              <div className="space-y-2">
-                {teamMembers.map((member) => (
-                  <div key={member._id} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-[#521138] to-[#843C6D] rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        {member.firstName.charAt(0)}{member.lastName.charAt(0)}
-                      </div>
-                      <span className="text-sm font-medium">
-                        {member.firstName} {member.lastName}
-                      </span>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {member.designation || 'Employee'}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500 text-center py-4">
-                No team members assigned
+        {/* Employment Information */}
+        <InfoCard icon={Building} title="Employment Information">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {renderField("Employee ID", employee.employeeId)}
+              {renderField("Designation", employee.designation)}
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-medium text-gray-700">Department:</span>
+              <span className="text-gray-900 break-words">
+                {employee.department}
+                {employee.subcategory && (
+                  <span className="text-gray-600 ml-2">
+                    ({employee.subcategory})
+                  </span>
+                )}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {renderField("Joining Date", formatDate(employee.joiningDate), CalendarDays)}
+              {renderField("Team", employee.team, Users2)}
+            </div>
+            {employee.reportingManager && (
+              <div className="flex items-center gap-2 text-sm">
+                <Users className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700">Reporting Manager:</span>
+                <span className="text-gray-900">
+                  {managers.find(m => m._id === employee.reportingManager)?.firstName} {managers.find(m => m._id === employee.reportingManager)?.lastName}
+                </span>
               </div>
             )}
           </div>
         </InfoCard>
 
-        {/* Leave Balance */}
-        <InfoCard icon={CalendarDays} title="Leave Balance">
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              {renderField("Paid Leave", employee.leaveBalance?.paid)}
-              {renderField("Casual Leave", employee.leaveBalance?.casual)}
+        {/* Team Information - Show team members if employee is a manager */}
+        {employee.role === 'manager' && (
+          <InfoCard icon={Users} title="Team Members">
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-gray-700">
+                Direct Reports ({teamMembers.length})
+              </div>
+              {teamMembers.length > 0 ? (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {teamMembers.map((member) => (
+                    <div key={member._id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{member.firstName} {member.lastName}</p>
+                        <p className="text-xs text-gray-600">{member.employeeId} • {member.designation}</p>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                        {member.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No team members assigned yet.</p>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {renderField("Sick Leave", employee.leaveBalance?.sick)}
-              {renderField("Short Leave", employee.leaveBalance?.short)}
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {renderField("Compensatory", employee.leaveBalance?.compensatory)}
-              {renderField("Total", employee.leaveBalance?.total)}
-            </div>
-          </div>
-        </InfoCard>
+          </InfoCard>
+        )}
+      </div>
 
+      {/* Salary Information and Emergency Contact Row */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
         {/* Salary Information */}
         <InfoCard icon={IndianRupee} title="Salary Information">
           <div className="space-y-3">
@@ -286,34 +282,27 @@ export const EmployeeViewContent = ({
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {renderField("DA", formatCurrency(employee.salary?.da))}
-              {renderField("Allowances", formatCurrency(employee.salary?.allowances))}
+              {renderField("Special Allowance", formatCurrency(employee.salary?.specialAllowance))}
             </div>
-            <div className="pt-2 border-t">
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <IndianRupee className="w-4 h-4 text-green-600" />
-                <span className="text-gray-700">Total Salary:</span>
-                <span className="text-green-600">
-                  {formatCurrency(
-                    (employee.salary?.basic || 0) +
-                    (employee.salary?.hra || 0) +
-                    (employee.salary?.da || 0) +
-                    (employee.salary?.allowances || 0)
-                  )}
-                </span>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {renderField("Transport Allowance", formatCurrency(employee.salary?.transportAllowance))}
+              {renderField("Medical Allowance", formatCurrency(employee.salary?.medicalAllowance))}
             </div>
           </div>
         </InfoCard>
 
         {/* Emergency Contact */}
-        <InfoCard icon={Heart} title="Emergency Contact">
+        <InfoCard icon={Phone} title="Emergency Contact">
           <div className="space-y-3">
-            {renderField("Name", employee.emergencyContact?.name)}
+            {renderField("Contact Name", employee.emergencyContact?.name)}
             {renderField("Relationship", employee.emergencyContact?.relationship)}
-            {renderField("Phone", employee.emergencyContact?.phone, Phone)}
+            {renderField("Contact Phone", employee.emergencyContact?.phone, Phone)}
           </div>
         </InfoCard>
+      </div>
 
+      {/* Permanent Address, Current Address Row */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
         {/* Permanent Address */}
         <InfoCard icon={MapPin} title="Permanent Address">
           <div className="space-y-3">
@@ -343,53 +332,69 @@ export const EmployeeViewContent = ({
             </div>
           </div>
         </InfoCard>
+      </div>
 
+      {/* Education and Bank Details Row */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
         {/* Education */}
         <InfoCard icon={GraduationCap} title="Education">
           <div className="space-y-3">
-            {renderDocumentLink("Degree Certificate", employee.education?.degreeCertificate)}
-            {renderDocumentLink("Mark Sheet", employee.education?.markSheet)}
-            {renderDocumentLink("Transfer Certificate", employee.education?.transferCertificate)}
-            {renderDocumentLink("Character Certificate", employee.education?.characterCertificate)}
-            {renderDocumentLink("Other Certificates", employee.education?.otherCertificates)}
+            {renderDocumentLink("Intermediate Certificate (10+2)", employee.documents?.intermediate)}
+            {renderDocumentLink("Undergraduate Certificate (UG)", employee.documents?.undergraduate)}
+            {renderDocumentLink("Postgraduate Certificate (PG)", employee.documents?.postgraduate)}
           </div>
         </InfoCard>
 
         {/* Bank Details */}
         <InfoCard icon={CreditCard} title="Bank Details">
           <div className="space-y-3">
-            {renderField("Account Number", employee.bankDetails?.accountNumber)}
             {renderField("Bank Name", employee.bankDetails?.bankName)}
+            {renderField("Account Number", employee.bankDetails?.accountNumber)}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {renderField("IFSC Code", employee.bankDetails?.ifscCode)}
-              {renderField("Branch", employee.bankDetails?.branch)}
+              {renderField("Branch Name", employee.bankDetails?.branchName)}
+            </div>
+          </div>
+        </InfoCard>
+      </div>
+
+      {/* Documents */}
+      <InfoCard icon={IdCard} title="Documents">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          {renderDocumentLink("Aadhar Card", employee.documents?.aadhar)}
+          {renderDocumentLink("PAN Card", employee.documents?.pan)}
+          {renderDocumentLink("Passport", employee.documents?.passport)}
+          {renderDocumentLink("Driving License", employee.documents?.drivingLicense)}
+          {renderDocumentLink("Voter ID", employee.documents?.voterId)}
+          {renderDocumentLink("Relieving Letter", employee.documents?.relievingLetter)}
+          {renderDocumentLink("Experience Letter", employee.documents?.experienceLetter)}
+          {renderDocumentLink("Last Month Payslip", employee.documents?.lastPayslip)}
+          {renderDocumentLink("Passport Size Photo", employee.documents?.passportPhoto)}
+          {renderDocumentLink("Offer Letter", employee.documents?.offerLetter)}
+        </div>
+      </InfoCard>
+
+      {/* Leave Balance and Additional Information Row */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+        {/* Leave Balance */}
+        <InfoCard icon={CalendarDays} title="Leave Balance">
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {renderField("Paid Leave", employee.leaveBalance?.paid)}
+              {renderField("Casual Leave", employee.leaveBalance?.casual)}
+              {renderField("Sick Leave", employee.leaveBalance?.sick)}
+              {renderField("Short Leave", employee.leaveBalance?.short)}
+              {renderField("Comp Off", employee.leaveBalance?.compensatory)}
+              {renderField("Total Leave", employee.leaveBalance?.total)}
             </div>
           </div>
         </InfoCard>
 
-        {/* Documents */}
-        <InfoCard icon={IdCard} title="Documents">
-          <div className="space-y-3">
-            {renderDocumentLink("Aadhar Card", employee.documents?.aadhar)}
-            {renderDocumentLink("PAN Card", employee.documents?.pan)}
-            {renderDocumentLink("Passport", employee.documents?.passport)}
-            {renderDocumentLink("Driving License", employee.documents?.drivingLicense)}
-            {renderDocumentLink("Voter ID", employee.documents?.voterId)}
-            {renderDocumentLink("Relieving Letter", employee.documents?.relievingLetter)}
-            {renderDocumentLink("Experience Letter", employee.documents?.experienceLetter)}
-            {renderDocumentLink("Last Payslip", employee.documents?.lastPayslip)}
-            {renderDocumentLink("Passport Photo", employee.documents?.passportPhoto)}
-            {renderDocumentLink("Offer Letter", employee.documents?.offerLetter)}
-          </div>
-        </InfoCard>
-
         {/* Additional Information */}
-        <InfoCard icon={StickyNote} title="Additional Information">
+        <InfoCard icon={AlertTriangle} title="Additional Information">
           <div className="space-y-3">
-            {renderField("Profile Complete", employee.isProfileComplete ? "Yes" : "No")}
-            {renderField("Last Login", formatDate(employee.lastLogin), Clock)}
-            {renderField("Created At", formatDate(employee.createdAt), CalendarDays)}
-            {renderField("Updated At", formatDate(employee.updatedAt), CalendarDays)}
+            {renderField("Profile Complete", employee.isProfileComplete ? "Complete" : "Incomplete")}
+            {renderField("Last Updated", formatDate(employee.updatedAt), CalendarDays)}
             {employee.notes && (
               <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
                 <span className="font-medium text-gray-700">Notes:</span>

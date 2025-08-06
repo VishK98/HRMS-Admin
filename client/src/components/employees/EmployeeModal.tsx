@@ -36,6 +36,7 @@ export const EmployeeModal = ({
   onCancel,
 }: EmployeeModalProps) => {
   const [editedEmployee, setEditedEmployee] = useState<Employee | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});
 
   // Update editedEmployee when employee prop changes
   useEffect(() => {
@@ -48,6 +49,56 @@ export const EmployeeModal = ({
 
   const handleSave = async () => {
     try {
+      // First, upload all selected files
+      if (Object.keys(selectedFiles).length > 0 && editedEmployee?._id) {
+        const loadingToast = toast.loading('Uploading documents...');
+        
+        try {
+          // Upload all files
+          for (const [type, file] of Object.entries(selectedFiles)) {
+            console.log(`Uploading file for ${type}:`, file.name);
+            
+            let updatedEmployee: Employee;
+            
+            // Determine which section this file belongs to and upload accordingly
+            if (type === "aadhar" || type === "pan" || type === "passport" || 
+                type === "drivingLicense" || type === "voterId" || type === "relievingLetter" ||
+                type === "experienceLetter" || type === "lastPayslip" || type === "passportPhoto" ||
+                type === "offerLetter") {
+              // Upload to documents endpoint
+              updatedEmployee = await employeeService.uploadDocument(editedEmployee._id, type, file);
+            } else if (type === "intermediate" || type === "undergraduate" || 
+                       type === "postgraduate" || type === "other") {
+              // Upload to education endpoint
+              updatedEmployee = await employeeService.uploadEducationDocument(editedEmployee._id, type, file);
+            } else {
+              console.error(`Unknown file type: ${type}`);
+              continue;
+            }
+            
+            // Update the edited employee with the response from server
+            setEditedEmployee(prev => {
+              if (prev && updatedEmployee) {
+                return {
+                  ...updatedEmployee,
+                  _id: prev._id || updatedEmployee._id
+                };
+              }
+              return updatedEmployee;
+            });
+          }
+          
+          toast.dismiss(loadingToast);
+          toast.success('Documents uploaded successfully!');
+          
+        } catch (error) {
+          toast.dismiss(loadingToast);
+          console.error('Error uploading files:', error);
+          toast.error('Failed to upload some documents');
+        }
+      }
+      
+      // Then save the employee details
       if (mode === 'edit' && !employee) {
         // Creating new employee
         if (onSave && editedEmployee) {
@@ -60,6 +111,9 @@ export const EmployeeModal = ({
           toast.success('Employee details updated successfully!');
         }
       }
+      
+      // Clear selected files
+      setSelectedFiles({});
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving employee:', error);
@@ -95,89 +149,8 @@ export const EmployeeModal = ({
     });
   };
 
-  const handleFileUpload = async (type: string, file: File | null) => {
-    if (!editedEmployee || !editedEmployee._id) {
-      console.error('No employee selected for file upload');
-      toast.error('No employee selected for file upload');
-      return;
-    }
-
-    try {
-      if (file) {
-        console.log(`Uploading file for ${type}:`, file.name);
-        
-        // Show loading toast
-        const loadingToast = toast.loading(`Uploading ${type} document...`);
-        
-        let updatedEmployee: Employee;
-        
-        // Determine which section this file belongs to and upload accordingly
-        if (type === "aadhar" || type === "pan" || type === "passport" || 
-            type === "drivingLicense" || type === "voterId" || type === "relievingLetter" ||
-            type === "experienceLetter" || type === "lastPayslip" || type === "passportPhoto" ||
-            type === "offerLetter") {
-          // Upload to documents endpoint
-          updatedEmployee = await employeeService.uploadDocument(editedEmployee._id, type, file);
-        } else if (type === "intermediate" || type === "undergraduate" || 
-                   type === "postgraduate" || type === "other") {
-          // Upload to education endpoint
-          updatedEmployee = await employeeService.uploadEducationDocument(editedEmployee._id, type, file);
-        } else {
-          console.error(`Unknown file type: ${type}`);
-          toast.error(`Unknown file type: ${type}`);
-          return;
-        }
-        
-        // Update the edited employee with the response from server
-        setEditedEmployee(prev => {
-          if (prev && updatedEmployee) {
-            // Preserve the _id from the original employee
-            return {
-              ...updatedEmployee,
-              _id: prev._id || updatedEmployee._id
-            };
-          }
-          return updatedEmployee;
-        });
-        
-        console.log(`File uploaded successfully for ${type}`);
-        
-        // Dismiss loading toast and show success toast
-        toast.dismiss(loadingToast);
-        toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} document uploaded successfully!`);
-        
-      } else {
-        // Handle file removal - this would need a delete endpoint on the server
-        console.log(`File removed for ${type}`);
-        
-        // For now, just update the local state to remove the file
-        setEditedEmployee((prev) => {
-          if (!prev) return null;
-          
-          if (type === "aadhar" || type === "pan" || type === "passport" || 
-              type === "drivingLicense" || type === "voterId" || type === "relievingLetter" ||
-              type === "experienceLetter" || type === "lastPayslip" || type === "passportPhoto" ||
-              type === "offerLetter") {
-            const newDocuments = { ...(prev.documents || {}) };
-            delete newDocuments[type];
-            return {
-              ...prev,
-              documents: newDocuments,
-            };
-          }
-          
-          return prev;
-        });
-        
-        toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} document removed successfully!`);
-      }
-    } catch (error) {
-      console.error(`Error uploading file for ${type}:`, error);
-      
-      // Dismiss any loading toast and show error toast
-      toast.dismiss();
-      toast.error(`Failed to upload ${type} document: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+  const handleFilesSelected = (files: { [key: string]: File }) => {
+    setSelectedFiles(files);
   };
 
   const getTitle = () => {
@@ -216,7 +189,7 @@ export const EmployeeModal = ({
             editedEmployee={editedEmployee}
             handleInputChange={handleInputChange}
             handleNestedInputChange={handleNestedInputChange}
-            handleFileUpload={handleFileUpload}
+            onFilesSelected={handleFilesSelected}
             onSave={handleSave}
             onCancel={onCancel || (() => onOpenChange(false))}
           />
