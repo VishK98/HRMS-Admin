@@ -1316,23 +1316,23 @@ export const EmployeeEditContent = ({
         </div>
       </InfoCard>
 
-      {/* Update Button Section - Positioned after all fields */}
-      <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 bg-gray-50 -mx-6 px-6 py-4 rounded-b-lg">
-        <Button 
-          variant="outline" 
-          onClick={onCancel}
-          className="hover:bg-gray-100"
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={onSave}
-          className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200 gap-2"
-        >
-          <Save className="w-4 h-4" />
-          Update Employee
-        </Button>
-      </div>
+             {/* Update Button Section - Positioned after all fields */}
+       <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 bg-gray-50 px-6 py-4 rounded-b-lg">
+         <Button 
+           variant="outline" 
+           onClick={onCancel}
+           className="hover:bg-gray-100"
+         >
+           Cancel
+         </Button>
+         <Button
+           onClick={onSave}
+           className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200 gap-2"
+         >
+           <Save className="w-4 h-4" />
+           Update Employee
+         </Button>
+       </div>
     </div>
   );
 };
