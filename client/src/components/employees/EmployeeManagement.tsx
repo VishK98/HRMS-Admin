@@ -275,10 +275,10 @@ export const EmployeeManagement = () => {
             <Download className="w-4 h-4" />
             Export
           </Button>
-          <Button className="gap-2 bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200">
+          {/* <Button className="gap-2 bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200">
             <Plus className="w-4 h-4" />
             Add Employee
-          </Button>
+          </Button> */}
         </div>
       </div>
 
