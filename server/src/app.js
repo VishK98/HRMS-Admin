@@ -19,6 +19,7 @@ const announcementRoutes = require("./routes/announcement.routes");
 const companyRoutes = require("./routes/company.routes");
 const systemRoutes = require("./routes/system.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
+const adminDashboardRoutes = require("./routes/admin-dashboard.routes");
 
 // Debug: Log route loading
 console.log("Loading routes...");
@@ -29,6 +30,7 @@ console.log("Designation routes loaded:", !!designationRoutes);
 console.log("Department routes loaded:", !!departmentRoutes);
 console.log("Holiday routes loaded:", !!holidayRoutes);
 console.log("Announcement routes loaded:", !!announcementRoutes);
+console.log("Admin Dashboard routes loaded:", !!adminDashboardRoutes);
 
 const app = express();
 
@@ -101,6 +103,7 @@ app.use("/api/announcements", announcementRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/system", systemRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/admin", adminDashboardRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -285,7 +285,45 @@ class ApiClient {
     return this.request(`/leave/summary?${queryParams.toString()}`);
   }
 
-  // Broadcast Management endpoints
+  // Employee Management
+  async getEmployeesByCompany(companyId: string) {
+    return this.request(`/employees/company/${companyId}`);
+  }
+
+  async getEmployeeById(employeeId: string) {
+    return this.request(`/employees/${employeeId}`);
+  }
+
+  async createEmployee(employeeData: any) {
+    return this.uploadRequest('/employees', employeeData);
+  }
+
+  async updateEmployee(employeeId: string, updateData: any) {
+    return this.uploadRequest(`/employees/${employeeId}`, updateData);
+  }
+
+  async deleteEmployee(employeeId: string) {
+    return this.request(`/employees/${employeeId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async uploadEmployeeDocument(employeeId: string, documentType: string, file: File) {
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('documentType', documentType);
+    
+    return this.uploadRequest(`/employees/${employeeId}/documents`, formData);
+  }
+
+  async uploadEmployeeEducation(employeeId: string, educationType: string, file: File) {
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('educationType', educationType);
+    
+    return this.uploadRequest(`/employees/${employeeId}/education`, formData);
+  }
+
   // Designations
   async getDesignationsByCompany(companyId: string) {
     return this.request(`/designations/company/${companyId}`);
@@ -440,6 +478,58 @@ class ApiClient {
 
   async getComprehensiveAnalytics(timeRange: string) {
     return this.request(`/analytics/comprehensive?timeRange=${timeRange}`);
+  }
+
+  // Admin Dashboard endpoints
+  async getEmployeesByCompany(companyId: string, filters?: any) {
+    if (!companyId) {
+      console.error("Company ID is required for getEmployeesByCompany");
+      return {
+        success: false,
+        message: "Company ID is required",
+        data: []
+      };
+    }
+
+    const queryParams = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const queryString = queryParams.toString();
+    const url = `/admin/employees/company/${companyId}${queryString ? `?${queryString}` : ''}`;
+    return this.request(url);
+  }
+
+  async getAttendanceSummary(startDate: string, endDate: string) {
+    return this.request(`/admin/attendance/summary?startDate=${startDate}&endDate=${endDate}`);
+  }
+
+  async getLeaveRequests(filters?: any) {
+    const queryParams = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const queryString = queryParams.toString();
+    const url = `/admin/leave/requests${queryString ? `?${queryString}` : ''}`;
+    return this.request(url);
+  }
+
+  async getActivityAnalytics(timeRange: string) {
+    return this.request(`/admin/analytics/activities?timeRange=${timeRange}`);
+  }
+
+  async getCompanyStats() {
+    return this.request('/admin/company/stats');
   }
 }
 
