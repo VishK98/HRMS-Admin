@@ -1,0 +1,1015 @@
+{
+  "info": {
+    "name": "HRMS API Collection - Part 2",
+    "description": "HRMS API Collection containing Attendance, Leave, Regularization, Analytics, Department, Designation, Holiday, Announcement, Company, System, and Additional Routes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    },
+    {
+      "key": "companyId",
+      "value": "your_company_id_here",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "your_employee_id_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "3. Attendance Management",
+      "item": [
+        {
+          "name": "Check In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"location\": {\n    \"latitude\": 12.9716,\n    \"longitude\": 77.5946\n  },\n  \"deviceInfo\": \"Mobile App\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/check-in",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "check-in"]
+            }
+          }
+        },
+        {
+          "name": "Check Out",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"location\": {\n    \"latitude\": 12.9716,\n    \"longitude\": 77.5946\n  },\n  \"deviceInfo\": \"Mobile App\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/check-out",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "check-out"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Attendance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/employee/{{employeeId}}?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "employee", "{{employeeId}}"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Company Attendance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/company?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "company"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/summary?date=2024-01-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "summary"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-01-15"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Today's Attendance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/today/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "today", "{{employeeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Attendance",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkInTime\": \"2024-01-15T09:00:00Z\",\n  \"checkOutTime\": \"2024-01-15T18:00:00Z\",\n  \"status\": \"present\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/attendanceId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "attendanceId"]
+            }
+          }
+        },
+        {
+          "name": "Delete Attendance",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/attendanceId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "attendanceId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Leave Management",
+      "item": [
+        {
+          "name": "Create Leave Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"leaveType\": \"sick\",\n  \"startDate\": \"2024-01-20\",\n  \"endDate\": \"2024-01-22\",\n  \"reason\": \"Not feeling well\",\n  \"days\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests"]
+            }
+          }
+        },
+        {
+          "name": "Get All Leave Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests?status=pending&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Leave Request by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests/leaveId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests", "leaveId"]
+            }
+          }
+        },
+        {
+          "name": "Update Leave Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"comments\": \"Approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests/leaveId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests", "leaveId", "status"]
+            }
+          }
+        },
+        {
+          "name": "Update Manager Action",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"managerAction\": \"approved\",\n  \"managerComments\": \"Approved by manager\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests/leaveId/manager-action",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests", "leaveId", "manager-action"]
+            }
+          }
+        },
+        {
+          "name": "Update Leave Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2024-01-21\",\n  \"endDate\": \"2024-01-23\",\n  \"reason\": \"Updated reason\",\n  \"days\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests/leaveId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests", "leaveId"]
+            }
+          }
+        },
+        {
+          "name": "Delete Leave Request",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests/leaveId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests", "leaveId"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Leave Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/requests/employee/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "requests", "employee", "{{employeeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Leave Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/leave/summary?year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "leave", "summary"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2024"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Regularization Management",
+      "item": [
+        {
+          "name": "Create Regularization Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"date\": \"2024-01-15\",\n  \"reason\": \"Late due to traffic\",\n  \"requestedTime\": \"09:30\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regularization/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "regularization", "requests"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Regularization Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/regularization/requests/employee/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "regularization", "requests", "employee", "{{employeeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Regularization Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/regularization/requests/company?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "regularization", "requests", "company"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Regularization Request by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/regularization/requests/requestId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "regularization", "requests", "requestId"]
+            }
+          }
+        },
+        {
+          "name": "Update Regularization Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"comments\": \"Approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regularization/requests/requestId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "regularization", "requests", "requestId", "status"]
+            }
+          }
+        },
+        {
+          "name": "Delete Regularization Request",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/regularization/requests/requestId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "regularization", "requests", "requestId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Get User Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/companies",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "companies"]
+            }
+          }
+        },
+        {
+          "name": "Get System Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/system",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "system"]
+            }
+          }
+        },
+        {
+          "name": "Get Activity Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/activities",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "activities"]
+            }
+          }
+        },
+        {
+          "name": "Get Comprehensive Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/comprehensive",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "analytics", "comprehensive"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Department Management",
+      "item": [
+        {
+          "name": "Get Departments by Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/company/{{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "company", "{{companyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Department by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/departmentId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "departmentId"]
+            }
+          }
+        },
+        {
+          "name": "Create Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"IT Department\",\n  \"description\": \"Information Technology Department\",\n  \"companyId\": \"{{companyId}}\",\n  \"head\": \"John Doe\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments"]
+            }
+          }
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated IT Department\",\n  \"description\": \"Updated Information Technology Department\",\n  \"head\": \"Jane Smith\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/departmentId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "departmentId"]
+            }
+          }
+        },
+        {
+          "name": "Delete Department",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/departmentId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "departmentId"]
+            }
+          }
+        },
+        {
+          "name": "Add Subcategory to Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Software Development\",\n  \"description\": \"Software Development Team\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/departments/departmentId/subcategories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "departments", "departmentId", "subcategories"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Designation Management",
+      "item": [
+        {
+          "name": "Get Designations by Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/designations/company/{{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "designations", "company", "{{companyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Designation by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/designations/designationId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "designations", "designationId"]
+            }
+          }
+        },
+        {
+          "name": "Create Designation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Software Engineer\",\n  \"description\": \"Software Engineer Role\",\n  \"companyId\": \"{{companyId}}\",\n  \"level\": \"Mid\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/designations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "designations"]
+            }
+          }
+        },
+        {
+          "name": "Update Designation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Senior Software Engineer\",\n  \"description\": \"Senior Software Engineer Role\",\n  \"level\": \"Senior\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/designations/designationId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "designations", "designationId"]
+            }
+          }
+        },
+        {
+          "name": "Delete Designation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/designations/designationId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "designations", "designationId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Holiday Management",
+      "item": [
+        {
+          "name": "Get Holidays by Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/holidays/company/{{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "holidays", "company", "{{companyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Holiday by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/holidays/holidayId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "holidays", "holidayId"]
+            }
+          }
+        },
+        {
+          "name": "Create Holiday",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Republic Day\",\n  \"date\": \"2024-01-26\",\n  \"description\": \"Republic Day Holiday\",\n  \"companyId\": \"{{companyId}}\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/holidays",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "holidays"]
+            }
+          }
+        },
+        {
+          "name": "Update Holiday",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Republic Day\",\n  \"date\": \"2024-01-26\",\n  \"description\": \"Updated Republic Day Holiday\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/holidays/holidayId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "holidays", "holidayId"]
+            }
+          }
+        },
+        {
+          "name": "Delete Holiday",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/holidays/holidayId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "holidays", "holidayId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Announcement Management",
+      "item": [
+        {
+          "name": "Get Announcements by Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/company/{{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "company", "{{companyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Announcement by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/announcementId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "announcementId"]
+            }
+          }
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Important Announcement\",\n  \"content\": \"This is an important announcement for all employees.\",\n  \"companyId\": \"{{companyId}}\",\n  \"priority\": \"high\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements"]
+            }
+          }
+        },
+        {
+          "name": "Update Announcement",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Important Announcement\",\n  \"content\": \"This is an updated important announcement for all employees.\",\n  \"priority\": \"medium\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/announcementId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "announcementId"]
+            }
+          }
+        },
+        {
+          "name": "Delete Announcement",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/announcements/announcementId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "announcements", "announcementId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Company Management",
+      "item": [
+        {
+          "name": "Get Company Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/companies/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "companies", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get All Companies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/companies/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "companies", "all"]
+            }
+          }
+        },
+        {
+          "name": "Update Company Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/companies/{{companyId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "companies", "{{companyId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. System Management",
+      "item": [
+        {
+          "name": "Get System Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "health"]
+            }
+          }
+        },
+        {
+          "name": "Get System Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "logs"]
+            }
+          }
+        },
+        {
+          "name": "Get Performance Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/performance",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "performance"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Additional Routes",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Serve Uploaded Files",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/uploads/employees/{{employeeId}}/documents/filename.jpg",
+              "host": ["{{baseUrl}}"],
+              "path": ["uploads", "employees", "{{employeeId}}", "documents", "filename.jpg"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
