@@ -73,7 +73,7 @@ export function AppSidebar() {
     cn(
       "w-full justify-start transition-all duration-200 py-5",
       active
-        ? "bg-[#521149] text-white shadow-sm"
+        ? "theme-primary theme-shadow"
         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
     );
 
@@ -129,7 +129,7 @@ export function AppSidebar() {
             <div className="relative mb-4 p-4 bg-sidebar-accent/50 rounded-lg">
               {/* Online Badge */}
               <div className="absolute top-0.5 right-2 flex items-center gap-1 bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full" />
                 <span>Online</span>
               </div>
 
@@ -138,7 +138,7 @@ export function AppSidebar() {
                 <div
                   className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center",
-                    "bg-gradient-to-br from-[#521138] to-[#843C6D]",
+                    "theme-gradient",
                     "text-white font-bold text-sm shadow-sm"
                   )}
                 >

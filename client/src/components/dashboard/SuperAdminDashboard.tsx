@@ -297,9 +297,9 @@ export const SuperAdminDashboard = () => {
   };
 
   const getHealthColor = (value: number) => {
-    if (value >= 80) return "text-red-500";
-    if (value >= 60) return "text-yellow-500";
-    return "text-green-500";
+    if (value >= 80) return "text-destructive";
+    if (value >= 60) return "text-warning";
+    return "text-[var(--primary)]";
   };
 
   if (loading) {
@@ -317,8 +317,8 @@ export const SuperAdminDashboard = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-red-600">Error Loading Dashboard</h3>
+                      <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-destructive">Error Loading Dashboard</h3>
           <p className="text-sm text-gray-600 mt-2">{error}</p>
           <Button onClick={fetchDashboardData} className="mt-4">
             <RefreshCw className="h-4 w-4 mr-2" />

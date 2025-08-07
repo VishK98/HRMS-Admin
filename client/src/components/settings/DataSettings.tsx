@@ -522,7 +522,7 @@ export const DataSettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 <span>Data Backup</span>
               </div>
               <Badge variant="default">Active</Badge>
@@ -530,7 +530,7 @@ export const DataSettings = () => {
             
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 <span>Privacy Controls</span>
               </div>
               <Badge variant="default">Enabled</Badge>
@@ -538,7 +538,7 @@ export const DataSettings = () => {
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                <AlertTriangle className="h-5 w-5 text-warning" />
                 <span>Data Retention</span>
               </div>
               <Badge variant="outline">Configured</Badge>
@@ -546,7 +546,7 @@ export const DataSettings = () => {
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-[#843C6D]" />
+                <Clock className="h-5 w-5 text-[var(--primary)]" />
                 <span>Last Backup</span>
               </div>
               <Badge variant="outline">2 hours ago</Badge>

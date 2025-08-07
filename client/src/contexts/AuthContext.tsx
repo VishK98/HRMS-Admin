@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { applyTheme, getThemeByRole, getCurrentTheme } from '@/lib/theme';
 
 export type UserRole = 'super_admin' | 'admin';
 
@@ -44,7 +45,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedToken = localStorage.getItem('hrms_token');
     
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      
+      // Apply theme based on user role
+      const theme = getThemeByRole(userData.role);
+      applyTheme(theme);
+    } else {
+      // Apply default theme if no user
+      const defaultTheme = getCurrentTheme();
+      applyTheme(defaultTheme);
     }
     setIsLoading(false);
   }, []);
@@ -71,6 +81,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
         localStorage.setItem('hrms_user', JSON.stringify(userData));
         localStorage.setItem('hrms_token', token);
+        
+        // Apply theme based on user role
+        const theme = getThemeByRole(userData.role);
+        applyTheme(theme);
+        
         setIsLoading(false);
         return true;
       } else {

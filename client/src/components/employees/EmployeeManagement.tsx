@@ -270,15 +270,15 @@ export const EmployeeManagement = () => {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            className="gap-2 hover:bg-[#843C6D] hover:text-white transition-colors"
+            className="gap-2 theme-secondary-hover hover:text-white transition-colors"
           >
             <Download className="w-4 h-4" />
             Export
           </Button>
-          {/* <Button className="gap-2 bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90 transition-all duration-200">
+          <Button variant="gradient" className="gap-2">
             <Plus className="w-4 h-4" />
             Add Employee
-          </Button> */}
+          </Button>
         </div>
       </div>
 
@@ -305,7 +305,7 @@ export const EmployeeManagement = () => {
       {!loading && !error && (
         <>
           {/* Filters and Search */}
-          <Card>
+          <Card className="theme-bg-primary theme-border theme-shadow">
             <CardHeader>
               <CardTitle>Employee Directory</CardTitle>
               <CardDescription>Search and filter employees</CardDescription>

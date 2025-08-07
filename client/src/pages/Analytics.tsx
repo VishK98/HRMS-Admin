@@ -192,15 +192,15 @@ export default function Analytics() {
   };
 
   const getGrowthIcon = (rate: number) => {
-    if (rate > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (rate < 0) return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <Minus className="h-4 w-4 text-gray-500" />;
+    if (rate > 0) return <TrendingUp className="h-4 w-4 text-[var(--primary)]" />;
+    if (rate < 0) return <TrendingDown className="h-4 w-4 text-destructive" />;
+    return <Minus className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getHealthColor = (value: number) => {
-    if (value >= 80) return "text-red-500";
-    if (value >= 60) return "text-yellow-500";
-    return "text-green-500";
+    if (value >= 80) return "text-destructive";
+    if (value >= 60) return "text-warning";
+    return "text-[var(--primary)]";
   };
 
   const getStatusColor = (status: string) => {
@@ -215,11 +215,11 @@ export default function Analytics() {
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'excellent': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'good': return <CheckCircle className="h-4 w-4 text-blue-500" />;
-      case 'fair': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'poor': return <XCircle className="h-4 w-4 text-red-500" />;
-      default: return <Info className="h-4 w-4 text-gray-500" />;
+      case 'excellent': return <CheckCircle className="h-4 w-4 text-[var(--primary)]" />;
+      case 'good': return <CheckCircle className="h-4 w-4 text-[var(--secondary)]" />;
+      case 'fair': return <AlertTriangle className="h-4 w-4 text-warning" />;
+      case 'poor': return <XCircle className="h-4 w-4 text-destructive" />;
+      default: return <Info className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -243,8 +243,8 @@ export default function Analytics() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center max-w-md">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-red-600">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-destructive">
             {isPermissionError ? 'Access Restricted' : 'Error Loading Analytics'}
           </h3>
           <p className="text-sm text-gray-600 mt-2">

@@ -23,9 +23,9 @@ export const AttendanceOverview = ({
   className
 }: AttendanceOverviewProps) => {
   const getAttendanceColor = (rate: number) => {
-    if (rate >= 90) return 'bg-green-500';
-    if (rate >= 75) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (rate >= 90) return 'bg-[var(--primary)]';
+    if (rate >= 75) return 'bg-warning';
+    return 'bg-destructive';
   };
 
   return (
@@ -66,19 +66,19 @@ export const AttendanceOverview = ({
             />
 
             <div className="grid grid-cols-3 gap-4 mt-6">
-              <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-950/20">
-                <UserCheck className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-green-600">{presentCount}</p>
+              <div className="text-center p-4 rounded-lg bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20">
+                <UserCheck className="w-6 h-6 text-[var(--primary)] mx-auto mb-2" />
+                <p className="text-2xl font-bold text-[var(--primary)]">{presentCount}</p>
                 <p className="text-xs text-muted-foreground">Present</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-950/20">
-                <UserX className="w-6 h-6 text-red-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-red-600">{absentCount}</p>
+              <div className="text-center p-4 rounded-lg bg-destructive/10 dark:bg-destructive/20">
+                <UserX className="w-6 h-6 text-destructive mx-auto mb-2" />
+                <p className="text-2xl font-bold text-destructive">{absentCount}</p>
                 <p className="text-xs text-muted-foreground">Absent</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-yellow-50 dark:bg-yellow-950/20">
-                <Clock className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-yellow-600">{lateCount}</p>
+              <div className="text-center p-4 rounded-lg bg-warning/10 dark:bg-warning/20">
+                <Clock className="w-6 h-6 text-warning mx-auto mb-2" />
+                <p className="text-2xl font-bold text-warning">{lateCount}</p>
                 <p className="text-xs text-muted-foreground">Late</p>
               </div>
             </div>

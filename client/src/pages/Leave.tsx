@@ -31,8 +31,8 @@ export default function Leave() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "dashboard" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("dashboard")}
         >
@@ -44,8 +44,8 @@ export default function Leave() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "requests" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("requests")}
         >
@@ -57,8 +57,8 @@ export default function Leave() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "reports" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("reports")}
         >

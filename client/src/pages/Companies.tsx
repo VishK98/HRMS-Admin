@@ -410,14 +410,14 @@ export default function Companies() {
                         </Badge>
                       </TableCell>
                                              <TableCell>
-                         <Badge 
-                           className={company.isActive 
-                             ? 'bg-green-500 text-white hover:bg-green-600' 
-                             : 'bg-red-500 text-white hover:bg-red-600'
-                           }
-                         >
-                           {company.isActive ? 'Active' : 'Deactive'}
-                         </Badge>
+                                                   <Badge 
+                            className={company.isActive 
+                              ? 'bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]' 
+                              : 'bg-destructive text-white hover:bg-destructive/90'
+                            }
+                          >
+                            {company.isActive ? 'Active' : 'Deactive'}
+                          </Badge>
                        </TableCell>
                       <TableCell>
                         {formatDate(company.createdAt)}
@@ -458,8 +458,8 @@ export default function Companies() {
                                                                <Badge 
                                   className={`${
                                     company.isActive 
-                                      ? 'bg-green-500 text-white' 
-                                      : 'bg-red-500 text-white'
+                                      ? 'bg-[var(--primary)] text-white' 
+                                      : 'bg-destructive text-white'
                                   }`}
                                 >
                                   {company.isActive ? 'A' : 'D'}
@@ -611,14 +611,14 @@ export default function Companies() {
                         
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-emerald-50 rounded-lg">
-                            <Badge 
-                              className={selectedCompany.isActive 
-                                ? 'bg-green-500 text-white hover:bg-green-600' 
-                                : 'bg-red-500 text-white hover:bg-red-600'
-                              }
-                            >
-                              {selectedCompany.isActive ? 'Active' : 'Deactive'}
-                            </Badge>
+                                                  <Badge 
+                        className={selectedCompany.isActive 
+                          ? 'bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]' 
+                          : 'bg-destructive text-white hover:bg-destructive/90'
+                        }
+                      >
+                        {selectedCompany.isActive ? 'Active' : 'Deactive'}
+                      </Badge>
                           </div>
                           <div>
                             <label className="text-sm font-medium text-muted-foreground">Status</label>
@@ -757,12 +757,12 @@ export default function Companies() {
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
-                                  <Badge 
-                                    variant={user.status === 'active' ? 'default' : 'secondary'}
-                                    className={user.status === 'active' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}
-                                  >
-                                    {user.status}
-                                  </Badge>
+                                                                     <Badge 
+                                     variant={user.status === 'active' ? 'default' : 'secondary'}
+                                     className={user.status === 'active' ? 'bg-[var(--primary)] text-white' : 'bg-muted text-muted-foreground'}
+                                   >
+                                     {user.status}
+                                   </Badge>
                                 </TableCell>
                                 <TableCell>
                                   <span className="text-sm font-mono">{user.employeeId || 'N/A'}</span>

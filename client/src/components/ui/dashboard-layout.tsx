@@ -66,7 +66,7 @@ export const DashboardLayout = ({
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="text-center">
-              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Error Loading Dashboard</h3>
               <p className="text-muted-foreground mb-4">{error}</p>
               {onRetry && (

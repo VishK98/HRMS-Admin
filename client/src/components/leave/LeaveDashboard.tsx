@@ -85,10 +85,10 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeColor = (leaveType: string) => {
     const colors: Record<string, string> = {
-      paid: "bg-[#843C6D]",
-      casual: "bg-green-500",
-      short: "bg-yellow-500",
-      sick: "bg-red-500",
+      paid: "bg-[var(--primary)]",
+      casual: "bg-[var(--secondary)]",
+      short: "bg-warning",
+      sick: "bg-destructive",
       halfday: "bg-purple-500",
     };
 
@@ -97,10 +97,10 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeBackground = (leaveType: string) => {
     const backgrounds: Record<string, string> = {
-      paid: "bg-[#843C6D]/5",
-      casual: "bg-green-50",
-      short: "bg-yellow-50",
-      sick: "bg-red-50",
+      paid: "bg-[var(--primary)]/5",
+      casual: "bg-[var(--secondary)]/5",
+      short: "bg-warning/5",
+      sick: "bg-destructive/5",
       halfday: "bg-purple-50",
     };
 
@@ -109,10 +109,10 @@ export const LeaveDashboard = () => {
 
   const getLeaveTypeHover = (leaveType: string) => {
     const hovers: Record<string, string> = {
-      paid: "hover:bg-[#843C6D]/10",
-      casual: "hover:bg-green-100",
-      short: "hover:bg-yellow-100",
-      sick: "hover:bg-red-100",
+      paid: "hover:bg-[var(--primary)]/10",
+      casual: "hover:bg-[var(--secondary)]/10",
+      short: "hover:bg-warning/10",
+      sick: "hover:bg-destructive/10",
       halfday: "hover:bg-purple-100",
     };
 
@@ -135,13 +135,13 @@ export const LeaveDashboard = () => {
 
   const getAvatarColor = (name: string) => {
     const colors = [
-      { bg: 'bg-[#843C6D]/20', text: 'text-[#843C6D]' },
-      { bg: 'bg-green-500/20', text: 'text-green-700' },
+      { bg: 'bg-[var(--primary)]/20', text: 'text-[var(--primary)]' },
+      { bg: 'bg-[var(--secondary)]/20', text: 'text-[var(--secondary)]' },
       { bg: 'bg-purple-500/20', text: 'text-purple-700' },
-      { bg: 'bg-red-500/20', text: 'text-red-700' },
+      { bg: 'bg-destructive/20', text: 'text-destructive' },
       { bg: 'bg-indigo-500/20', text: 'text-indigo-700' },
       { bg: 'bg-pink-500/20', text: 'text-pink-700' },
-      { bg: 'bg-yellow-500/20', text: 'text-yellow-700' },
+      { bg: 'bg-warning/20', text: 'text-warning' },
       { bg: 'bg-teal-500/20', text: 'text-teal-700' },
       { bg: 'bg-orange-500/20', text: 'text-orange-700' },
       { bg: 'bg-cyan-500/20', text: 'text-cyan-700' }
