@@ -104,21 +104,15 @@ export const SuperAdminDashboard = () => {
         apiClient.getSystemHealth(),
       ]);
 
-      // Fetch activity analytics for real recent activities
-      const activityResponse = await apiClient.getSuperAdminActivityAnalytics(timeRange || '7d');
+      // Fetch real activities from the new activity service
+      const activityResponse = await apiClient.getSuperAdminActivities(timeRange || '7d');
       
-      // Convert activity analytics to the expected format
-      const recentActivities = activityResponse.success && (activityResponse.data as { recentActivities: Array<{ action: string; timestamp: string; type: string }> })?.recentActivities
-        ? (activityResponse.data as { recentActivities: Array<{ action: string; timestamp: string; type: string }> }).recentActivities.slice(0, 5).map(activity => ({
+      // Use real activities from the response
+      const recentActivities = activityResponse.success && activityResponse.data?.recentActivities
+        ? activityResponse.data.recentActivities.slice(0, 5).map(activity => ({
             action: activity.action,
-            time: new Date(activity.timestamp).toLocaleString('en-US', {
-              timeZone: 'Asia/Kolkata', 
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
-            type: activity.type as 'company' | 'user' | 'system' | 'security'
+            time: activity.time,
+            type: activity.type as 'company' | 'user' | 'system' | 'security' | 'employee' | 'attendance' | 'leave'
           }))
         : [
             {

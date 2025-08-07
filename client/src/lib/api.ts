@@ -526,7 +526,31 @@ class ApiClient {
     return this.request(`/analytics/comprehensive?timeRange=${timeRange}`);
   }
 
-  // Super Admin Activity Analytics
+  // Activity endpoints
+  async getSuperAdminActivities(timeRange: string = "7d", type?: string) {
+    const params = new URLSearchParams();
+    params.append("timeRange", timeRange);
+    if (type) params.append("type", type);
+    return this.request(`/activities/super-admin?${params.toString()}`);
+  }
+
+  async getAdminActivities(timeRange: string = "7d", type?: string) {
+    const params = new URLSearchParams();
+    params.append("timeRange", timeRange);
+    if (type) params.append("type", type);
+    return this.request(`/activities/admin?${params.toString()}`);
+  }
+
+  async getActivityStats(timeRange: string = "7d", type?: string) {
+    const params = new URLSearchParams();
+    params.append("timeRange", timeRange);
+    if (type) params.append("type", type);
+    return this.request(`/activities/stats?${params.toString()}`);
+  }
+
+
+
+  // Super Admin Activity Analytics (legacy - keeping for backward compatibility)
   async getSuperAdminActivityAnalytics(timeRange: string) {
     return this.request(`/analytics/activities?timeRange=${timeRange}`);
   }

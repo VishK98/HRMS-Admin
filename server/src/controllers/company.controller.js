@@ -1,5 +1,6 @@
 const Company = require("../models/company.model");
 const Employee = require("../models/employee.model");
+const activityService = require("../services/activity.service");
 
 class CompanyController {
   // Get company statistics for super admin

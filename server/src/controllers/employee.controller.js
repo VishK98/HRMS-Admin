@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const employeeService = require("../services/employee.service");
+const activityService = require("../services/activity.service");
 const fs = require("fs");
 const path = require("path");
 
@@ -17,6 +18,18 @@ class EmployeeController {
       }
 
       const result = await employeeService.registerEmployee(req.body);
+      
+      // Log activity for employee registration
+      if (result.success && result.data) {
+        await activityService.logEmployeeActivity(
+          `New employee registered: ${result.data.firstName} ${result.data.lastName}`,
+          result.data._id,
+          result.data.company,
+          req.user?.id,
+          { employeeId: result.data.employeeId }
+        );
+      }
+      
       res.status(201).json(result);
     } catch (error) {
       res.status(400).json({
@@ -40,6 +53,17 @@ class EmployeeController {
 
       const { email, password } = req.body;
       const result = await employeeService.loginEmployee(email, password);
+      
+      // Log activity for employee login
+      if (result.success && result.data) {
+        await activityService.logUserActivity(
+          `Employee logged in: ${result.data.firstName} ${result.data.lastName}`,
+          result.data._id,
+          result.data.company,
+          { email: email }
+        );
+      }
+      
       res.status(200).json(result);
     } catch (error) {
       res.status(401).json({
