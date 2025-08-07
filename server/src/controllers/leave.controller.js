@@ -110,11 +110,31 @@ class LeaveController {
       let companyId;
       if (req.user.role === "super_admin") {
         companyId = req.query.companyId;
+        // For super admin, if no company ID is provided, get all leave requests
         if (!companyId) {
-          return res.status(400).json({
-            success: false,
-            message: "Company ID is required for super admin",
+          const filters = {
+            status,
+            leaveType,
+            startDate,
+            endDate,
+            employeeId,
+          };
+
+          // Clean filters - remove undefined values
+          Object.keys(filters).forEach(key => {
+            if (filters[key] === undefined || filters[key] === null || filters[key] === "") {
+              delete filters[key];
+            }
           });
+
+          const leaves = await leaveService.getAllLeaveRequests(filters);
+
+          res.status(200).json({
+            success: true,
+            message: "All leave requests retrieved successfully",
+            data: leaves,
+          });
+          return;
         }
       } else {
         companyId = req.user.company?._id || req.user.companyId || req.user.company;

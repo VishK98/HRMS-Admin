@@ -437,6 +437,10 @@ class ApiClient {
   async getActivityAnalytics(timeRange: string) {
     return this.request(`/analytics/activities?timeRange=${timeRange}`);
   }
+
+  async getComprehensiveAnalytics(timeRange: string) {
+    return this.request(`/analytics/comprehensive?timeRange=${timeRange}`);
+  }
 }
 
 export const apiClient = new ApiClient(); 

@@ -141,6 +141,56 @@ class LeaveService {
     }
   }
 
+  // Get all leave requests across all companies (for super admin)
+  async getAllLeaveRequests(filters = {}) {
+    try {
+      const query = {};
+
+      if (filters.employeeId) {
+        query.employee = mongoose.Types.ObjectId.isValid(filters.employeeId)
+          ? new mongoose.Types.ObjectId(filters.employeeId)
+          : filters.employeeId;
+      }
+
+      if (filters.status) {
+        query.status = filters.status;
+      }
+
+      if (filters.leaveType) {
+        query.leaveType = filters.leaveType;
+      }
+
+      if (filters.startDate && filters.endDate) {
+        query.$or = [
+          {
+            startDate: {
+              $gte: new Date(filters.startDate),
+              $lte: new Date(filters.endDate),
+            },
+          },
+          {
+            endDate: {
+              $gte: new Date(filters.startDate),
+              $lte: new Date(filters.endDate),
+            },
+          },
+        ];
+      }
+
+      const leaves = await Leave.find(query)
+        .populate([
+          { path: "employee", select: "firstName lastName employeeId department designation" },
+          { path: "approvedBy", select: "name email" },
+          { path: "company", select: "name" },
+        ])
+        .sort({ submittedDate: -1 });
+
+      return leaves;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Get leave request by ID
   async getLeaveRequestById(leaveId) {
     try {

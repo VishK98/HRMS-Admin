@@ -7,36 +7,52 @@ const {
 
 const router = express.Router();
 
+// Bind controller methods to preserve 'this' context
+const boundController = {
+  getAnalyticsOverview: analyticsController.getAnalyticsOverview.bind(analyticsController),
+  getUserAnalytics: analyticsController.getUserAnalytics.bind(analyticsController),
+  getCompanyAnalytics: analyticsController.getCompanyAnalytics.bind(analyticsController),
+  getSystemAnalytics: analyticsController.getSystemAnalytics.bind(analyticsController),
+  getActivityAnalytics: analyticsController.getActivityAnalytics.bind(analyticsController),
+  getComprehensiveAnalytics: analyticsController.getComprehensiveAnalytics.bind(analyticsController),
+};
+
 // Admin analytics routes (both super_admin and admin can access)
 router.get(
   "/overview",
   authenticate,
   requireAdmin,
-  analyticsController.getAnalyticsOverview
+  boundController.getAnalyticsOverview
 );
 router.get(
   "/users",
   authenticate,
   requireAdmin,
-  analyticsController.getUserAnalytics
+  boundController.getUserAnalytics
 );
 router.get(
   "/companies",
   authenticate,
   requireAdmin,
-  analyticsController.getCompanyAnalytics
+  boundController.getCompanyAnalytics
 );
 router.get(
   "/system",
   authenticate,
   requireAdmin,
-  analyticsController.getSystemAnalytics
+  boundController.getSystemAnalytics
 );
 router.get(
   "/activities",
   authenticate,
   requireAdmin,
-  analyticsController.getActivityAnalytics
+  boundController.getActivityAnalytics
+);
+router.get(
+  "/comprehensive",
+  authenticate,
+  requireAdmin,
+  boundController.getComprehensiveAnalytics
 );
 
 module.exports = router;
