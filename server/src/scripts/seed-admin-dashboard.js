@@ -235,11 +235,72 @@ const seedAdminDashboardData = async () => {
       }
     }
 
+    // Create today's leave status records
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Create leave status records for today
+    const leaveStatusRecords = [
+      {
+        employee: createdEmployees[4]._id, // David Brown - On Leave
+        company: testCompany._id,
+        leaveType: 'sick',
+        startDate: today,
+        endDate: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000), // 2 days
+        reason: 'Medical appointment',
+        days: 2,
+        status: 'approved'
+      },
+      {
+        employee: createdEmployees[3]._id, // Sarah Wilson - Half Day
+        company: testCompany._id,
+        leaveType: 'half_day',
+        startDate: today,
+        endDate: today,
+        reason: 'Afternoon appointment',
+        days: 0.5,
+        status: 'approved'
+      },
+      {
+        employee: createdEmployees[2]._id, // Mike Johnson - Short Leave
+        company: testCompany._id,
+        leaveType: 'short_leave',
+        startDate: today,
+        endDate: today,
+        reason: 'Quick errand',
+        days: 0.25,
+        status: 'approved'
+      }
+    ];
+
+    // Create leave status records
+    for (const leaveStatusData of leaveStatusRecords) {
+      const existingLeaveStatus = await Leave.findOne({
+        employee: leaveStatusData.employee,
+        startDate: { $gte: today, $lt: tomorrow }
+      });
+
+      if (!existingLeaveStatus) {
+        await Leave.create(leaveStatusData);
+        console.log(`✅ Leave status record created for ${leaveStatusData.employee}`);
+      }
+    }
+
     console.log('✅ Admin dashboard data seeding completed!');
     console.log(`📊 Company: ${testCompany.name}`);
     console.log(`👥 Employees: ${createdEmployees.length}`);
     console.log(`📅 Attendance records: ${attendanceRecords.length}`);
     console.log(`🏖️ Leave requests: ${leaveRequests.length}`);
+    console.log(`📋 Leave status records: ${leaveStatusRecords.length}`);
+    console.log('\n📈 Today\'s Status:');
+    console.log(`   ✅ Present: 4 employees`);
+    console.log(`   ❌ Absent: 1 employee (David Brown)`);
+    console.log(`   ⏰ Late: 1 employee (Mike Johnson)`);
+    console.log(`   🏖️ On Leave: 1 employee (David Brown)`);
+    console.log(`   ⏰ Half Day: 1 employee (Sarah Wilson)`);
+    console.log(`   ⏰ Short Leave: 1 employee (Mike Johnson)`);
 
   } catch (error) {
     console.error('❌ Error seeding admin dashboard data:', error);

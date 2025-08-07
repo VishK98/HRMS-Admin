@@ -7,8 +7,8 @@ import { ReactNode } from "react";
 
 interface DashboardLayoutProps {
   title: string;
-  subtitle?: string;
   greeting?: string;
+  welcomeMessage?: string;
   currentTime?: Date;
   onRefresh?: () => void;
   refreshing?: boolean;
@@ -35,8 +35,8 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({
   title,
-  subtitle,
   greeting,
+  welcomeMessage,
   currentTime,
   onRefresh,
   refreshing = false,
@@ -88,15 +88,11 @@ export const DashboardLayout = ({
             <h1 className="text-3xl font-bold text-foreground">
               {greeting || title}
             </h1>
-            {currentTime && (
-              <div className="text-3xl font-bold text-foreground">
-                {formatTime(currentTime)}
-              </div>
-            )}
           </div>
-          {subtitle && (
-            <p className="text-muted-foreground">{subtitle}</p>
+          {welcomeMessage && (
+            <p className="text-lg text-muted-foreground">{welcomeMessage}</p>
           )}
+
         </div>
         <div className="flex items-center gap-3">
           {onRefresh && (

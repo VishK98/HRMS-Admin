@@ -531,6 +531,12 @@ class ApiClient {
   async getCompanyStats() {
     return this.request('/admin/company/stats');
   }
+
+  async getLeaveStatusToday() {
+    return this.request('/admin/leave/status/today');
+  }
+
+  // Analytics endpoints
 }
 
 export const apiClient = new ApiClient(); 
