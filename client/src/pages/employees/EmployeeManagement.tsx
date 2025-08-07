@@ -373,7 +373,7 @@ export default function EmployeeManagement() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#521138] to-[#843C6D] rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 theme-gradient rounded-full flex items-center justify-center text-white font-bold">
                     {employee.firstName.charAt(0)}{employee.lastName.charAt(0)}
                   </div>
                   <div>

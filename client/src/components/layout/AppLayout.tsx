@@ -51,7 +51,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center",
-                      "bg-gradient-to-br from-[#521138] to-[#843C6D]",
+                      "theme-gradient",
                       "text-white font-bold text-sm shadow-sm"
                     )}
                   >
