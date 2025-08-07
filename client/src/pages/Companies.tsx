@@ -155,9 +155,11 @@ export default function Companies() {
   };
 
   // Action handlers
-  const handleViewCompany = (company: Company) => {
+  const handleViewCompany = async (company: Company) => {
     setSelectedCompany(company);
     setShowCompanyDetails(true);
+    // Fetch users for this company
+    await fetchCompanyUsers(company._id);
   };
 
   const handleEditCompany = (company: Company) => {
@@ -175,9 +177,11 @@ export default function Companies() {
     console.log('Toggle company status:', company);
   };
 
-  const handleViewCompanyUsers = (company: Company) => {
+  const handleViewCompanyUsers = async (company: Company) => {
     setSelectedCompany(company);
     setShowCompanyDetails(true);
+    // Fetch users for this company
+    await fetchCompanyUsers(company._id);
     // The dialog will show the users tab by default
   };
 
@@ -484,126 +488,292 @@ export default function Companies() {
       {/* Company Details Dialog */}
       {selectedCompany && (
         <Dialog open={showCompanyDetails} onOpenChange={setShowCompanyDetails}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Company Details</DialogTitle>
-              <DialogDescription>
-                Detailed information about {selectedCompany.name}
-              </DialogDescription>
-            </DialogHeader>
-            <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="details">Company Details</TabsTrigger>
-                <TabsTrigger value="users">Users ({companyUsers.length})</TabsTrigger>
-              </TabsList>
-              <TabsContent value="details" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Company Name</label>
-                    <p className="text-sm text-muted-foreground">{selectedCompany.name}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Company Code</label>
-                    <p className="text-sm text-muted-foreground">{selectedCompany.code}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-muted-foreground">{selectedCompany.email}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Phone</label>
-                    <p className="text-sm text-muted-foreground">{selectedCompany.phone}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Website</label>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedCompany.website || 'Not provided'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Industry</label>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedCompany.industry || 'Not specified'}
-                    </p>
-                  </div>
-                  <div className="col-span-2">
-                    <label className="text-sm font-medium">Address</label>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedCompany.address.street}, {selectedCompany.address.city}, {selectedCompany.address.state} {selectedCompany.address.zipCode}, {selectedCompany.address.country}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Subscription Plan</label>
-                    <Badge variant={getPlanBadgeVariant(selectedCompany.subscription.plan)}>
-                      {selectedCompany.subscription.plan}
-                    </Badge>
-                  </div>
-                                     <div>
-                     <label className="text-sm font-medium">Status</label>
-                     <Badge 
-                       className={selectedCompany.isActive 
-                         ? 'bg-green-500 text-white hover:bg-green-600' 
-                         : 'bg-red-500 text-white hover:bg-red-600'
-                       }
-                     >
-                       {selectedCompany.isActive ? 'Active' : 'Deactive'}
-                     </Badge>
-                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Created</label>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDate(selectedCompany.createdAt)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Last Updated</label>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDate(selectedCompany.updatedAt)}
-                    </p>
-                  </div>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Building2 className="h-6 w-6 text-primary" />
                 </div>
+                <div>
+                  <DialogTitle className="text-xl">{selectedCompany.name}</DialogTitle>
+                  <DialogDescription className="text-sm">
+                    Company Code: {selectedCompany.code} • {selectedCompany.industry || 'Industry not specified'}
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            
+            <Tabs defaultValue="details" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="details" className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Company Details
+                </TabsTrigger>
+                <TabsTrigger value="users" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Users ({companyUsers.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="details" className="space-y-6">
+                {/* Company Overview Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="h-5 w-5" />
+                      Company Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-50 rounded-lg">
+                            <Building2 className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Company Name</label>
+                            <p className="text-sm font-semibold">{selectedCompany.name}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-green-50 rounded-lg">
+                            <Mail className="h-4 w-4 text-green-600" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Email</label>
+                            <p className="text-sm font-semibold">{selectedCompany.email}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-purple-50 rounded-lg">
+                            <Phone className="h-4 w-4 text-purple-600" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                            <p className="text-sm font-semibold">{selectedCompany.phone}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-50 rounded-lg">
+                            <ExternalLink className="h-4 w-4 text-orange-600" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Website</label>
+                            <p className="text-sm font-semibold">
+                              {selectedCompany.website ? (
+                                <a href={selectedCompany.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                  {selectedCompany.website}
+                                </a>
+                              ) : (
+                                'Not provided'
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-indigo-50 rounded-lg">
+                            <Calendar className="h-4 w-4 text-indigo-600" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Company Code</label>
+                            <p className="text-sm font-semibold">{selectedCompany.code}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-teal-50 rounded-lg">
+                            <Building2 className="h-4 w-4 text-teal-600" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Industry</label>
+                            <p className="text-sm font-semibold">{selectedCompany.industry || 'Not specified'}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-yellow-50 rounded-lg">
+                            <Badge variant={getPlanBadgeVariant(selectedCompany.subscription.plan)}>
+                              {selectedCompany.subscription.plan}
+                            </Badge>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Subscription Plan</label>
+                            <p className="text-sm font-semibold capitalize">{selectedCompany.subscription.plan}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-emerald-50 rounded-lg">
+                            <Badge 
+                              className={selectedCompany.isActive 
+                                ? 'bg-green-500 text-white hover:bg-green-600' 
+                                : 'bg-red-500 text-white hover:bg-red-600'
+                              }
+                            >
+                              {selectedCompany.isActive ? 'Active' : 'Deactive'}
+                            </Badge>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Status</label>
+                            <p className="text-sm font-semibold">{selectedCompany.isActive ? 'Active' : 'Inactive'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Address Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      Address Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-blue-50 rounded-lg">
+                        <MapPin className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm font-medium text-muted-foreground">Full Address</label>
+                        <p className="text-sm font-semibold mt-1">
+                          {selectedCompany.address.street}, {selectedCompany.address.city}, {selectedCompany.address.state} {selectedCompany.address.zipCode}, {selectedCompany.address.country}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Timestamps Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Timestamps
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-50 rounded-lg">
+                          <Calendar className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Created</label>
+                          <p className="text-sm font-semibold">{formatDate(selectedCompany.createdAt)}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Last Updated</label>
+                          <p className="text-sm font-semibold">{formatDate(selectedCompany.updatedAt)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
-              <TabsContent value="users">
+              
+              <TabsContent value="users" className="space-y-4">
                 {isLoadingUsers ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin" />
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">Loading users...</p>
                   </div>
                 ) : companyUsers.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No users found for this company.</p>
-                  </div>
+                  <Card>
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                      <Users className="w-16 h-16 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No Users Found</h3>
+                      <p className="text-muted-foreground text-center max-w-md">
+                        No users have been registered for this company yet. Users will appear here once they register or are added by an admin.
+                      </p>
+                    </CardContent>
+                  </Card>
                 ) : (
-                  <div className="space-y-4">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Role</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {companyUsers.map((user) => (
-                          <TableRow key={user._id}>
-                            <TableCell>
-                              {user.firstName} {user.lastName}
-                            </TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{user.role}</Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={getStatusBadgeVariant(user.status === 'active')}>
-                                {user.status}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5" />
+                        Company Users ({companyUsers.length})
+                      </CardTitle>
+                      <CardDescription>
+                        All registered users for {selectedCompany.name}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Email</TableHead>
+                              <TableHead>Role</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Employee ID</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {companyUsers.map((user) => (
+                              <TableRow key={user._id}>
+                                <TableCell>
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                                      <span className="text-sm font-medium text-primary">
+                                        {user.firstName?.[0]}{user.lastName?.[0]}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <p className="font-medium">{user.firstName} {user.lastName}</p>
+                                      <p className="text-xs text-muted-foreground">{user.department || 'No department'}</p>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-sm">{user.email}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge 
+                                    variant={user.role === 'admin' ? 'default' : user.role === 'super_admin' ? 'secondary' : 'outline'}
+                                    className="capitalize"
+                                  >
+                                    {user.role}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge 
+                                    variant={user.status === 'active' ? 'default' : 'secondary'}
+                                    className={user.status === 'active' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}
+                                  >
+                                    {user.status}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <span className="text-sm font-mono">{user.employeeId || 'N/A'}</span>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </TabsContent>
             </Tabs>
