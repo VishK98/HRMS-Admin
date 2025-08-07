@@ -74,7 +74,7 @@ class AnalyticsController {
         growthRate = 0;
       }
 
-      // Calculate revenue (mock calculation based on subscription plans) - with error handling
+      // Calculate revenue (based on subscription plans) - with error handling
       let totalRevenue = 0;
       try {
         const companiesByPlan = await Company.aggregate([
