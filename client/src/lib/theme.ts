@@ -69,7 +69,7 @@ export const getThemeCSSVariables = (theme: ThemeType) => {
   };
 };
 
-// Apply theme to document
+// Apply themes to document
 export const applyTheme = (theme: ThemeType) => {
   const root = document.documentElement;
   const variables = getThemeCSSVariables(theme);
