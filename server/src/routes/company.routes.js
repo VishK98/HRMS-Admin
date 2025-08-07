@@ -1,12 +1,36 @@
 const express = require("express");
 const companyController = require("../controllers/company.controller");
-const { authenticate, requireSuperAdmin } = require("../middlewares/auth.middleware");
+const {
+  authenticate,
+  requireSuperAdmin,
+} = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
 // Super admin routes
-router.get("/stats", authenticate, requireSuperAdmin, companyController.getCompanyStats);
-router.get("/all", authenticate, requireSuperAdmin, companyController.getAllCompanies);
-router.put("/:companyId/status", authenticate, requireSuperAdmin, companyController.updateCompanyStatus);
+router.get(
+  "/stats",
+  authenticate,
+  requireSuperAdmin,
+  companyController.getCompanyStats
+);
+router.get(
+  "/all",
+  authenticate,
+  requireSuperAdmin,
+  companyController.getAllCompanies
+);
+router.put(
+  "/:companyId/status",
+  authenticate,
+  requireSuperAdmin,
+  companyController.updateCompanyStatus
+);
+router.get(
+  "/debug/employee-relations",
+  authenticate,
+  requireSuperAdmin,
+  companyController.debugEmployeeCompanyRelations
+);
 
-module.exports = router; 
+module.exports = router;

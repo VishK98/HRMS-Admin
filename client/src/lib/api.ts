@@ -456,6 +456,10 @@ class ApiClient {
     return this.request('/auth/all');
   }
 
+  async getUsersByCompany(companyId: string) {
+    return this.request(`/auth/companies/${companyId}/users`);
+  }
+
   // Analytics endpoints
   async getAnalyticsOverview(timeRange: string) {
     return this.request(`/analytics/overview?timeRange=${timeRange}`);

@@ -16,6 +16,8 @@ import Settings from "./pages/Settings";
 import Payroll from "./pages/Payroll";
 import Calendar from "./pages/Calendar";
 import Analytics from "./pages/Analytics";
+import Companies from "./pages/Companies";
+import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,12 +57,12 @@ const ProtectedApp = () => {
         {/* Super Admin Only Routes */}
         <Route path="/companies" element={
           <ProtectedRoute requiredRole="super_admin">
-            <div>Companies Management (Coming Soon)</div>
+            <Companies />
           </ProtectedRoute>
         } />
         <Route path="/users" element={
           <ProtectedRoute requiredRole="super_admin">
-            <div>User Management (Coming Soon)</div>
+            <Users />
           </ProtectedRoute>
         } />
         <Route path="/system" element={
