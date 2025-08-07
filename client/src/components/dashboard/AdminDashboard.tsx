@@ -110,11 +110,11 @@ export const AdminDashboard = () => {
       }
 
       // Fetch real data from server
-      const [attendanceResponse, leaveResponse, employeeResponse, activityResponse, leaveStatusResponse] = await Promise.all([
-        apiClient.getAttendanceSummary(new Date().toISOString().split('T')[0], new Date().toISOString().split('T')[0]),
-        apiClient.getLeaveRequests({ status: 'pending', limit: 5 }),
-        apiClient.getEmployeesByCompany(companyId),
-        apiClient.getActivityAnalytics('7d'),
+      const [employeeResponse, leaveResponse, attendanceResponse, activityResponse, leaveStatusResponse] = await Promise.all([
+        apiClient.getAdminEmployeesByCompany(companyId),
+        apiClient.getAdminLeaveRequests({ status: 'pending', limit: 5 }),
+        apiClient.getAdminAttendanceSummary(new Date().toISOString().split('T')[0], new Date().toISOString().split('T')[0]),
+        apiClient.getAdminActivityAnalytics('7d'),
         apiClient.getLeaveStatusToday()
       ]);
 

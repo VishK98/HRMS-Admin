@@ -99,20 +99,20 @@ export const SuperAdminDashboard = () => {
 
       // Fetch real data from server
       const [companiesResponse, usersResponse, systemResponse] = await Promise.all([
-        apiClient.getCompanyStats(),
-        apiClient.getUserStats(),
+        apiClient.getSuperAdminCompanyStats(),
+        apiClient.getSuperAdminUserStats(),
         apiClient.getSystemHealth(),
       ]);
 
       // Fetch activity analytics for real recent activities
-      const activityResponse = await apiClient.getActivityAnalytics(timeRange || '7d');
+      const activityResponse = await apiClient.getSuperAdminActivityAnalytics(timeRange || '7d');
       
       // Convert activity analytics to the expected format
-      const recentActivities = activityResponse.success && activityResponse.data?.recentActivities 
-        ? activityResponse.data.recentActivities.slice(0, 5).map(activity => ({
+      const recentActivities = activityResponse.success && (activityResponse.data as { recentActivities: Array<{ action: string; timestamp: string; type: string }> })?.recentActivities
+        ? (activityResponse.data as { recentActivities: Array<{ action: string; timestamp: string; type: string }> }).recentActivities.slice(0, 5).map(activity => ({
             action: activity.action,
             time: new Date(activity.timestamp).toLocaleString('en-US', {
-              timeZone: 'Asia/Kolkata',
+              timeZone: 'Asia/Kolkata', 
               month: 'short',
               day: 'numeric',
               hour: '2-digit',
@@ -154,10 +154,13 @@ export const SuperAdminDashboard = () => {
           limit: 5
         });
         
-        if (leaveResponse.success && leaveResponse.data && leaveResponse.data.length > 0) {
-          pendingApprovals.push(...leaveResponse.data.map(leave => ({
+        if (leaveResponse.success && Array.isArray(leaveResponse.data) && leaveResponse.data.length > 0) {
+          pendingApprovals.push(...(leaveResponse.data as Array<{
+            employee: { firstName: string; lastName: string };
+            createdAt: string;
+          }>).map(leave => ({
             name: `${leave.employee.firstName} ${leave.employee.lastName}`,
-            type: "Leave Request",
+            type: "Leave Request", 
             status: "Pending",
             date: new Date(leave.createdAt).toLocaleDateString('en-US', {
               timeZone: 'Asia/Kolkata',
@@ -223,10 +226,10 @@ export const SuperAdminDashboard = () => {
 
       // Combine the data
       const combinedStats: SuperAdminStats = {
-        totalCompanies: companiesResponse.success ? companiesResponse.data.totalCompanies : 0,
-        activeCompanies: companiesResponse.success ? companiesResponse.data.activeCompanies : 0,
-        totalUsers: usersResponse.success ? usersResponse.data.totalUsers : 0,
-        systemHealth: systemResponse.success ? systemResponse.data : {
+        totalCompanies: companiesResponse.success ? (companiesResponse.data as { totalCompanies: number }).totalCompanies : 0,
+        activeCompanies: companiesResponse.success ? (companiesResponse.data as { activeCompanies: number }).activeCompanies : 0,
+        totalUsers: usersResponse.success ? (usersResponse.data as { totalUsers: number }).totalUsers : 0,
+        systemHealth: systemResponse.success ? (systemResponse.data as { cpu: number; memory: number; disk: number; network: number }) : {
           cpu: 45,
           memory: 68,
           disk: 32,
@@ -235,14 +238,14 @@ export const SuperAdminDashboard = () => {
         recentActivities,
         pendingApprovals,
         platformMetrics: {
-          dailyActiveUsers: activityResponse.success ? activityResponse.data?.topActions?.find(a => a.action === "User Login")?.count || 0 : 0,
+          dailyActiveUsers: activityResponse.success ? (activityResponse.data as { topActions: { action: string, count: number }[] })?.topActions?.find(a => a.action === "User Login")?.count || 0 : 0,
           weeklyGrowth: 12, // This would need real calculation
           monthlyGrowth: 8, // This would need real calculation
-          avgResponseTime: systemResponse.success ? systemResponse.data.avgResponseTime || 120 : 120,
-          uptime: systemResponse.success ? systemResponse.data.uptime || 99.9 : 99.9,
-          errorRate: systemResponse.success ? systemResponse.data.errorRate || 0.1 : 0.1,
-          monthlyRevenue: companiesResponse.success ? companiesResponse.data.totalRevenue || 0 : 0,
-          activeSubscriptions: companiesResponse.success ? companiesResponse.data.activeCompanies || 0 : 0,
+          avgResponseTime: systemResponse.success ? (systemResponse.data as { avgResponseTime: number }).avgResponseTime || 120 : 120,
+          uptime: systemResponse.success ? (systemResponse.data as { uptime: number }).uptime || 99.9 : 99.9,
+          errorRate: systemResponse.success ? (systemResponse.data as { errorRate: number }).errorRate || 0.1 : 0.1,
+          monthlyRevenue: companiesResponse.success ? (companiesResponse.data as { totalRevenue: number }).totalRevenue || 0 : 0,
+          activeSubscriptions: companiesResponse.success ? (companiesResponse.data as { activeCompanies: number }).activeCompanies || 0 : 0,
         },
       };
 

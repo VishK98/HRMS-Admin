@@ -123,10 +123,6 @@ class ApiClient {
     });
   }
 
-  async getAllCompanies() {
-    return this.request('/auth/companies');
-  }
-
   async getCompanyById(companyId: string) {
     return this.request(`/auth/companies/${companyId}`);
   }
@@ -205,8 +201,13 @@ class ApiClient {
     return this.request(`/attendance/today/${employeeId}`);
   }
 
-  async getAttendanceSummary(startDate: string, endDate: string) {
-    return this.request(`/attendance/summary?startDate=${startDate}&endDate=${endDate}`);
+  async getAttendanceSummary(startDate: string, endDate: string, employeeId?: string) {
+    const queryParams = new URLSearchParams({
+      startDate,
+      endDate,
+      ...(employeeId ? { employeeId } : {})
+    });
+    return this.request(`/attendance/summary?${queryParams}`);
   }
 
   async getCompanyAttendance(startDate: string, endDate: string, filters?: any) {
@@ -434,12 +435,12 @@ class ApiClient {
     });
   }
 
-  // Super Admin Dashboard endpoints
-  async getCompanyStats() {
+  // Super Admin endpoints
+  async getSuperAdminCompanyStats() {
     return this.request('/companies/stats');
   }
 
-  async getUserStats() {
+  async getSuperAdminUserStats() {
     return this.request('/auth/stats');
   }
 
@@ -472,16 +473,17 @@ class ApiClient {
     return this.request(`/analytics/system?timeRange=${timeRange}`);
   }
 
-  async getActivityAnalytics(timeRange: string) {
-    return this.request(`/analytics/activities?timeRange=${timeRange}`);
-  }
-
   async getComprehensiveAnalytics(timeRange: string) {
     return this.request(`/analytics/comprehensive?timeRange=${timeRange}`);
   }
 
+  // Super Admin Activity Analytics
+  async getSuperAdminActivityAnalytics(timeRange: string) {
+    return this.request(`/analytics/activities?timeRange=${timeRange}`);
+  }
+
   // Admin Dashboard endpoints
-  async getEmployeesByCompany(companyId: string, filters?: any) {
+  async getAdminEmployeesByCompany(companyId: string, filters?: any) {
     if (!companyId) {
       console.error("Company ID is required for getEmployeesByCompany");
       return {
@@ -505,11 +507,11 @@ class ApiClient {
     return this.request(url);
   }
 
-  async getAttendanceSummary(startDate: string, endDate: string) {
+  async getAdminAttendanceSummary(startDate: string, endDate: string) {
     return this.request(`/admin/attendance/summary?startDate=${startDate}&endDate=${endDate}`);
   }
 
-  async getLeaveRequests(filters?: any) {
+  async getAdminLeaveRequests(filters?: Record<string, unknown>) {
     const queryParams = new URLSearchParams();
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -524,19 +526,17 @@ class ApiClient {
     return this.request(url);
   }
 
-  async getActivityAnalytics(timeRange: string) {
+  async getAdminActivityAnalytics(timeRange: string) {
     return this.request(`/admin/analytics/activities?timeRange=${timeRange}`);
   }
 
-  async getCompanyStats() {
+  async getAdminCompanyStats() {
     return this.request('/admin/company/stats');
   }
 
   async getLeaveStatusToday() {
     return this.request('/admin/leave/status/today');
   }
-
-  // Analytics endpoints
 }
 
 export const apiClient = new ApiClient(); 
