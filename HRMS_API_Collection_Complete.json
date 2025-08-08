@@ -1,0 +1,492 @@
+{
+  "info": {
+    "name": "HRMS API Collection - Complete",
+    "description": "Complete API collection for HRMS system with all endpoints organized by sections",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication & User Management",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Register Company (Super Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Test Company\",\n  \"companyCode\": \"TC001\",\n  \"companyEmail\": \"info@testcompany.com\",\n  \"companyPhone\": \"9876543210\",\n  \"companyAddress\": {\n    \"street\": \"123 Test Street\",\n    \"city\": \"Test City\",\n    \"state\": \"Test State\",\n    \"zipCode\": \"123456\"\n  },\n  \"adminName\": \"Admin User\",\n  \"adminEmail\": \"admin@testcompany.com\",\n  \"adminPassword\": \"password123\",\n  \"adminPhone\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register-company",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register-company"]
+            }
+          }
+        },
+        {
+          "name": "Get All Companies (Super Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/companies",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "companies"]
+            }
+          }
+        },
+        {
+          "name": "Get Company by ID (Super Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/companies/:companyId",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "companies", ":companyId"],
+              "variable": [
+                {
+                  "key": "companyId",
+                  "value": "company_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Users by Company (Super Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/companies/:companyId/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "companies", ":companyId", "users"],
+              "variable": [
+                {
+                  "key": "companyId",
+                  "value": "company_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Stats (Super Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users (Super Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "all"]
+            }
+          }
+        },
+        {
+          "name": "Init Super Admin (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Super Admin\",\n  \"email\": \"superadmin@hrms.com\",\n  \"password\": \"superadmin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/init-super-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "init-super-admin"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Employee Management",
+      "item": [
+        {
+          "name": "Register Employee (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"gender\": \"male\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"email\": \"john.doe@company.com\",\n  \"phone\": \"9876543210\",\n  \"companyId\": \"company_id_here\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "register"]
+            }
+          }
+        },
+        {
+          "name": "Employee Login (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@company.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Get Employees by Company (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/company/:companyId",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "company", ":companyId"],
+              "variable": [
+                {
+                  "key": "companyId",
+                  "value": "company_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Employee by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/:employeeId",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":employeeId"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Employee Profile (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"department\": \"IT\",\n  \"designation\": \"Software Engineer\",\n  \"joiningDate\": \"2024-01-01\",\n  \"salary\": {\n    \"basic\": 50000,\n    \"hra\": 20000,\n    \"da\": 15000,\n    \"allowances\": 10000\n  },\n  \"bankDetails\": {\n    \"accountNumber\": \"1234567890\",\n    \"bankName\": \"Test Bank\",\n    \"ifscCode\": \"TEST0001234\",\n    \"branch\": \"Main Branch\"\n  },\n  \"address\": {\n    \"street\": \"123 Employee Street\",\n    \"city\": \"Employee City\",\n    \"state\": \"Employee State\",\n    \"zipCode\": \"123456\"\n  },\n  \"emergencyContact\": {\n    \"name\": \"Emergency Contact\",\n    \"relationship\": \"Spouse\",\n    \"phone\": \"9876543210\"\n  },\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/profile/:employeeId",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "profile", ":employeeId"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Employee (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/:employeeId/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":employeeId", "deactivate"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Stats (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/company/:companyId/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "company", ":companyId", "stats"],
+              "variable": [
+                {
+                  "key": "companyId",
+                  "value": "company_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Employee Documents (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "aadhar",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "pan",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "passportPhoto",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/:employeeId/documents/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":employeeId", "documents", "upload"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Education Documents (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "intermediate",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "undergraduate",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "postgraduate",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/:employeeId/education/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":employeeId", "education", "upload"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Single Document (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/:employeeId/documents/:documentType",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":employeeId", "documents", ":documentType"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                },
+                {
+                  "key": "documentType",
+                  "value": "aadhar"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Document (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/employees/:employeeId/documents/:documentType",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":employeeId", "documents", ":documentType"],
+              "variable": [
+                {
+                  "key": "employeeId",
+                  "value": "employee_id_here"
+                },
+                {
+                  "key": "documentType",
+                  "value": "aadhar"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

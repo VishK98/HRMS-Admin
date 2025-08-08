@@ -1,111 +1,132 @@
-# HRMS Admin API Documentation
-
-Complete API documentation for HRMS Admin system with all 67 endpoints.
+# HRMS API Documentation - Complete Collection
 
 ## Base URL
 ```
-http://localhost:5000
+http://localhost:5000/api
 ```
 
 ## Authentication
 All protected endpoints require Bearer token authentication:
 ```
-Authorization: Bearer <token>
+Authorization: Bearer <your_token>
 ```
 
-## API Endpoints
+---
 
-### 1. Authentication & User Management (8 APIs)
+## 🔐 Authentication & User Management
 
-#### 1.1 Login
-- **Method:** `POST`
-- **URL:** `/api/auth/login`
-- **Description:** User login
-- **Body:**
-```json
+### Public Endpoints
+
+#### 1. Login
+```http
+POST /auth/login
+Content-Type: application/json
+
 {
-  "email": "admin@othtech.com",
-  "password": "admin@123"
+  "email": "admin@example.com",
+  "password": "password123"
 }
 ```
 
-#### 1.2 Get Profile
-- **Method:** `GET`
-- **URL:** `/api/auth/profile`
-- **Description:** Get user profile (authenticated)
+#### 2. Initialize Super Admin (First-time setup)
+```http
+POST /auth/init-super-admin
+Content-Type: application/json
 
-#### 1.3 Update Profile
-- **Method:** `PUT`
-- **URL:** `/api/auth/profile`
-- **Description:** Update user profile
-- **Body:**
-```json
 {
-  "name": "Updated Admin Name",
+  "name": "Super Admin",
+  "email": "superadmin@hrms.com",
+  "password": "superadmin123"
+}
+```
+
+### Protected Endpoints
+
+#### 3. Get Profile
+```http
+GET /auth/profile
+Authorization: Bearer <token>
+```
+
+#### 4. Update Profile
+```http
+PUT /auth/profile
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
   "phone": "9876543210"
 }
 ```
 
-#### 1.4 Register Company
-- **Method:** `POST`
-- **URL:** `/api/auth/register-company`
-- **Description:** Register new company with admin
-- **Body:**
-```json
+### Super Admin Only Endpoints
+
+#### 5. Register Company
+```http
+POST /auth/register-company
+Authorization: Bearer <super_admin_token>
+Content-Type: application/json
+
 {
-  "companyName": "Your Company Name",
-  "companyCode": "COMP001",
-  "companyEmail": "info@yourcompany.com",
+  "companyName": "Test Company",
+  "companyCode": "TC001",
+  "companyEmail": "info@testcompany.com",
   "companyPhone": "9876543210",
   "companyAddress": {
-    "street": "123 Business Street",
-    "city": "Your City",
-    "state": "Your State",
+    "street": "123 Test Street",
+    "city": "Test City",
+    "state": "Test State",
     "zipCode": "123456"
   },
   "adminName": "Admin User",
-  "adminEmail": "admin@yourcompany.com",
-  "adminPassword": "admin123",
+  "adminEmail": "admin@testcompany.com",
+  "adminPassword": "password123",
   "adminPhone": "9876543210"
 }
 ```
 
-#### 1.5 Get All Companies
-- **Method:** `GET`
-- **URL:** `/api/auth/companies`
-- **Description:** Get all companies (super admin only)
-
-#### 1.6 Get Company by ID
-- **Method:** `GET`
-- **URL:** `/api/auth/companies/:companyId`
-- **Description:** Get company by ID (super admin only)
-
-#### 1.7 Get Users by Company
-- **Method:** `GET`
-- **URL:** `/api/auth/companies/:companyId/users`
-- **Description:** Get users by company (super admin only)
-
-#### 1.8 Initialize Super Admin
-- **Method:** `POST`
-- **URL:** `/api/auth/init-super-admin`
-- **Description:** Initialize super admin (public route)
-- **Body:**
-```json
-{
-  "name": "Super Admin",
-  "email": "admin@othtech.com",
-  "password": "admin@123"
-}
+#### 6. Get All Companies
+```http
+GET /auth/companies
+Authorization: Bearer <super_admin_token>
 ```
 
-### 2. Employee Management (18 APIs)
+#### 7. Get Company by ID
+```http
+GET /auth/companies/:companyId
+Authorization: Bearer <super_admin_token>
+```
 
-#### 2.1 Employee Registration
-- **Method:** `POST`
-- **URL:** `/api/employees/register`
-- **Description:** Employee registration
-- **Body:**
-```json
+#### 8. Get Users by Company
+```http
+GET /auth/companies/:companyId/users
+Authorization: Bearer <super_admin_token>
+```
+
+#### 9. Get User Stats
+```http
+GET /auth/stats
+Authorization: Bearer <super_admin_token>
+```
+
+#### 10. Get All Users
+```http
+GET /auth/all
+Authorization: Bearer <super_admin_token>
+```
+
+---
+
+## 👥 Employee Management
+
+### Public Endpoints
+
+#### 11. Register Employee
+```http
+POST /employees/register
+Content-Type: application/json
+
 {
   "firstName": "John",
   "lastName": "Doe",
@@ -113,57 +134,54 @@ Authorization: Bearer <token>
   "dateOfBirth": "1990-01-01",
   "email": "john.doe@company.com",
   "phone": "9876543210",
-  "companyName": "Your Company Name",
+  "companyId": "company_id_here",
   "password": "password123"
 }
 ```
 
-#### 2.2 Employee Login
-- **Method:** `POST`
-- **URL:** `/api/employees/login`
-- **Description:** Employee login
-- **Body:**
-```json
+#### 12. Employee Login
+```http
+POST /employees/login
+Content-Type: application/json
+
 {
   "email": "john.doe@company.com",
   "password": "password123"
 }
 ```
 
-#### 2.3 Create Admin User
-- **Method:** `POST`
-- **URL:** `/api/employees/create-admin`
-- **Description:** Create admin user
-- **Body:**
-```json
-{
-  "name": "Admin User",
-  "email": "admin@company.com",
-  "password": "admin123",
-  "role": "admin"
-}
+### Protected Endpoints
+
+#### 13. Get Employee Profile
+```http
+GET /employees/profile
+Authorization: Bearer <token>
 ```
 
-#### 2.4 Get Employee Profile
-- **Method:** `GET`
-- **URL:** `/api/employees/profile`
-- **Description:** Get employee profile (authenticated)
+### Admin Only Endpoints
 
-#### 2.5 Check User Role
-- **Method:** `GET`
-- **URL:** `/api/employees/debug/role`
-- **Description:** Check user role (debug)
+#### 14. Get Employees by Company
+```http
+GET /employees/company/:companyId
+Authorization: Bearer <admin_token>
+```
 
-#### 2.6 Update Employee Profile
-- **Method:** `PUT`
-- **URL:** `/api/employees/profile/:employeeId`
-- **Description:** Update employee profile (admin only)
-- **Body:**
-```json
+#### 15. Get Employee by ID
+```http
+GET /employees/:employeeId
+Authorization: Bearer <admin_token>
+```
+
+#### 16. Update Employee Profile
+```http
+PUT /employees/profile/:employeeId
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
 {
   "department": "IT",
   "designation": "Software Engineer",
-  "joiningDate": "2023-01-01",
+  "joiningDate": "2024-01-01",
   "salary": {
     "basic": 50000,
     "hra": 20000,
@@ -174,7 +192,7 @@ Authorization: Bearer <token>
     "accountNumber": "1234567890",
     "bankName": "Test Bank",
     "ifscCode": "TEST0001234",
-    "branch": "Test Branch"
+    "branch": "Main Branch"
   },
   "address": {
     "street": "123 Employee Street",
@@ -191,581 +209,710 @@ Authorization: Bearer <token>
 }
 ```
 
-#### 2.7 Get Employees by Company
-- **Method:** `GET`
-- **URL:** `/api/employees/company/:companyId`
-- **Description:** Get employees by company (admin only)
+#### 17. Deactivate Employee
+```http
+PUT /employees/:employeeId/deactivate
+Authorization: Bearer <admin_token>
+```
 
-#### 2.8 Get Employee by ID
-- **Method:** `GET`
-- **URL:** `/api/employees/:employeeId`
-- **Description:** Get employee by ID (admin only)
+#### 18. Get Employee Stats
+```http
+GET /employees/company/:companyId/stats
+Authorization: Bearer <admin_token>
+```
 
-#### 2.9 Deactivate Employee
-- **Method:** `PUT`
-- **URL:** `/api/employees/:employeeId/deactivate`
-- **Description:** Deactivate employee (admin only)
+#### 19. Upload Employee Documents
+```http
+POST /employees/:employeeId/documents/upload
+Authorization: Bearer <admin_token>
+Content-Type: multipart/form-data
 
-#### 2.10 Get Employee Stats
-- **Method:** `GET`
-- **URL:** `/api/employees/company/:companyId/stats`
-- **Description:** Get employee stats (admin only)
+Form Data:
+- aadhar: [file]
+- pan: [file]
+- passportPhoto: [file]
+```
 
-#### 2.11 Upload Documents
-- **Method:** `POST`
-- **URL:** `/api/employees/:employeeId/documents/upload`
-- **Description:** Upload employee documents (admin only)
-- **Body:** FormData with files (aadhar, pan, passportPhoto)
+#### 20. Upload Education Documents
+```http
+POST /employees/:employeeId/education/upload
+Authorization: Bearer <admin_token>
+Content-Type: multipart/form-data
 
-#### 2.12 Upload Education Documents
-- **Method:** `POST`
-- **URL:** `/api/employees/:employeeId/education/upload`
-- **Description:** Upload education documents (admin only)
-- **Body:** FormData with files (intermediate, undergraduate, postgraduate)
+Form Data:
+- intermediate: [file]
+- undergraduate: [file]
+- postgraduate: [file]
+```
 
-#### 2.13 Upload Single Document
-- **Method:** `POST`
-- **URL:** `/api/employees/:employeeId/documents/:documentType`
-- **Description:** Upload single document (admin only)
-- **Body:** FormData with file
+#### 21. Upload Single Document
+```http
+POST /employees/:employeeId/documents/:documentType
+Authorization: Bearer <admin_token>
+Content-Type: multipart/form-data
 
-#### 2.14 Delete Document
-- **Method:** `DELETE`
-- **URL:** `/api/employees/:employeeId/documents/:documentType`
-- **Description:** Delete document (admin only)
+Form Data:
+- document: [file]
+```
 
-### 3. Attendance Management (8 APIs)
+#### 22. Delete Document
+```http
+DELETE /employees/:employeeId/documents/:documentType
+Authorization: Bearer <admin_token>
+```
 
-#### 3.1 Check In
-- **Method:** `POST`
-- **URL:** `/api/attendance/check-in`
-- **Description:** Employee check in
-- **Body:**
-```json
+---
+
+## ⏰ Attendance Management
+
+### Protected Endpoints
+
+#### 23. Check In
+```http
+POST /attendance/check-in
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "employeeId": "employeeId",
+  "employeeId": "employee_id_here",
   "location": {
-    "latitude": 12.9716,
-    "longitude": 77.5946
-  },
-  "deviceInfo": "Mobile App"
+    "latitude": 28.6139,
+    "longitude": 77.2090,
+    "address": "Office Location"
+  }
 }
 ```
 
-#### 3.2 Check Out
-- **Method:** `POST`
-- **URL:** `/api/attendance/check-out`
-- **Description:** Employee check out
-- **Body:**
-```json
+#### 24. Check Out
+```http
+POST /attendance/check-out
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "employeeId": "employeeId",
+  "employeeId": "employee_id_here",
   "location": {
-    "latitude": 12.9716,
-    "longitude": 77.5946
-  },
-  "deviceInfo": "Mobile App"
+    "latitude": 28.6139,
+    "longitude": 77.2090,
+    "address": "Office Location"
+  }
 }
 ```
 
-#### 3.3 Get Employee Attendance
-- **Method:** `GET`
-- **URL:** `/api/attendance/employee/:employeeId`
-- **Description:** Get employee attendance for date range
-- **Query:** `startDate=2024-01-01&endDate=2024-01-31`
+#### 25. Get Employee Attendance
+```http
+GET /attendance/employee/:employeeId?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer <token>
+```
 
-#### 3.4 Get Company Attendance
-- **Method:** `GET`
-- **URL:** `/api/attendance/company`
-- **Description:** Get company attendance for date range
-- **Query:** `startDate=2024-01-01&endDate=2024-01-31`
+#### 26. Get Company Attendance
+```http
+GET /attendance/company?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer <token>
+```
 
-#### 3.5 Get Attendance Summary
-- **Method:** `GET`
-- **URL:** `/api/attendance/summary`
-- **Description:** Get attendance summary
-- **Query:** `date=2024-01-15`
+#### 27. Get Attendance Summary
+```http
+GET /attendance/summary?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer <token>
+```
 
-#### 3.6 Get Today's Attendance
-- **Method:** `GET`
-- **URL:** `/api/attendance/today/:employeeId`
-- **Description:** Get today's attendance status for employee
+#### 28. Get Today's Attendance
+```http
+GET /attendance/today/:employeeId
+Authorization: Bearer <token>
+```
 
-#### 3.7 Update Attendance
-- **Method:** `PUT`
-- **URL:** `/api/attendance/:attendanceId`
-- **Description:** Update attendance record (admin only)
-- **Body:**
-```json
+### Admin Only Endpoints
+
+#### 29. Update Attendance
+```http
+PUT /attendance/:attendanceId
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
 {
-  "checkInTime": "2024-01-15T09:00:00Z",
-  "checkOutTime": "2024-01-15T18:00:00Z",
+  "checkIn": "2024-01-01T09:00:00.000Z",
+  "checkOut": "2024-01-01T18:00:00.000Z",
   "status": "present"
 }
 ```
 
-#### 3.8 Delete Attendance
-- **Method:** `DELETE`
-- **URL:** `/api/attendance/:attendanceId`
-- **Description:** Delete attendance record (admin only)
+#### 30. Delete Attendance
+```http
+DELETE /attendance/:attendanceId
+Authorization: Bearer <admin_token>
+```
 
-### 4. Leave Management (8 APIs)
+---
 
-#### 4.1 Create Leave Request
-- **Method:** `POST`
-- **URL:** `/api/leave/requests`
-- **Description:** Create leave request
-- **Body:**
-```json
+## 🏖️ Leave Management
+
+### Protected Endpoints
+
+#### 31. Create Leave Request
+```http
+POST /leave/requests
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "employeeId": "employeeId",
-  "leaveType": "sick",
-  "startDate": "2024-01-20",
-  "endDate": "2024-01-22",
-  "reason": "Not feeling well",
+  "employeeId": "employee_id_here",
+  "leaveType": "annual",
+  "startDate": "2024-01-15",
+  "endDate": "2024-01-17",
+  "reason": "Personal leave",
   "days": 3
 }
 ```
 
-#### 4.2 Get All Leave Requests
-- **Method:** `GET`
-- **URL:** `/api/leave/requests`
-- **Description:** Get all leave requests with filtering
-- **Query:** `status=pending&page=1&limit=10`
+#### 32. Get Leave Requests
+```http
+GET /leave/requests?status=pending&limit=10
+Authorization: Bearer <token>
+```
 
-#### 4.3 Get Leave Request by ID
-- **Method:** `GET`
-- **URL:** `/api/leave/requests/:leaveId`
-- **Description:** Get leave request by ID
+#### 33. Get Leave Request by ID
+```http
+GET /leave/requests/:leaveId
+Authorization: Bearer <token>
+```
 
-#### 4.4 Update Leave Status
-- **Method:** `PUT`
-- **URL:** `/api/leave/requests/:leaveId/status`
-- **Description:** Update leave request status
-- **Body:**
-```json
+#### 34. Update Leave Status
+```http
+PUT /leave/requests/:leaveId/status
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "status": "approved",
-  "comments": "Approved"
+  "comments": "Approved by manager"
 }
 ```
 
-#### 4.5 Update Manager Action
-- **Method:** `PUT`
-- **URL:** `/api/leave/requests/:leaveId/manager-action`
-- **Description:** Update manager action on leave request
-- **Body:**
-```json
+#### 35. Update Manager Action
+```http
+PUT /leave/requests/:leaveId/manager-action
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "managerAction": "approved",
-  "managerComments": "Approved by manager"
+  "action": "approved",
+  "comment": "Approved by manager"
 }
 ```
 
-#### 4.6 Update Leave Request
-- **Method:** `PUT`
-- **URL:** `/api/leave/requests/:leaveId`
-- **Description:** Update leave request
-- **Body:**
-```json
+#### 36. Update Leave Request
+```http
+PUT /leave/requests/:leaveId
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "startDate": "2024-01-21",
-  "endDate": "2024-01-23",
+  "startDate": "2024-01-20",
+  "endDate": "2024-01-22",
   "reason": "Updated reason",
   "days": 3
 }
 ```
 
-#### 4.7 Delete Leave Request
-- **Method:** `DELETE`
-- **URL:** `/api/leave/requests/:leaveId`
-- **Description:** Delete leave request
+#### 37. Delete Leave Request
+```http
+DELETE /leave/requests/:leaveId
+Authorization: Bearer <token>
+```
 
-#### 4.8 Get Employee Leave Requests
-- **Method:** `GET`
-- **URL:** `/api/leave/requests/employee/:employeeId`
-- **Description:** Get employee leave requests
+#### 38. Get Employee Leave Requests
+```http
+GET /leave/requests/employee/:employeeId?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer <token>
+```
 
-#### 4.9 Get Leave Summary
-- **Method:** `GET`
-- **URL:** `/api/leave/summary`
-- **Description:** Get leave summary
-- **Query:** `year=2024`
+#### 39. Get Leave Summary
+```http
+GET /leave/summary?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer <token>
+```
 
-### 5. Regularization Management (6 APIs)
+---
 
-#### 5.1 Create Regularization Request
-- **Method:** `POST`
-- **URL:** `/api/regularization/requests`
-- **Description:** Create regularization request (admin only)
-- **Body:**
-```json
+## 📝 Regularization Management
+
+### Admin Only Endpoints
+
+#### 40. Create Regularization Request
+```http
+POST /regularization/requests
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
 {
-  "employeeId": "employeeId",
+  "employeeId": "employee_id_here",
   "date": "2024-01-15",
-  "reason": "Late due to traffic",
-  "requestedTime": "09:30"
+  "reason": "Late arrival due to traffic"
 }
 ```
 
-#### 5.2 Get Employee Regularization Requests
-- **Method:** `GET`
-- **URL:** `/api/regularization/requests/employee/:employeeId`
-- **Description:** Get regularization requests for employee (admin only)
+#### 41. Get Employee Regularization Requests
+```http
+GET /regularization/requests/employee/:employeeId
+Authorization: Bearer <admin_token>
+```
 
-#### 5.3 Get Company Regularization Requests
-- **Method:** `GET`
-- **URL:** `/api/regularization/requests/company`
-- **Description:** Get regularization requests for company (admin only)
-- **Query:** `status=pending`
+#### 42. Get Company Regularization Requests
+```http
+GET /regularization/requests/company
+Authorization: Bearer <admin_token>
+```
 
-#### 5.4 Get Regularization Request by ID
-- **Method:** `GET`
-- **URL:** `/api/regularization/requests/:requestId`
-- **Description:** Get regularization request by ID (admin only)
+#### 43. Get Regularization Request by ID
+```http
+GET /regularization/requests/:requestId
+Authorization: Bearer <admin_token>
+```
 
-#### 5.5 Update Regularization Status
-- **Method:** `PUT`
-- **URL:** `/api/regularization/requests/:requestId/status`
-- **Description:** Update regularization request status (admin only)
-- **Body:**
-```json
+#### 44. Update Regularization Status
+```http
+PUT /regularization/requests/:requestId/status
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+
 {
   "status": "approved",
-  "comments": "Approved"
+  "comments": "Approved by manager"
 }
 ```
 
-#### 5.6 Delete Regularization Request
-- **Method:** `DELETE`
-- **URL:** `/api/regularization/requests/:requestId`
-- **Description:** Delete regularization request (admin only)
+#### 45. Delete Regularization Request
+```http
+DELETE /regularization/requests/:requestId
+Authorization: Bearer <admin_token>
+```
 
-### 6. Analytics (6 APIs)
+---
 
-#### 6.1 Get Analytics Overview
-- **Method:** `GET`
-- **URL:** `/api/analytics/overview`
-- **Description:** Get analytics overview (admin only)
+## 🏢 Company Management
 
-#### 6.2 Get User Analytics
-- **Method:** `GET`
-- **URL:** `/api/analytics/users`
-- **Description:** Get user analytics (admin only)
+### Super Admin Only Endpoints
 
-#### 6.3 Get Company Analytics
-- **Method:** `GET`
-- **URL:** `/api/analytics/companies`
-- **Description:** Get company analytics (admin only)
+#### 46. Get Company Stats
+```http
+GET /companies/stats
+Authorization: Bearer <super_admin_token>
+```
 
-#### 6.4 Get System Analytics
-- **Method:** `GET`
-- **URL:** `/api/analytics/system`
-- **Description:** Get system analytics (admin only)
+#### 47. Get All Companies
+```http
+GET /companies/all
+Authorization: Bearer <super_admin_token>
+```
 
-#### 6.5 Get Activity Analytics
-- **Method:** `GET`
-- **URL:** `/api/analytics/activities`
-- **Description:** Get activity analytics (admin only)
+#### 48. Update Company Status
+```http
+PUT /companies/:companyId/status
+Authorization: Bearer <super_admin_token>
+Content-Type: application/json
 
-#### 6.6 Get Comprehensive Analytics
-- **Method:** `GET`
-- **URL:** `/api/analytics/comprehensive`
-- **Description:** Get comprehensive analytics (admin only)
+{
+  "isActive": true
+}
+```
 
-### 7. Department Management (6 APIs)
+#### 49. Debug Employee Company Relations
+```http
+GET /companies/debug/employee-relations
+Authorization: Bearer <super_admin_token>
+```
 
-#### 7.1 Get Departments by Company
-- **Method:** `GET`
-- **URL:** `/api/departments/company/:companyId`
-- **Description:** Get departments by company
+---
 
-#### 7.2 Get Department by ID
-- **Method:** `GET`
-- **URL:** `/api/departments/:id`
-- **Description:** Get department by ID
+## 📊 Analytics
 
-#### 7.3 Create Department
-- **Method:** `POST`
-- **URL:** `/api/departments`
-- **Description:** Create department
-- **Body:**
-```json
+### Admin & Super Admin Endpoints
+
+#### 50. Get Analytics Overview
+```http
+GET /analytics/overview?timeRange=7d
+Authorization: Bearer <token>
+```
+
+#### 51. Get User Analytics
+```http
+GET /analytics/users?timeRange=7d
+Authorization: Bearer <token>
+```
+
+#### 52. Get Company Analytics
+```http
+GET /analytics/companies?timeRange=7d
+Authorization: Bearer <token>
+```
+
+#### 53. Get System Analytics
+```http
+GET /analytics/system?timeRange=7d
+Authorization: Bearer <token>
+```
+
+#### 54. Get Activity Analytics
+```http
+GET /analytics/activities?timeRange=7d
+Authorization: Bearer <token>
+```
+
+#### 55. Get Comprehensive Analytics
+```http
+GET /analytics/comprehensive?timeRange=7d
+Authorization: Bearer <token>
+```
+
+---
+
+## 🏗️ Department Management
+
+### Protected Endpoints
+
+#### 56. Get Departments by Company
+```http
+GET /departments/company/:companyId
+Authorization: Bearer <token>
+```
+
+#### 57. Get Department by ID
+```http
+GET /departments/:id
+Authorization: Bearer <token>
+```
+
+#### 58. Create Department
+```http
+POST /departments
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "IT Department",
   "description": "Information Technology Department",
-  "companyId": "companyId",
-  "head": "John Doe",
-  "isActive": true
+  "companyId": "company_id_here"
 }
 ```
 
-#### 7.4 Update Department
-- **Method:** `PUT`
-- **URL:** `/api/departments/:id`
-- **Description:** Update department
-- **Body:**
-```json
+#### 59. Update Department
+```http
+PUT /departments/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "Updated IT Department",
-  "description": "Updated Information Technology Department",
-  "head": "Jane Smith",
-  "isActive": true
+  "description": "Updated description"
 }
 ```
 
-#### 7.5 Delete Department
-- **Method:** `DELETE`
-- **URL:** `/api/departments/:id`
-- **Description:** Delete department
+#### 60. Delete Department
+```http
+DELETE /departments/:id
+Authorization: Bearer <token>
+```
 
-#### 7.6 Add Subcategory to Department
-- **Method:** `POST`
-- **URL:** `/api/departments/:id/subcategories`
-- **Description:** Add subcategory to department
-- **Body:**
-```json
+#### 61. Add Subcategory to Department
+```http
+POST /departments/:id/subcategories
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "Software Development",
-  "description": "Software Development Team"
+  "description": "Software development team"
 }
 ```
 
-### 8. Designation Management (5 APIs)
+---
 
-#### 8.1 Get Designations by Company
-- **Method:** `GET`
-- **URL:** `/api/designations/company/:companyId`
-- **Description:** Get designations by company
+## 👔 Designation Management
 
-#### 8.2 Get Designation by ID
-- **Method:** `GET`
-- **URL:** `/api/designations/:id`
-- **Description:** Get designation by ID
+### Protected Endpoints
 
-#### 8.3 Create Designation
-- **Method:** `POST`
-- **URL:** `/api/designations`
-- **Description:** Create designation
-- **Body:**
-```json
+#### 62. Get Designations by Company
+```http
+GET /designations/company/:companyId
+Authorization: Bearer <token>
+```
+
+#### 63. Get Designation by ID
+```http
+GET /designations/:id
+Authorization: Bearer <token>
+```
+
+#### 64. Create Designation
+```http
+POST /designations
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "Software Engineer",
-  "description": "Software Engineer Role",
-  "companyId": "companyId",
-  "level": "Mid",
-  "isActive": true
+  "description": "Software development role",
+  "companyId": "company_id_here"
 }
 ```
 
-#### 8.4 Update Designation
-- **Method:** `PUT`
-- **URL:** `/api/designations/:id`
-- **Description:** Update designation
-- **Body:**
-```json
+#### 65. Update Designation
+```http
+PUT /designations/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "Senior Software Engineer",
-  "description": "Senior Software Engineer Role",
-  "level": "Senior",
-  "isActive": true
+  "description": "Updated description"
 }
 ```
 
-#### 8.5 Delete Designation
-- **Method:** `DELETE`
-- **URL:** `/api/designations/:id`
-- **Description:** Delete designation
+#### 66. Delete Designation
+```http
+DELETE /designations/:id
+Authorization: Bearer <token>
+```
 
-### 9. Holiday Management (5 APIs)
+---
 
-#### 9.1 Get Holidays by Company
-- **Method:** `GET`
-- **URL:** `/api/holidays/company/:companyId`
-- **Description:** Get holidays by company
+## 🎉 Holiday Management
 
-#### 9.2 Get Holiday by ID
-- **Method:** `GET`
-- **URL:** `/api/holidays/:id`
-- **Description:** Get holiday by ID
+### Protected Endpoints
 
-#### 9.3 Create Holiday
-- **Method:** `POST`
-- **URL:** `/api/holidays`
-- **Description:** Create holiday
-- **Body:**
-```json
+#### 67. Get Holidays by Company
+```http
+GET /holidays/company/:companyId
+Authorization: Bearer <token>
+```
+
+#### 68. Get Holiday by ID
+```http
+GET /holidays/:id
+Authorization: Bearer <token>
+```
+
+#### 69. Create Holiday
+```http
+POST /holidays
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "Republic Day",
   "date": "2024-01-26",
-  "description": "Republic Day Holiday",
-  "companyId": "companyId",
-  "isActive": true
+  "description": "National holiday",
+  "companyId": "company_id_here"
 }
 ```
 
-#### 9.4 Update Holiday
-- **Method:** `PUT`
-- **URL:** `/api/holidays/:id`
-- **Description:** Update holiday
-- **Body:**
-```json
+#### 70. Update Holiday
+```http
+PUT /holidays/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "name": "Updated Republic Day",
   "date": "2024-01-26",
-  "description": "Updated Republic Day Holiday",
-  "isActive": true
+  "description": "Updated description"
 }
 ```
 
-#### 9.5 Delete Holiday
-- **Method:** `DELETE`
-- **URL:** `/api/holidays/:id`
-- **Description:** Delete holiday
+#### 71. Delete Holiday
+```http
+DELETE /holidays/:id
+Authorization: Bearer <token>
+```
 
-### 10. Announcement Management (5 APIs)
+---
 
-#### 10.1 Get Announcements by Company
-- **Method:** `GET`
-- **URL:** `/api/announcements/company/:companyId`
-- **Description:** Get announcements by company
+## 📢 Announcement Management
 
-#### 10.2 Get Announcement by ID
-- **Method:** `GET`
-- **URL:** `/api/announcements/:id`
-- **Description:** Get announcement by ID
+### Protected Endpoints
 
-#### 10.3 Create Announcement
-- **Method:** `POST`
-- **URL:** `/api/announcements`
-- **Description:** Create announcement
-- **Body:**
-```json
+#### 72. Get Announcements by Company
+```http
+GET /announcements/company/:companyId
+Authorization: Bearer <token>
+```
+
+#### 73. Get Announcement by ID
+```http
+GET /announcements/:id
+Authorization: Bearer <token>
+```
+
+#### 74. Create Announcement
+```http
+POST /announcements
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "title": "Important Announcement",
-  "content": "This is an important announcement for all employees.",
-  "companyId": "companyId",
-  "priority": "high",
-  "isActive": true
+  "content": "This is an important announcement for all employees",
+  "companyId": "company_id_here",
+  "priority": "high"
 }
 ```
 
-#### 10.4 Update Announcement
-- **Method:** `PUT`
-- **URL:** `/api/announcements/:id`
-- **Description:** Update announcement
-- **Body:**
-```json
+#### 75. Update Announcement
+```http
+PUT /announcements/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "title": "Updated Important Announcement",
-  "content": "This is an updated important announcement for all employees.",
-  "priority": "medium",
-  "isActive": true
+  "title": "Updated Announcement",
+  "content": "Updated content",
+  "priority": "medium"
 }
 ```
 
-#### 10.5 Delete Announcement
-- **Method:** `DELETE`
-- **URL:** `/api/announcements/:id`
-- **Description:** Delete announcement
+#### 76. Delete Announcement
+```http
+DELETE /announcements/:id
+Authorization: Bearer <token>
+```
 
-### 11. Company Management (3 APIs)
+---
 
-#### 11.1 Get Company Stats
-- **Method:** `GET`
-- **URL:** `/api/companies/stats`
-- **Description:** Get company stats (super admin only)
+## 🖥️ System Management
 
-#### 11.2 Get All Companies
-- **Method:** `GET`
-- **URL:** `/api/companies/all`
-- **Description:** Get all companies (super admin only)
+### Super Admin Only Endpoints
 
-#### 11.3 Update Company Status
-- **Method:** `PUT`
-- **URL:** `/api/companies/:companyId/status`
-- **Description:** Update company status (super admin only)
-- **Body:**
-```json
+#### 77. Get System Health
+```http
+GET /system/health
+Authorization: Bearer <super_admin_token>
+```
+
+#### 78. Get System Logs
+```http
+GET /system/logs
+Authorization: Bearer <super_admin_token>
+```
+
+#### 79. Get Performance Metrics
+```http
+GET /system/performance
+Authorization: Bearer <super_admin_token>
+```
+
+---
+
+## 📈 Activity Management
+
+### Protected Endpoints
+
+#### 80. Get Super Admin Activities
+```http
+GET /activities/super-admin?timeRange=7d
+Authorization: Bearer <super_admin_token>
+```
+
+#### 81. Get Admin Activities
+```http
+GET /activities/admin?timeRange=7d
+Authorization: Bearer <admin_token>
+```
+
+#### 82. Get Activity Stats
+```http
+GET /activities/stats?timeRange=7d
+Authorization: Bearer <token>
+```
+
+#### 83. Log Activity (Internal)
+```http
+POST /activities/log
+Authorization: Bearer <token>
+Content-Type: application/json
+
 {
-  "isActive": false
+  "action": "User logged in",
+  "userId": "user_id_here",
+  "companyId": "company_id_here",
+  "type": "login"
 }
 ```
 
-### 12. System Management (3 APIs)
+---
 
-#### 12.1 Get System Health
-- **Method:** `GET`
-- **URL:** `/api/system/health`
-- **Description:** Get system health (super admin only)
+## 🎛️ Admin Dashboard
 
-#### 12.2 Get System Logs
-- **Method:** `GET`
-- **URL:** `/api/system/logs`
-- **Description:** Get system logs (super admin only)
+### Admin Only Endpoints
 
-#### 12.3 Get Performance Metrics
-- **Method:** `GET`
-- **URL:** `/api/system/performance`
-- **Description:** Get performance metrics (super admin only)
+#### 84. Get Employees by Company (Admin Dashboard)
+```http
+GET /admin/employees/company/:companyId?page=1&limit=10&status=active
+Authorization: Bearer <admin_token>
+```
 
-### 13. Additional Routes (2 APIs)
+#### 85. Get Attendance Summary (Admin Dashboard)
+```http
+GET /admin/attendance/summary?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer <admin_token>
+```
 
-#### 13.1 Health Check
-- **Method:** `GET`
-- **URL:** `/health`
-- **Description:** Server health check
+#### 86. Get Leave Requests (Admin Dashboard)
+```http
+GET /admin/leave/requests?status=pending&limit=5
+Authorization: Bearer <admin_token>
+```
 
-#### 13.2 Serve Uploaded Files
-- **Method:** `GET`
-- **URL:** `/uploads/employees/:employeeId/:folder/:filename`
-- **Description:** Serve uploaded employee files
+#### 87. Get Activity Analytics (Admin Dashboard)
+```http
+GET /admin/analytics/activities?timeRange=7d
+Authorization: Bearer <admin_token>
+```
+
+#### 88. Get Company Stats (Admin Dashboard)
+```http
+GET /admin/company/stats
+Authorization: Bearer <admin_token>
+```
+
+#### 89. Get Leave Status Today (Admin Dashboard)
+```http
+GET /admin/leave/status/today
+Authorization: Bearer <admin_token>
+```
+
+---
+
+## 🔧 Health Check
+
+### Public Endpoint
+
+#### 90. Health Check
+```http
+GET /health
+```
+
+---
 
 ## Summary
 
-**Total APIs: 67**
+This documentation covers **90 API endpoints** across all sections of the HRMS system:
 
-- Authentication & User Management: 8 APIs
-- Employee Management: 18 APIs
-- Attendance Management: 8 APIs
-- Leave Management: 8 APIs
-- Regularization Management: 6 APIs
-- Analytics: 6 APIs
-- Department Management: 6 APIs
-- Designation Management: 5 APIs
-- Holiday Management: 5 APIs
-- Announcement Management: 5 APIs
-- Company Management: 3 APIs
-- System Management: 3 APIs
-- Additional Routes: 2 APIs
+- **Authentication & User Management**: 10 endpoints
+- **Employee Management**: 12 endpoints
+- **Attendance Management**: 8 endpoints
+- **Leave Management**: 9 endpoints
+- **Regularization Management**: 6 endpoints
+- **Company Management**: 4 endpoints
+- **Analytics**: 6 endpoints
+- **Department Management**: 6 endpoints
+- **Designation Management**: 5 endpoints
+- **Holiday Management**: 5 endpoints
+- **Announcement Management**: 5 endpoints
+- **System Management**: 3 endpoints
+- **Activity Management**: 4 endpoints
+- **Admin Dashboard**: 6 endpoints
+- **Health Check**: 1 endpoint
 
-## Response Format
-
-### Success Response
-```json
-{
-  "success": true,
-  "message": "Success message",
-  "data": {}
-}
-```
-
-### Error Response
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "errors": []
-}
-```
-
-## Authentication
-
-Most endpoints require authentication. After login, use the returned token in the Authorization header:
-```
-Authorization: Bearer <your_token_here>
-```
-
-## File Upload
-
-For file upload endpoints, use `multipart/form-data` content type and include the files in the request body.
+All endpoints are properly categorized by access level (Public, Protected, Admin Only, Super Admin Only) and include proper authentication requirements.

@@ -69,13 +69,21 @@ export function AppSidebar() {
     return currentPath.startsWith(path);
   };
 
-  const getNavCls = (active: boolean) =>
-    cn(
-      "w-full justify-start transition-all duration-200 py-5",
+  const getNavCls = (active: boolean) => {
+    const isSuperAdmin = user?.role === "super_admin";
+
+    return cn(
+      "w-full justify-start py-5 relative group",
       active
-        ? "theme-primary theme-shadow"
-        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        ? "bg-[var(--theme-primary)] text-white shadow-lg"
+        : cn(
+            "text-sidebar-foreground",
+            isSuperAdmin
+              ? "hover:bg-[var(--theme-primary-hover)] hover:text-white border-l-4 border-transparent hover:border-l-[var(--theme-secondary)]"
+              : "hover:bg-[var(--theme-primary-hover)] hover:text-white border-l-4 border-transparent hover:border-l-[var(--theme-secondary)]"
+          )
     );
+  };
 
   return (
     <Sidebar
@@ -98,9 +106,6 @@ export function AppSidebar() {
 
         {/* Navigation */}
         <SidebarGroup>
-          {/* <SidebarGroupLabel className="text-sidebar-foreground/70">
-            {!collapsed && (user?.role === 'super_admin' ? 'Platform Management' : 'HR Management')}
-          </SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -111,10 +116,19 @@ export function AppSidebar() {
                       end={item.url === "/"}
                       className={getNavCls(isActive(item.url))}
                     >
-                      <item.icon className="w-5 h-5" />
-                      {!collapsed && (
-                        <span className="font-medium">{item.title}</span>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <item.icon
+                          className={cn(
+                            "w-5 h-5 transition-all duration-300 flex-shrink-0",
+                            "group-hover:rotate-1 group-hover:opacity-80"
+                          )}
+                        />
+                        {!collapsed && (
+                          <span className="font-medium transition-all duration-300 group-hover:translate-x-0.5">
+                            {item.title}
+                          </span>
+                        )}
+                      </div>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -126,10 +140,10 @@ export function AppSidebar() {
         {/* User Info & Logout */}
         <div className="mt-auto p-4 border-t border-sidebar-border">
           {!collapsed && (
-            <div className="relative mb-4 p-4 bg-sidebar-accent/50 rounded-lg">
+            <div className="relative mb-5 bg-sidebar-accent/50 rounded-lg">
               {/* Online Badge */}
               <div className="absolute top-0.5 right-2 flex items-center gap-1 bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full">
-                <div className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full" />
+                <div className="w-1.5 h-1.5 bg-[var(--theme-primary)] rounded-full" />
                 <span>Online</span>
               </div>
 
@@ -167,20 +181,27 @@ export function AppSidebar() {
             variant="ghost"
             size="sm"
             className={cn(
-              "w-full justify-start transition-all duration-200 group",
+              "w-full justify-start transition-all duration-300 group",
               "text-red-600 hover:text-red-700 hover:bg-red-50",
               "border border-red-200 hover:border-red-300",
-              "rounded-lg font-medium",
+              "rounded-lg font-medium hover:scale-[1.02]",
+              "hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]",
               collapsed && "justify-center"
             )}
           >
-            <LogOut
-              className={cn(
-                "w-4 h-4 transition-transform duration-200",
-                "group-hover:scale-110 group-hover:-translate-x-0.5"
+            <div className="flex items-center gap-3">
+              <LogOut
+                className={cn(
+                  "w-4 h-4 transition-all duration-300 flex-shrink-0",
+                  "group-hover:rotate-12 group-hover:opacity-80"
+                )}
+              />
+              {!collapsed && (
+                <span className="transition-all duration-300 group-hover:translate-x-0.5">
+                  Sign Out
+                </span>
               )}
-            />
-            {!collapsed && <span className="ml-2">Sign Out</span>}
+            </div>
           </Button>
         </div>
       </SidebarContent>
