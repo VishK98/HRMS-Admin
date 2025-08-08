@@ -220,132 +220,211 @@ router.get("/analytics/activities", async (req, res) => {
 
     const recentActivities = [];
 
-    // Get recent employee logins
-    const recentLogins = await Employee.find({
-      company: companyId,
-      lastLogin: { $gte: startDate },
-    })
-      .select("firstName lastName employeeId lastLogin")
-      .sort({ lastLogin: -1 })
-      .limit(3);
+    // 1. Recent employee registrations for this company
+    try {
+      const recentEmployees = await Employee.find({
+        company: companyId,
+        createdAt: { $gte: startDate },
+      })
+        .populate("company", "name code")
+        .sort({ createdAt: -1 })
+        .limit(5);
 
-    recentLogins.forEach((employee) => {
-      if (employee.lastLogin) {
+      recentEmployees.forEach((employee) => {
         recentActivities.push({
-          action: `${employee.firstName} ${employee.lastName} logged in`,
-          timestamp: employee.lastLogin.toISOString(),
-          type: "attendance",
+          action: `New employee registered: ${employee.firstName} ${employee.lastName}`,
+          timestamp: employee.createdAt.toISOString(),
+          type: "employee",
+          user: "HR System",
+          company: employee.company?.name || "Unknown Company",
+          employeeId: employee.employeeId,
+          companyCode: employee.company?.code,
         });
-      }
-    });
-
-    // Get recent leave requests
-    const recentLeaves = await Leave.find({
-      company: companyId,
-      createdAt: { $gte: startDate },
-    })
-      .populate("employee", "firstName lastName employeeId")
-      .sort({ createdAt: -1 })
-      .limit(3);
-
-    recentLeaves.forEach((leave) => {
-      const action =
-        leave.status === "pending"
-          ? `${leave.employee.firstName} ${leave.employee.lastName} applied for ${leave.leaveType} leave`
-          : `${leave.employee.firstName} ${leave.employee.lastName}'s ${leave.leaveType} leave was ${leave.status}`;
-
-      recentActivities.push({
-        action,
-        timestamp: leave.createdAt.toISOString(),
-        type: "leave",
       });
-    });
+    } catch (error) {
+      console.error("Error fetching recent employees:", error);
+    }
 
-    // Get recent attendance check-ins
-    const recentAttendance = await Attendance.find({
-      company: companyId,
-      checkIn: { $gte: startDate },
-    })
-      .populate("employee", "firstName lastName employeeId")
-      .sort({ checkIn: -1 })
-      .limit(3);
+    // 2. Recent employee logins for this company
+    try {
+      const recentLogins = await Employee.find({
+        company: companyId,
+        lastLogin: { $gte: startDate },
+      })
+        .populate("company", "name code")
+        .sort({ lastLogin: -1 })
+        .limit(5);
 
-    recentAttendance.forEach((attendance) => {
-      const action =
-        attendance.status === "present"
-          ? `${attendance.employee.firstName} ${attendance.employee.lastName} checked in`
-          : `${attendance.employee.firstName} ${attendance.employee.lastName} checked in (${attendance.status})`;
-
-      recentActivities.push({
-        action,
-        timestamp: attendance.checkIn.toISOString(),
-        type: "attendance",
+      recentLogins.forEach((employee) => {
+        if (employee.lastLogin) {
+          recentActivities.push({
+            action: `Employee login: ${employee.firstName} ${employee.lastName}`,
+            timestamp: employee.lastLogin.toISOString(),
+            type: "user",
+            user: `${employee.firstName} ${employee.lastName}`,
+            company: employee.company?.name || "Unknown Company",
+            employeeId: employee.employeeId,
+            companyCode: employee.company?.code,
+          });
+        }
       });
-    });
+    } catch (error) {
+      console.error("Error fetching recent logins:", error);
+    }
 
-    // Add system activities
-    const systemActivities = [
-      {
-        action: "Monthly attendance report generated",
-        timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-        type: "system",
-      },
-      {
-        action: "System backup completed",
-        timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-        type: "system",
-      },
-      {
-        action: "Database optimization completed",
-        timestamp: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
-        type: "system",
-      },
-    ];
+    // 3. Recent leave requests for this company
+    try {
+      const recentLeaves = await Leave.find({
+        company: companyId,
+        createdAt: { $gte: startDate },
+      })
+        .populate("employee", "firstName lastName employeeId")
+        .populate("company", "name code")
+        .sort({ createdAt: -1 })
+        .limit(5);
 
-    // Add employee activities (simulated)
-    const employeeActivities = [
-      {
-        action: "New employee onboarding completed",
-        timestamp: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
-        type: "employee",
-      },
-      {
-        action: "Employee profile updated",
-        timestamp: new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString(),
-        type: "employee",
-      },
-    ];
+      recentLeaves.forEach((leave) => {
+        const action =
+          leave.status === "pending"
+            ? `${leave.employee.firstName} ${leave.employee.lastName} applied for ${leave.leaveType} leave`
+            : `${leave.employee.firstName} ${leave.employee.lastName}'s ${leave.leaveType} leave was ${leave.status}`;
 
-    // Add task activities (simulated)
-    const taskActivities = [
-      {
-        action: "Project milestone completed",
-        timestamp: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
-        type: "task",
-      },
-      {
-        action: "Team meeting scheduled",
-        timestamp: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
-        type: "task",
-      },
-    ];
+        recentActivities.push({
+          action,
+          timestamp: leave.createdAt.toISOString(),
+          type: "leave",
+          user: `${leave.employee.firstName} ${leave.employee.lastName}`,
+          company: leave.company?.name || "Unknown Company",
+          employeeId: leave.employee.employeeId,
+          companyCode: leave.company?.code,
+          status: leave.status,
+        });
+      });
+    } catch (error) {
+      console.error("Error fetching recent leaves:", error);
+    }
 
-    // Combine all activities
-    recentActivities.push(
-      ...systemActivities,
-      ...employeeActivities,
-      ...taskActivities
-    );
+    // 4. Recent attendance check-ins for this company
+    try {
+      const recentAttendance = await Attendance.find({
+        company: companyId,
+        checkIn: { $gte: startDate },
+      })
+        .populate("employee", "firstName lastName employeeId")
+        .populate("company", "name code")
+        .sort({ checkIn: -1 })
+        .limit(5);
+
+      recentAttendance.forEach((attendance) => {
+        const action =
+          attendance.status === "present"
+            ? `${attendance.employee.firstName} ${attendance.employee.lastName} checked in`
+            : `${attendance.employee.firstName} ${attendance.employee.lastName} checked in (${attendance.status})`;
+
+        recentActivities.push({
+          action,
+          timestamp: attendance.checkIn.toISOString(),
+          type: "attendance",
+          user: `${attendance.employee.firstName} ${attendance.employee.lastName}`,
+          company: attendance.company?.name || "Unknown Company",
+          employeeId: attendance.employee.employeeId,
+          companyCode: attendance.company?.code,
+          status: attendance.status,
+        });
+      });
+    } catch (error) {
+      console.error("Error fetching recent attendance:", error);
+    }
+
+    // 5. Recent employee profile updates for this company
+    try {
+      const recentProfileUpdates = await Employee.find({
+        company: companyId,
+        updatedAt: { $gte: startDate },
+        updatedAt: { $ne: "$createdAt" }, // Exclude initial creation
+      })
+        .populate("company", "name code")
+        .sort({ updatedAt: -1 })
+        .limit(3);
+
+      recentProfileUpdates.forEach((employee) => {
+        if (
+          employee.updatedAt &&
+          employee.updatedAt.getTime() !== employee.createdAt.getTime()
+        ) {
+          recentActivities.push({
+            action: `Employee profile updated: ${employee.firstName} ${employee.lastName}`,
+            timestamp: employee.updatedAt.toISOString(),
+            type: "employee",
+            user: "HR System",
+            company: employee.company?.name || "Unknown Company",
+            employeeId: employee.employeeId,
+            companyCode: employee.company?.code,
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching recent profile updates:", error);
+    }
+
+    // 6. Recent document uploads for this company (if available)
+    try {
+      const employeesWithDocuments = await Employee.find({
+        company: companyId,
+        "documents.aadhar": { $exists: true, $ne: null },
+        updatedAt: { $gte: startDate },
+      })
+        .populate("company", "name code")
+        .sort({ updatedAt: -1 })
+        .limit(3);
+
+      employeesWithDocuments.forEach((employee) => {
+        recentActivities.push({
+          action: `Documents uploaded for: ${employee.firstName} ${employee.lastName}`,
+          timestamp: employee.updatedAt.toISOString(),
+          type: "document",
+          user: "HR System",
+          company: employee.company?.name || "Unknown Company",
+          employeeId: employee.employeeId,
+          companyCode: employee.company?.code,
+        });
+      });
+    } catch (error) {
+      console.error("Error fetching recent document uploads:", error);
+    }
 
     // Sort all activities by timestamp (most recent first)
     recentActivities.sort(
       (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
     );
 
+    // Get activity statistics for this company
+    const activityStats = {
+      newEmployees: await Employee.countDocuments({
+        company: companyId,
+        createdAt: { $gte: startDate },
+      }),
+      employeeLogins: await Employee.countDocuments({
+        company: companyId,
+        lastLogin: { $gte: startDate },
+      }),
+      leaveRequests: await Leave.countDocuments({
+        company: companyId,
+        createdAt: { $gte: startDate },
+      }),
+      attendanceCheckins: await Attendance.countDocuments({
+        company: companyId,
+        checkIn: { $gte: startDate },
+      }),
+    };
+
     res.status(200).json({
       success: true,
       data: {
-        recentActivities: recentActivities.slice(0, 12),
+        recentActivities: recentActivities.slice(0, 15),
+        activityStats,
+        timeRange,
+        companyId,
       },
     });
   } catch (error) {

@@ -531,14 +531,14 @@ class ApiClient {
     const params = new URLSearchParams();
     params.append("timeRange", timeRange);
     if (type) params.append("type", type);
-    return this.request(`/activities/super-admin?${params.toString()}`);
+    return this.request(`/analytics/activities?${params.toString()}`);
   }
 
   async getAdminActivities(timeRange: string = "7d", type?: string) {
     const params = new URLSearchParams();
     params.append("timeRange", timeRange);
     if (type) params.append("type", type);
-    return this.request(`/activities/admin?${params.toString()}`);
+    return this.request(`/admin/analytics/activities?${params.toString()}`);
   }
 
   async getActivityStats(timeRange: string = "7d", type?: string) {

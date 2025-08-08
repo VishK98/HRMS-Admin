@@ -533,130 +533,275 @@ class AnalyticsController {
       console.log("Activity analytics request received");
       const { timeRange } = req.query;
       const dateRange = AnalyticsController.getDateRange(timeRange);
+      const userRole = req.user?.role;
 
       // Get real recent activities from various sources
       const recentActivities = [];
 
-      // 1. Recent employee logins (last 7 days)
-      try {
-        const recentLogins = await Employee.find({
-          lastLogin: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-        })
-          .populate("company", "name")
-          .sort({ lastLogin: -1 })
-          .limit(10);
+      // For Super Admin: Focus ONLY on company registrations and system-wide activities
+      if (userRole === "super_admin") {
+        // 1. Recent company registrations ONLY
+        try {
+          const recentCompanies = await Company.find({
+            createdAt: {
+              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          })
+            .sort({ createdAt: -1 })
+            .limit(10);
 
-        recentLogins.forEach((employee) => {
-          if (employee.lastLogin) {
+          recentCompanies.forEach((company) => {
             recentActivities.push({
-              action: `Employee login: ${employee.firstName} ${employee.lastName}`,
-              timestamp: employee.lastLogin.toISOString(),
-              type: "user",
-              user: `${employee.firstName} ${employee.lastName}`,
-              company: employee.company?.name || "Unknown Company",
-              employeeId: employee.employeeId,
+              action: `New company registered: ${company.name}`,
+              timestamp: company.createdAt.toISOString(),
+              type: "company",
+              user: "System",
+              company: company.name,
+              companyCode: company.code,
+              status: company.isActive ? "Active" : "Inactive",
             });
+          });
+        } catch (error) {
+          console.error("Error fetching recent companies:", error);
+        }
+
+        // 2. System-wide login activities (company admins logging in)
+        try {
+          const recentLogins = await Employee.find({
+            role: "admin",
+            lastLogin: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          })
+            .populate("company", "name code")
+            .sort({ lastLogin: -1 })
+            .limit(10);
+
+          recentLogins.forEach((employee) => {
+            if (employee.lastLogin) {
+              recentActivities.push({
+                action: `Company admin login: ${
+                  employee.company?.name || "Unknown Company"
+                }`,
+                timestamp: employee.lastLogin.toISOString(),
+                type: "user",
+                user: `${employee.firstName} ${employee.lastName}`,
+                company: employee.company?.name || "Unknown Company",
+                companyCode: employee.company?.code,
+              });
+            }
+          });
+        } catch (error) {
+          console.error("Error fetching recent admin logins:", error);
+        }
+
+        // 3. System-wide leave activities (only company-wide leave patterns)
+        try {
+          const Leave = require("../models/leave.model");
+          const recentLeaves = await Leave.find({
+            createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          })
+            .populate("employee", "firstName lastName employeeId")
+            .populate("company", "name code")
+            .sort({ createdAt: -1 })
+            .limit(10);
+
+          recentLeaves.forEach((leave) => {
+            recentActivities.push({
+              action: `Leave activity at ${
+                leave.company?.name || "Unknown Company"
+              }: ${leave.leaveType} leave`,
+              timestamp: leave.createdAt.toISOString(),
+              type: "leave",
+              user: `${leave.employee.firstName} ${leave.employee.lastName}`,
+              company: leave.company?.name || "Unknown Company",
+              employeeId: leave.employee.employeeId,
+              companyCode: leave.company?.code,
+              status: leave.status,
+            });
+          });
+        } catch (error) {
+          console.error("Error fetching recent leaves:", error);
+        }
+
+        // 4. System-wide attendance activities (only company-wide attendance patterns)
+        try {
+          const Attendance = require("../models/attendance.model");
+          const recentAttendance = await Attendance.find({
+            checkIn: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          })
+            .populate("employee", "firstName lastName employeeId")
+            .populate("company", "name code")
+            .sort({ checkIn: -1 })
+            .limit(10);
+
+          recentAttendance.forEach((attendance) => {
+            recentActivities.push({
+              action: `Attendance activity at ${
+                attendance.company?.name || "Unknown Company"
+              }: ${attendance.status}`,
+              timestamp: attendance.checkIn.toISOString(),
+              type: "attendance",
+              user: `${attendance.employee.firstName} ${attendance.employee.lastName}`,
+              company: attendance.company?.name || "Unknown Company",
+              employeeId: attendance.employee.employeeId,
+              companyCode: attendance.company?.code,
+              status: attendance.status,
+            });
+          });
+        } catch (error) {
+          console.error("Error fetching recent attendance:", error);
+        }
+      } else {
+        // For Admin: Focus ONLY on company-specific employee activities
+        const companyId =
+          req.user?.company?._id || req.user?.companyId || req.user?.company;
+
+        if (companyId) {
+          // 1. Recent employee registrations for this company
+          try {
+            const recentEmployees = await Employee.find({
+              company: companyId,
+              createdAt: {
+                $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              },
+            })
+              .populate("company", "name code")
+              .sort({ createdAt: -1 })
+              .limit(10);
+
+            recentEmployees.forEach((employee) => {
+              recentActivities.push({
+                action: `New employee registered: ${employee.firstName} ${employee.lastName}`,
+                timestamp: employee.createdAt.toISOString(),
+                type: "employee",
+                user: "HR System",
+                company: employee.company?.name || "Unknown Company",
+                employeeId: employee.employeeId,
+                companyCode: employee.company?.code,
+              });
+            });
+          } catch (error) {
+            console.error("Error fetching recent employees:", error);
           }
-        });
-      } catch (error) {
-        console.error("Error fetching recent logins:", error);
-      }
 
-      // 2. Recent leave requests
-      try {
-        const Leave = require("../models/leave.model");
-        const recentLeaves = await Leave.find({
-          createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-        })
-          .populate("employee", "firstName lastName employeeId")
-          .populate("company", "name")
-          .sort({ createdAt: -1 })
-          .limit(10);
+          // 2. Recent employee logins for this company
+          try {
+            const recentLogins = await Employee.find({
+              company: companyId,
+              lastLogin: {
+                $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              },
+            })
+              .populate("company", "name code")
+              .sort({ lastLogin: -1 })
+              .limit(10);
 
-        recentLeaves.forEach((leave) => {
-          recentActivities.push({
-            action: `Leave request ${leave.status}: ${leave.leaveType} leave`,
-            timestamp: leave.createdAt.toISOString(),
-            type: "leave",
-            user: `${leave.employee.firstName} ${leave.employee.lastName}`,
-            company: leave.company?.name || "Unknown Company",
-            employeeId: leave.employee.employeeId,
-            status: leave.status,
-          });
-        });
-      } catch (error) {
-        console.error("Error fetching recent leaves:", error);
-      }
+            recentLogins.forEach((employee) => {
+              if (employee.lastLogin) {
+                recentActivities.push({
+                  action: `Employee login: ${employee.firstName} ${employee.lastName}`,
+                  timestamp: employee.lastLogin.toISOString(),
+                  type: "user",
+                  user: `${employee.firstName} ${employee.lastName}`,
+                  company: employee.company?.name || "Unknown Company",
+                  employeeId: employee.employeeId,
+                  companyCode: employee.company?.code,
+                });
+              }
+            });
+          } catch (error) {
+            console.error("Error fetching recent logins:", error);
+          }
 
-      // 3. Recent attendance check-ins
-      try {
-        const Attendance = require("../models/attendance.model");
-        const recentAttendance = await Attendance.find({
-          checkIn: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-        })
-          .populate("employee", "firstName lastName employeeId")
-          .populate("company", "name")
-          .sort({ checkIn: -1 })
-          .limit(10);
+          // 3. Recent leave requests for this company
+          try {
+            const Leave = require("../models/leave.model");
+            const recentLeaves = await Leave.find({
+              company: companyId,
+              createdAt: {
+                $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              },
+            })
+              .populate("employee", "firstName lastName employeeId")
+              .populate("company", "name code")
+              .sort({ createdAt: -1 })
+              .limit(10);
 
-        recentAttendance.forEach((attendance) => {
-          recentActivities.push({
-            action: `Attendance check-in: ${attendance.status}`,
-            timestamp: attendance.checkIn.toISOString(),
-            type: "attendance",
-            user: `${attendance.employee.firstName} ${attendance.employee.lastName}`,
-            company: attendance.company?.name || "Unknown Company",
-            employeeId: attendance.employee.employeeId,
-            status: attendance.status,
-          });
-        });
-      } catch (error) {
-        console.error("Error fetching recent attendance:", error);
-      }
+            recentLeaves.forEach((leave) => {
+              recentActivities.push({
+                action: `Leave request ${leave.status}: ${leave.leaveType} leave`,
+                timestamp: leave.createdAt.toISOString(),
+                type: "leave",
+                user: `${leave.employee.firstName} ${leave.employee.lastName}`,
+                company: leave.company?.name || "Unknown Company",
+                employeeId: leave.employee.employeeId,
+                companyCode: leave.company?.code,
+                status: leave.status,
+              });
+            });
+          } catch (error) {
+            console.error("Error fetching recent leaves:", error);
+          }
 
-      // 4. Recent company registrations
-      try {
-        const recentCompanies = await Company.find({
-          createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        })
-          .sort({ createdAt: -1 })
-          .limit(5);
+          // 4. Recent attendance check-ins for this company
+          try {
+            const Attendance = require("../models/attendance.model");
+            const recentAttendance = await Attendance.find({
+              company: companyId,
+              checkIn: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+            })
+              .populate("employee", "firstName lastName employeeId")
+              .populate("company", "name code")
+              .sort({ checkIn: -1 })
+              .limit(10);
 
-        recentCompanies.forEach((company) => {
-          recentActivities.push({
-            action: `New company registered: ${company.name}`,
-            timestamp: company.createdAt.toISOString(),
-            type: "company",
-            user: "System",
-            company: company.name,
-            companyCode: company.code,
-          });
-        });
-      } catch (error) {
-        console.error("Error fetching recent companies:", error);
-      }
+            recentAttendance.forEach((attendance) => {
+              recentActivities.push({
+                action: `Attendance check-in: ${attendance.status}`,
+                timestamp: attendance.checkIn.toISOString(),
+                type: "attendance",
+                user: `${attendance.employee.firstName} ${attendance.employee.lastName}`,
+                company: attendance.company?.name || "Unknown Company",
+                employeeId: attendance.employee.employeeId,
+                companyCode: attendance.company?.code,
+                status: attendance.status,
+              });
+            });
+          } catch (error) {
+            console.error("Error fetching recent attendance:", error);
+          }
 
-      // 5. Recent employee creations
-      try {
-        const recentEmployees = await Employee.find({
-          createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-        })
-          .populate("company", "name")
-          .sort({ createdAt: -1 })
-          .limit(10);
+          // 5. Recent document uploads for this company
+          try {
+            const recentEmployees = await Employee.find({
+              company: companyId,
+              updatedAt: {
+                $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              },
+            })
+              .populate("company", "name code")
+              .sort({ updatedAt: -1 })
+              .limit(5);
 
-        recentEmployees.forEach((employee) => {
-          recentActivities.push({
-            action: `New employee added: ${employee.firstName} ${employee.lastName}`,
-            timestamp: employee.createdAt.toISOString(),
-            type: "employee",
-            user: "HR System",
-            company: employee.company?.name || "Unknown Company",
-            employeeId: employee.employeeId,
-          });
-        });
-      } catch (error) {
-        console.error("Error fetching recent employees:", error);
+            recentEmployees.forEach((employee) => {
+              if (
+                employee.updatedAt &&
+                employee.updatedAt.getTime() !== employee.createdAt.getTime()
+              ) {
+                recentActivities.push({
+                  action: `Documents uploaded for: ${employee.firstName} ${employee.lastName}`,
+                  timestamp: employee.updatedAt.toISOString(),
+                  type: "document",
+                  user: "HR System",
+                  company: employee.company?.name || "Unknown Company",
+                  employeeId: employee.employeeId,
+                  companyCode: employee.company?.code,
+                });
+              }
+            });
+          } catch (error) {
+            console.error("Error fetching recent document uploads:", error);
+          }
+        }
       }
 
       // Sort all activities by timestamp (most recent first) and limit to 20
@@ -665,62 +810,129 @@ class AnalyticsController {
       );
       const finalRecentActivities = recentActivities.slice(0, 20);
 
-      // Calculate real top actions
+      // Calculate real top actions based on user role
       const topActions = [];
 
-      // Count logins
-      try {
-        const loginCount = await Employee.countDocuments({
-          lastLogin: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        });
-        topActions.push({ action: "User Login", count: loginCount });
-      } catch (error) {
-        console.error("Error counting logins:", error);
-      }
+      if (userRole === "super_admin") {
+        // Super admin: Focus ONLY on company and system-wide activities
+        try {
+          const newCompanyCount = await Company.countDocuments({
+            createdAt: {
+              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+          topActions.push({
+            action: "New Company Registration",
+            count: newCompanyCount,
+          });
+        } catch (error) {
+          console.error("Error counting new companies:", error);
+        }
 
-      // Count leave requests
-      try {
-        const Leave = require("../models/leave.model");
-        const leaveCount = await Leave.countDocuments({
-          createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        });
-        topActions.push({ action: "Leave Request", count: leaveCount });
-      } catch (error) {
-        console.error("Error counting leaves:", error);
-      }
+        try {
+          const adminLoginCount = await Employee.countDocuments({
+            role: "admin",
+            lastLogin: {
+              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+          topActions.push({
+            action: "Company Admin Login",
+            count: adminLoginCount,
+          });
+        } catch (error) {
+          console.error("Error counting admin logins:", error);
+        }
 
-      // Count attendance check-ins
-      try {
-        const Attendance = require("../models/attendance.model");
-        const attendanceCount = await Attendance.countDocuments({
-          checkIn: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        });
-        topActions.push({
-          action: "Attendance Check-in",
-          count: attendanceCount,
-        });
-      } catch (error) {
-        console.error("Error counting attendance:", error);
-      }
+        try {
+          const Leave = require("../models/leave.model");
+          const leaveCount = await Leave.countDocuments({
+            createdAt: {
+              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+          topActions.push({
+            action: "System Leave Activity",
+            count: leaveCount,
+          });
+        } catch (error) {
+          console.error("Error counting leaves:", error);
+        }
 
-      // Count new employees
-      try {
-        const newEmployeeCount = await Employee.countDocuments({
-          createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        });
-        topActions.push({ action: "New Employee", count: newEmployeeCount });
-      } catch (error) {
-        console.error("Error counting new employees:", error);
-      }
+        try {
+          const Attendance = require("../models/attendance.model");
+          const attendanceCount = await Attendance.countDocuments({
+            checkIn: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+          });
+          topActions.push({
+            action: "System Attendance Activity",
+            count: attendanceCount,
+          });
+        } catch (error) {
+          console.error("Error counting attendance:", error);
+        }
+      } else {
+        // Admin: Focus ONLY on company-specific employee activities
+        const companyId =
+          req.user?.company?._id || req.user?.companyId || req.user?.company;
 
-      // Count new companies
-      try {
-        const newCompanyCount = await Company.countDocuments({
-          createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        });
-        topActions.push({ action: "New Company", count: newCompanyCount });
-      } catch (error) {
-        console.error("Error counting new companies:", error);
+        if (companyId) {
+          try {
+            const newEmployeeCount = await Employee.countDocuments({
+              company: companyId,
+              createdAt: {
+                $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
+            });
+            topActions.push({
+              action: "New Employee Registration",
+              count: newEmployeeCount,
+            });
+          } catch (error) {
+            console.error("Error counting new employees:", error);
+          }
+
+          try {
+            const loginCount = await Employee.countDocuments({
+              company: companyId,
+              lastLogin: {
+                $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
+            });
+            topActions.push({ action: "Employee Login", count: loginCount });
+          } catch (error) {
+            console.error("Error counting logins:", error);
+          }
+
+          try {
+            const Leave = require("../models/leave.model");
+            const leaveCount = await Leave.countDocuments({
+              company: companyId,
+              createdAt: {
+                $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
+            });
+            topActions.push({ action: "Leave Request", count: leaveCount });
+          } catch (error) {
+            console.error("Error counting leaves:", error);
+          }
+
+          try {
+            const Attendance = require("../models/attendance.model");
+            const attendanceCount = await Attendance.countDocuments({
+              company: companyId,
+              checkIn: {
+                $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
+            });
+            topActions.push({
+              action: "Attendance Check-in",
+              count: attendanceCount,
+            });
+          } catch (error) {
+            console.error("Error counting attendance:", error);
+          }
+        }
       }
 
       // Sort top actions by count
@@ -729,9 +941,25 @@ class AnalyticsController {
       // Calculate real peak usage hours based on login times
       const peakUsageHours = [];
       try {
-        const recentLogins = await Employee.find({
-          lastLogin: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-        }).select("lastLogin");
+        const query =
+          userRole === "super_admin"
+            ? {
+                role: "admin", // Only admin logins for super admin
+                lastLogin: {
+                  $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                },
+              }
+            : {
+                company:
+                  req.user?.company?._id ||
+                  req.user?.companyId ||
+                  req.user?.company,
+                lastLogin: {
+                  $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                },
+              };
+
+        const recentLogins = await Employee.find(query).select("lastLogin");
 
         // Initialize hours array
         const hourCounts = new Array(24).fill(0);
@@ -766,6 +994,7 @@ class AnalyticsController {
         recentActivities: finalRecentActivities,
         topActions,
         peakUsageHours,
+        userRole, // Include user role for frontend to differentiate
       };
 
       console.log("Activity analytics data:", activityAnalytics);
