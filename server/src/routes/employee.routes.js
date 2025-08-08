@@ -35,10 +35,7 @@ const employeeRegistrationValidation = [
     .trim()
     .isLength({ min: 10, max: 15 })
     .withMessage("Please enter a valid phone number"),
-  body("companyName")
-    .trim()
-    .isLength({ min: 2, max: 100 })
-    .withMessage("Company name must be between 2 and 100 characters"),
+  body("companyId").isMongoId().withMessage("Please enter a valid company ID"),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),

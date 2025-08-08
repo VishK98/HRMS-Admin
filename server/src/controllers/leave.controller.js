@@ -257,7 +257,7 @@ class LeaveController {
         await activityService.logLeaveActivity(
           `Leave request ${status}: ${leave.employee.firstName} ${leave.employee.lastName} - ${leave.leaveType} leave`,
           leave.employee._id,
-          leave.company,
+          leave.company._id || leave.company,
           req.user._id,
           { 
             leaveType: leave.leaveType,
