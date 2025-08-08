@@ -150,8 +150,8 @@ export const AdminDashboard = () => {
         : [];
 
       // Process activity data with real data from new activity service
-      const recentActivities = activityResponse.success && activityResponse.data?.recentActivities
-        ? activityResponse.data.recentActivities.slice(0, 8).map(activity => ({
+      const recentActivities = activityResponse.success && activityResponse.data
+        ? (activityResponse.data as { recentActivities: Array<{ action: string, time: string, type: string }> }).recentActivities.slice(0, 8).map(activity => ({
             action: activity.action,
             time: activity.time,
             type: activity.type as 'attendance' | 'leave' | 'task' | 'employee' | 'system'

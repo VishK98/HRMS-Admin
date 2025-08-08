@@ -108,8 +108,9 @@ export const SuperAdminDashboard = () => {
       const activityResponse = await apiClient.getSuperAdminActivities(timeRange || '7d');
       
       // Use real activities from the response
-      const recentActivities = activityResponse.success && activityResponse.data?.recentActivities
-        ? activityResponse.data.recentActivities.slice(0, 5).map(activity => ({
+      const recentActivities = activityResponse.success && activityResponse.data 
+        ? (activityResponse.data as { recentActivities: Array<{ action: string; time: string; type: string }> })
+          .recentActivities.slice(0, 5).map(activity => ({
             action: activity.action,
             time: activity.time,
             type: activity.type as 'company' | 'user' | 'system' | 'security' | 'employee' | 'attendance' | 'leave'
@@ -229,7 +230,11 @@ export const SuperAdminDashboard = () => {
           disk: 32,
           network: 85,
         },
-        recentActivities,
+        recentActivities: recentActivities.map(activity => ({
+          action: activity.action,
+          time: activity.time,
+          type: activity.type as "company" | "user" | "system" | "security"
+        })),
         pendingApprovals,
         platformMetrics: {
           dailyActiveUsers: activityResponse.success ? (activityResponse.data as { topActions: { action: string, count: number }[] })?.topActions?.find(a => a.action === "User Login")?.count || 0 : 0,
