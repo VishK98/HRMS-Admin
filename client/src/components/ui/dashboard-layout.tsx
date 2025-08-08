@@ -88,6 +88,11 @@ export const DashboardLayout = ({
             <h1 className="text-3xl font-bold text-foreground">
               {greeting || title}
             </h1>
+            {currentTime && (
+              <div className="text-3xl font-bold text-foreground">
+                {formatTime(currentTime)}
+              </div>
+            )}
           </div>
           {welcomeMessage && (
             <p className="text-lg text-muted-foreground">{welcomeMessage}</p>

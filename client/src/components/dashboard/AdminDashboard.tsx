@@ -58,6 +58,7 @@ const formatCurrentTime = (date: Date) => {
     timeZone: "Asia/Kolkata",
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
     hour12: false,
   });
 };
@@ -250,18 +251,16 @@ export const AdminDashboard = () => {
     console.log('Rejecting leave at index:', index);
   };
 
-  // Update current time every second
+  // Update current time every second and fetch data
   useEffect(() => {
-    const timer = setInterval(() => {
+    fetchDashboardData();
+    
+    // Update time every second
+    const timeInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
-
-  // Fetch dashboard data on component mount
-  useEffect(() => {
-    fetchDashboardData();
+    return () => clearInterval(timeInterval);
   }, [user]);
 
   if (loading) {
@@ -306,7 +305,7 @@ export const AdminDashboard = () => {
   return (
     <DashboardLayout
       title="Admin Dashboard"
-      greeting={`${getGreeting()}, ${formatCurrentTime(currentTime)}`}
+      greeting={getGreeting()}
       welcomeMessage={`We're glad to have you back — ${user?.company?.name || user?.company_name || 'OthTech Solutions'}.`}
       currentTime={currentTime}
       onRefresh={handleRefresh}

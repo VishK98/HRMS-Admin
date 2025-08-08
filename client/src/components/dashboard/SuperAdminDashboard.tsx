@@ -260,8 +260,8 @@ export const SuperAdminDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
     
-    // Set up real-time updates
-    const timer = setInterval(() => {
+    // Update time every second
+    const timeInterval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
@@ -271,7 +271,7 @@ export const SuperAdminDashboard = () => {
     }, 5 * 60 * 1000);
 
     return () => {
-      clearInterval(timer);
+      clearInterval(timeInterval);
       clearInterval(dataRefreshTimer);
     };
   }, []);
