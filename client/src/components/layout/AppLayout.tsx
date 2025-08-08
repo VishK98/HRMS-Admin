@@ -42,7 +42,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   className="relative hover:bg-muted/50 transition-colors"
                 >
                   <Bell className="w-4 h-4 text-muted-foreground" />
-                  <Badge className="absolute -top-1 -right-1 w-2 h-2 p-0 bg-red-500" />
+                  <Badge className="absolute -top-1 -right-1 w-2 h-2 p-0 bg-destructive" />
                 </Button>
 
                 {/* Admin Avatar */}
@@ -51,7 +51,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center",
-                      "bg-gradient-to-br from-[#521138] to-[#843C6D]",
+                      "theme-gradient",
                       "text-white font-bold text-sm shadow-sm"
                     )}
                   >

@@ -28,8 +28,8 @@ export default function Broadcast() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "designations" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("designations")}
         >
@@ -41,8 +41,8 @@ export default function Broadcast() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "departments" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("departments")}
         >
@@ -54,8 +54,8 @@ export default function Broadcast() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "holidays" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("holidays")}
         >
@@ -67,8 +67,8 @@ export default function Broadcast() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "announcements" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("announcements")}
         >

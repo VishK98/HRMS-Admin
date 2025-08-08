@@ -101,7 +101,7 @@ export const FileUpload = ({
               variant="ghost"
               size="sm"
               onClick={removeFile}
-              className="h-6 w-6 p-0 text-gray-500 hover:text-red-500 flex-shrink-0"
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive flex-shrink-0"
             >
               <X className="h-4 w-4" />
             </Button>

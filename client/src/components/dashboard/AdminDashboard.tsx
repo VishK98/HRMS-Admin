@@ -109,12 +109,14 @@ export const AdminDashboard = () => {
         return;
       }
 
+
+
       // Fetch real data from server
       const [employeeResponse, leaveResponse, attendanceResponse, activityResponse, leaveStatusResponse] = await Promise.all([
         apiClient.getAdminEmployeesByCompany(companyId),
         apiClient.getAdminLeaveRequests({ status: 'pending', limit: 5 }),
         apiClient.getAdminAttendanceSummary(new Date().toISOString().split('T')[0], new Date().toISOString().split('T')[0]),
-        apiClient.getAdminActivityAnalytics('7d'),
+        apiClient.getAdminActivities('7d'),
         apiClient.getLeaveStatusToday()
       ]);
 
@@ -147,68 +149,17 @@ export const AdminDashboard = () => {
           }))
         : [];
 
-      // Process activity data with enhanced real data
-      const recentActivities = activityResponse.success && activityResponse.data 
-        ? (activityResponse.data as { recentActivities: Array<{ action: string, timestamp: string, type: string }> })
-            .recentActivities.slice(0, 8).map(activity => ({
+      // Process activity data with real data from new activity service
+      const recentActivities = activityResponse.success && activityResponse.data?.recentActivities
+        ? activityResponse.data.recentActivities.slice(0, 8).map(activity => ({
             action: activity.action,
-            time: new Date(activity.timestamp).toLocaleString('en-US', {
-              timeZone: 'Asia/Kolkata',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
+            time: activity.time,
             type: activity.type as 'attendance' | 'leave' | 'task' | 'employee' | 'system'
           }))
         : [
             {
-              action: "John Doe checked in",
+              action: "No recent activities",
               time: new Date().toLocaleString('en-US', {
-                timeZone: 'Asia/Kolkata',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }),
-              type: 'attendance' as const
-            },
-            {
-              action: "Sarah Wilson applied for leave",
-              time: new Date(Date.now() - 30 * 60 * 1000).toLocaleString('en-US', {
-                timeZone: 'Asia/Kolkata',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }),
-              type: 'leave' as const
-            },
-            {
-              action: "Mike Johnson completed project task",
-              time: new Date(Date.now() - 2 * 60 * 60 * 1000).toLocaleString('en-US', {
-                timeZone: 'Asia/Kolkata',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }),
-              type: 'task' as const
-            },
-            {
-              action: "New employee Emma Davis onboarded",
-              time: new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString('en-US', {
-                timeZone: 'Asia/Kolkata',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }),
-              type: 'employee' as const
-            },
-            {
-              action: "System backup completed",
-              time: new Date(Date.now() - 6 * 60 * 60 * 1000).toLocaleString('en-US', {
                 timeZone: 'Asia/Kolkata',
                 month: 'short',
                 day: 'numeric',
@@ -330,7 +281,7 @@ export const AdminDashboard = () => {
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="text-center">
-              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Error Loading Dashboard</h3>
               <p className="text-muted-foreground mb-4">{error}</p>
               <Button onClick={fetchDashboardData}>Retry</Button>

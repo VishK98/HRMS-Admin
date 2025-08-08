@@ -1,4 +1,5 @@
 const leaveService = require("../services/leave.service");
+const activityService = require("../services/activity.service");
 const Employee = require("../models/employee.model");
 
 class LeaveController {
@@ -86,6 +87,26 @@ class LeaveController {
       };
 
       const leave = await leaveService.createLeaveRequest(leaveData);
+
+      // Log activity for leave request creation
+      if (leave) {
+        const employee = await Employee.findById(employeeId);
+        if (employee) {
+          await activityService.logLeaveActivity(
+            `Leave request created: ${employee.firstName} ${employee.lastName} - ${leaveType} leave`,
+            employeeId,
+            companyId,
+            req.user?.id,
+            { 
+              leaveType,
+              startDate,
+              endDate,
+              days,
+              status: leave.status
+            }
+          );
+        }
+      }
 
       res.status(201).json({
         success: true,
@@ -229,6 +250,22 @@ class LeaveController {
           success: false,
           message: "Leave request not found",
         });
+      }
+
+      // Log activity for leave status update
+      if (leave.employee) {
+        await activityService.logLeaveActivity(
+          `Leave request ${status}: ${leave.employee.firstName} ${leave.employee.lastName} - ${leave.leaveType} leave`,
+          leave.employee._id,
+          leave.company._id || leave.company,
+          req.user._id,
+          { 
+            leaveType: leave.leaveType,
+            status,
+            comments,
+            updatedBy: req.user._id
+          }
+        );
       }
 
       res.status(200).json({

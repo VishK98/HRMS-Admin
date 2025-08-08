@@ -402,9 +402,9 @@ export const NotificationSettings = () => {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 {notificationSettings.emailNotifications ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <AlertTriangle className="h-5 w-5 text-warning" />
                 )}
                 <span>Email Notifications</span>
               </div>
@@ -416,9 +416,9 @@ export const NotificationSettings = () => {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 {notificationSettings.pushNotifications ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <AlertTriangle className="h-5 w-5 text-warning" />
                 )}
                 <span>Push Notifications</span>
               </div>
@@ -430,9 +430,9 @@ export const NotificationSettings = () => {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 {notificationSettings.smsNotifications ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <AlertTriangle className="h-5 w-5 text-warning" />
                 )}
                 <span>SMS Notifications</span>
               </div>
@@ -444,9 +444,9 @@ export const NotificationSettings = () => {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 {notificationSettings.inAppNotifications ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <AlertTriangle className="h-5 w-5 text-warning" />
                 )}
                 <span>In-App Notifications</span>
               </div>

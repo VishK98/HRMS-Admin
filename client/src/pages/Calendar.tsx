@@ -32,8 +32,8 @@ export default function Calendar() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "view" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("view")}
         >
@@ -45,8 +45,8 @@ export default function Calendar() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "events" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("events")}
         >
@@ -58,8 +58,8 @@ export default function Calendar() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "stats" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "bg-[var(--primary)] text-white shadow-sm hover:bg-[var(--secondary)] hover:text-black" 
+              : "hover:bg-[var(--primary-hover)] hover:text-white"
           )}
           onClick={() => setActiveTab("stats")}
         >

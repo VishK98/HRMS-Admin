@@ -28,7 +28,11 @@ interface CompanyFormData {
   adminPhone: string;
 }
 
-export const CompanyRegistration = () => {
+interface CompanyRegistrationProps {
+  onSuccess?: () => void;
+}
+
+export const CompanyRegistration = ({ onSuccess }: CompanyRegistrationProps) => {
   const [formData, setFormData] = useState<CompanyFormData>({
     companyName: '',
     companyCode: '',
@@ -59,7 +63,7 @@ export const CompanyRegistration = () => {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof CompanyFormData],
+          ...prev[parent as keyof CompanyFormData] as Record<string, string>,
           [child]: value
         }
       }));
@@ -101,6 +105,10 @@ export const CompanyRegistration = () => {
           adminPassword: '',
           adminPhone: ''
         });
+        // Call onSuccess callback if provided
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Registration failed');

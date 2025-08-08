@@ -204,7 +204,7 @@ export const EmployeeEditContent = ({
   return (
     <div className="space-y-8">
       {/* Edit Header */}
-      <div className="relative bg-gradient-to-r from-[#521138] to-[#843C6D] rounded-lg px-4 py-3 text-white">
+              <div className="relative theme-gradient rounded-lg px-4 py-3 text-white">
         <h3 className="text-lg font-bold">Edit Employee Information</h3>
         <p className="text-white/80 text-xs">
           Update the employee's details below

@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -9,9 +10,9 @@ export interface ApiResponse<T = any> {
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('hrms_token');
+    const token = localStorage.getItem("hrms_token");
     return {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     };
   }
@@ -29,27 +30,27 @@ class ApiClient {
       },
     };
 
-    console.log('Making request to:', url); // Debug log
-    console.log('Request headers:', config.headers); // Debug log
+    console.log("Making request to:", url); // Debug log
+    console.log("Request headers:", config.headers); // Debug log
 
     try {
       const response = await fetch(url, config);
       const data = await response.json();
 
-      console.log('Response status:', response.status); // Debug log
-      console.log('Response data:', data); // Debug log
+      console.log("Response status:", response.status); // Debug log
+      console.log("Response data:", data); // Debug log
 
       if (!response.ok) {
-        throw new Error(data.message || 'Request failed');
+        throw new Error(data.message || "Request failed");
       }
 
       return data;
     } catch (error) {
-      console.error('Request error:', error); // Debug log
+      console.error("Request error:", error); // Debug log
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Network error');
+      throw new Error("Network error");
     }
   }
 
@@ -60,11 +61,11 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${API_BASE_URL}${endpoint}`;
-    const token = localStorage.getItem('hrms_token');
-    
+    const token = localStorage.getItem("hrms_token");
+
     const config: RequestInit = {
       ...options,
-      method: 'POST',
+      method: "POST",
       body: formData,
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -73,52 +74,52 @@ class ApiClient {
       },
     };
 
-    console.log('Making upload request to:', url); // Debug log
+    console.log("Making upload request to:", url); // Debug log
 
     try {
       const response = await fetch(url, config);
       const data = await response.json();
 
-      console.log('Upload response status:', response.status); // Debug log
-      console.log('Upload response data:', data); // Debug log
+      console.log("Upload response status:", response.status); // Debug log
+      console.log("Upload response data:", data); // Debug log
 
       if (!response.ok) {
-        throw new Error(data.message || 'Upload failed');
+        throw new Error(data.message || "Upload failed");
       }
 
       return data;
     } catch (error) {
-      console.error('Upload request error:', error); // Debug log
+      console.error("Upload request error:", error); // Debug log
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error('Network error');
+      throw new Error("Network error");
     }
   }
 
   // Auth endpoints
   async login(email: string, password: string) {
-    return this.request('/auth/login', {
-      method: 'POST',
+    return this.request("/auth/login", {
+      method: "POST",
       body: JSON.stringify({ email, password }),
     });
   }
 
   async getProfile() {
-    return this.request('/auth/profile');
+    return this.request("/auth/profile");
   }
 
   async updateProfile(updateData: any) {
-    return this.request('/auth/profile', {
-      method: 'PUT',
+    return this.request("/auth/profile", {
+      method: "PUT",
       body: JSON.stringify(updateData),
     });
   }
 
   // Company management (Super Admin only)
   async registerCompany(companyData: any) {
-    return this.request('/auth/register-company', {
-      method: 'POST',
+    return this.request("/auth/register-company", {
+      method: "POST",
       body: JSON.stringify(companyData),
     });
   }
@@ -127,26 +128,36 @@ class ApiClient {
     return this.request(`/auth/companies/${companyId}`);
   }
 
-  async getUsersByCompany(companyId: string) {
-    return this.request(`/auth/companies/${companyId}/users`);
-  }
+  // async getUsersByCompany(companyId: string) {
+  //   return this.request(`/auth/companies/${companyId}/users`);
+  // }
 
   // Regularization requests
   async createRegularizationRequest(requestData: any) {
-    return this.request('/regularization/requests', {
-      method: 'POST',
+    return this.request("/regularization/requests", {
+      method: "POST",
       body: JSON.stringify(requestData),
     });
   }
 
-  async getEmployeeRegularizationRequests(employeeId: string, startDate: string, endDate: string) {
-    return this.request(`/regularization/requests/employee/${employeeId}?startDate=${startDate}&endDate=${endDate}`);
+  async getEmployeeRegularizationRequests(
+    employeeId: string,
+    startDate: string,
+    endDate: string
+  ) {
+    return this.request(
+      `/regularization/requests/employee/${employeeId}?startDate=${startDate}&endDate=${endDate}`
+    );
   }
 
-  async getCompanyRegularizationRequests(startDate: string, endDate: string, filters?: any) {
+  async getCompanyRegularizationRequests(
+    startDate: string,
+    endDate: string,
+    filters?: any
+  ) {
     let url = `/regularization/requests/company?startDate=${startDate}&endDate=${endDate}`;
     if (filters) {
-      Object.keys(filters).forEach(key => {
+      Object.keys(filters).forEach((key) => {
         if (filters[key]) {
           url += `&${key}=${filters[key]}`;
         }
@@ -159,16 +170,19 @@ class ApiClient {
     return this.request(`/regularization/requests/${requestId}`);
   }
 
-  async updateRegularizationRequestStatus(requestId: string, status: 'approved' | 'rejected') {
+  async updateRegularizationRequestStatus(
+    requestId: string,
+    status: "approved" | "rejected"
+  ) {
     return this.request(`/regularization/requests/${requestId}/status`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({ status }),
     });
   }
 
   async deleteRegularizationRequest(requestId: string) {
     return this.request(`/regularization/requests/${requestId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -178,9 +192,9 @@ class ApiClient {
     if (location) {
       requestBody.location = location;
     }
-    
-    return this.request('/attendance/check-in', {
-      method: 'POST',
+
+    return this.request("/attendance/check-in", {
+      method: "POST",
       body: JSON.stringify(requestBody),
     });
   }
@@ -190,9 +204,9 @@ class ApiClient {
     if (location) {
       requestBody.location = location;
     }
-    
-    return this.request('/attendance/check-out', {
-      method: 'POST',
+
+    return this.request("/attendance/check-out", {
+      method: "POST",
       body: JSON.stringify(requestBody),
     });
   }
@@ -201,16 +215,24 @@ class ApiClient {
     return this.request(`/attendance/today/${employeeId}`);
   }
 
-  async getAttendanceSummary(startDate: string, endDate: string, employeeId?: string) {
+  async getAttendanceSummary(
+    startDate: string,
+    endDate: string,
+    employeeId?: string
+  ) {
     const queryParams = new URLSearchParams({
       startDate,
       endDate,
-      ...(employeeId ? { employeeId } : {})
+      ...(employeeId ? { employeeId } : {}),
     });
     return this.request(`/attendance/summary?${queryParams}`);
   }
 
-  async getCompanyAttendance(startDate: string, endDate: string, filters?: any) {
+  async getCompanyAttendance(
+    startDate: string,
+    endDate: string,
+    filters?: any
+  ) {
     const queryParams = new URLSearchParams({
       startDate,
       endDate,
@@ -222,19 +244,20 @@ class ApiClient {
 
   // Leave Management endpoints
   async createLeaveRequest(leaveData: any) {
-    return this.request('/leave/requests', {
-      method: 'POST',
+    return this.request("/leave/requests", {
+      method: "POST",
       body: JSON.stringify(leaveData),
     });
   }
 
   async getLeaveRequests(filters?: any) {
     const queryParams = new URLSearchParams();
-    if (filters?.status) queryParams.append('status', filters.status);
-    if (filters?.leaveType) queryParams.append('leaveType', filters.leaveType);
-    if (filters?.startDate) queryParams.append('startDate', filters.startDate);
-    if (filters?.endDate) queryParams.append('endDate', filters.endDate);
-    if (filters?.employeeId) queryParams.append('employeeId', filters.employeeId);
+    if (filters?.status) queryParams.append("status", filters.status);
+    if (filters?.leaveType) queryParams.append("leaveType", filters.leaveType);
+    if (filters?.startDate) queryParams.append("startDate", filters.startDate);
+    if (filters?.endDate) queryParams.append("endDate", filters.endDate);
+    if (filters?.employeeId)
+      queryParams.append("employeeId", filters.employeeId);
 
     return this.request(`/leave/requests?${queryParams.toString()}`);
   }
@@ -243,45 +266,59 @@ class ApiClient {
     return this.request(`/leave/requests/${leaveId}`);
   }
 
-  async updateLeaveStatus(leaveId: string, status: 'approved' | 'rejected' | 'cancelled', comments?: string) {
+  async updateLeaveStatus(
+    leaveId: string,
+    status: "approved" | "rejected" | "cancelled",
+    comments?: string
+  ) {
     return this.request(`/leave/requests/${leaveId}/status`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({ status, comments }),
     });
   }
 
-  async updateManagerAction(leaveId: string, action: 'pending' | 'approved' | 'rejected', comment?: string) {
+  async updateManagerAction(
+    leaveId: string,
+    action: "pending" | "approved" | "rejected",
+    comment?: string
+  ) {
     return this.request(`/leave/requests/${leaveId}/manager-action`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({ action, comment }),
     });
   }
 
   async updateLeaveRequest(leaveId: string, updateData: any) {
     return this.request(`/leave/requests/${leaveId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(updateData),
     });
   }
 
   async deleteLeaveRequest(leaveId: string) {
     return this.request(`/leave/requests/${leaveId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
-  async getEmployeeLeaveRequests(employeeId: string, startDate?: string, endDate?: string) {
+  async getEmployeeLeaveRequests(
+    employeeId: string,
+    startDate?: string,
+    endDate?: string
+  ) {
     const queryParams = new URLSearchParams();
-    if (startDate) queryParams.append('startDate', startDate);
-    if (endDate) queryParams.append('endDate', endDate);
+    if (startDate) queryParams.append("startDate", startDate);
+    if (endDate) queryParams.append("endDate", endDate);
 
-    return this.request(`/leave/requests/employee/${employeeId}?${queryParams.toString()}`);
+    return this.request(
+      `/leave/requests/employee/${employeeId}?${queryParams.toString()}`
+    );
   }
 
   async getLeaveSummary(startDate?: string, endDate?: string) {
     const queryParams = new URLSearchParams();
-    if (startDate) queryParams.append('startDate', startDate);
-    if (endDate) queryParams.append('endDate', endDate);
+    if (startDate) queryParams.append("startDate", startDate);
+    if (endDate) queryParams.append("endDate", endDate);
 
     return this.request(`/leave/summary?${queryParams.toString()}`);
   }
@@ -296,7 +333,7 @@ class ApiClient {
   }
 
   async createEmployee(employeeData: any) {
-    return this.uploadRequest('/employees', employeeData);
+    return this.uploadRequest("/employees", employeeData);
   }
 
   async updateEmployee(employeeId: string, updateData: any) {
@@ -305,23 +342,31 @@ class ApiClient {
 
   async deleteEmployee(employeeId: string) {
     return this.request(`/employees/${employeeId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
-  async uploadEmployeeDocument(employeeId: string, documentType: string, file: File) {
+  async uploadEmployeeDocument(
+    employeeId: string,
+    documentType: string,
+    file: File
+  ) {
     const formData = new FormData();
-    formData.append('document', file);
-    formData.append('documentType', documentType);
-    
+    formData.append("document", file);
+    formData.append("documentType", documentType);
+
     return this.uploadRequest(`/employees/${employeeId}/documents`, formData);
   }
 
-  async uploadEmployeeEducation(employeeId: string, educationType: string, file: File) {
+  async uploadEmployeeEducation(
+    employeeId: string,
+    educationType: string,
+    file: File
+  ) {
     const formData = new FormData();
-    formData.append('document', file);
-    formData.append('educationType', educationType);
-    
+    formData.append("document", file);
+    formData.append("educationType", educationType);
+
     return this.uploadRequest(`/employees/${employeeId}/education`, formData);
   }
 
@@ -332,8 +377,8 @@ class ApiClient {
 
   async createDesignation(designationData: any) {
     console.log("API createDesignation called with:", designationData);
-    const response = await this.request('/designations', {
-      method: 'POST',
+    const response = await this.request("/designations", {
+      method: "POST",
       body: JSON.stringify(designationData),
     });
     console.log("API createDesignation response:", response);
@@ -342,14 +387,14 @@ class ApiClient {
 
   async updateDesignation(designationId: string, updateData: any) {
     return this.request(`/designations/${designationId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(updateData),
     });
   }
 
   async deleteDesignation(designationId: string) {
     return this.request(`/designations/${designationId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -359,28 +404,28 @@ class ApiClient {
   }
 
   async createDepartment(departmentData: any) {
-    return this.request('/departments', {
-      method: 'POST',
+    return this.request("/departments", {
+      method: "POST",
       body: JSON.stringify(departmentData),
     });
   }
 
   async updateDepartment(departmentId: string, updateData: any) {
     return this.request(`/departments/${departmentId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(updateData),
     });
   }
 
   async deleteDepartment(departmentId: string) {
     return this.request(`/departments/${departmentId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   async addSubCategory(departmentId: string, subCategoryData: any) {
     return this.request(`/departments/${departmentId}/subcategories`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(subCategoryData),
     });
   }
@@ -391,22 +436,22 @@ class ApiClient {
   }
 
   async createHoliday(holidayData: any) {
-    return this.request('/holidays', {
-      method: 'POST',
+    return this.request("/holidays", {
+      method: "POST",
       body: JSON.stringify(holidayData),
     });
   }
 
   async updateHoliday(holidayId: string, updateData: any) {
     return this.request(`/holidays/${holidayId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(updateData),
     });
   }
 
   async deleteHoliday(holidayId: string) {
     return this.request(`/holidays/${holidayId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -416,44 +461,48 @@ class ApiClient {
   }
 
   async createAnnouncement(announcementData: any) {
-    return this.request('/announcements', {
-      method: 'POST',
+    return this.request("/announcements", {
+      method: "POST",
       body: JSON.stringify(announcementData),
     });
   }
 
   async updateAnnouncement(announcementId: string, updateData: any) {
     return this.request(`/announcements/${announcementId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(updateData),
     });
   }
 
   async deleteAnnouncement(announcementId: string) {
     return this.request(`/announcements/${announcementId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Super Admin endpoints
   async getSuperAdminCompanyStats() {
-    return this.request('/companies/stats');
+    return this.request("/companies/stats");
   }
 
   async getSuperAdminUserStats() {
-    return this.request('/auth/stats');
+    return this.request("/auth/stats");
   }
 
   async getSystemHealth() {
-    return this.request('/system/health');
+    return this.request("/system/health");
   }
 
   async getAllCompanies() {
-    return this.request('/companies/all');
+    return this.request("/companies/all");
   }
 
   async getAllUsers() {
-    return this.request('/auth/all');
+    return this.request("/auth/all");
+  }
+
+  async getUsersByCompany(companyId: string) {
+    return this.request(`/auth/companies/${companyId}/users`);
   }
 
   // Analytics endpoints
@@ -477,7 +526,31 @@ class ApiClient {
     return this.request(`/analytics/comprehensive?timeRange=${timeRange}`);
   }
 
-  // Super Admin Activity Analytics
+  // Activity endpoints
+  async getSuperAdminActivities(timeRange: string = "7d", type?: string) {
+    const params = new URLSearchParams();
+    params.append("timeRange", timeRange);
+    if (type) params.append("type", type);
+    return this.request(`/analytics/activities?${params.toString()}`);
+  }
+
+  async getAdminActivities(timeRange: string = "7d", type?: string) {
+    const params = new URLSearchParams();
+    params.append("timeRange", timeRange);
+    if (type) params.append("type", type);
+    return this.request(`/admin/analytics/activities?${params.toString()}`);
+  }
+
+  async getActivityStats(timeRange: string = "7d", type?: string) {
+    const params = new URLSearchParams();
+    params.append("timeRange", timeRange);
+    if (type) params.append("type", type);
+    return this.request(`/activities/stats?${params.toString()}`);
+  }
+
+
+
+  // Super Admin Activity Analytics (legacy - keeping for backward compatibility)
   async getSuperAdminActivityAnalytics(timeRange: string) {
     return this.request(`/analytics/activities?timeRange=${timeRange}`);
   }
@@ -489,7 +562,7 @@ class ApiClient {
       return {
         success: false,
         message: "Company ID is required",
-        data: []
+        data: [],
       };
     }
 
@@ -501,14 +574,18 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
-    const url = `/admin/employees/company/${companyId}${queryString ? `?${queryString}` : ''}`;
+    const url = `/admin/employees/company/${companyId}${
+      queryString ? `?${queryString}` : ""
+    }`;
     return this.request(url);
   }
 
   async getAdminAttendanceSummary(startDate: string, endDate: string) {
-    return this.request(`/admin/attendance/summary?startDate=${startDate}&endDate=${endDate}`);
+    return this.request(
+      `/admin/attendance/summary?startDate=${startDate}&endDate=${endDate}`
+    );
   }
 
   async getAdminLeaveRequests(filters?: Record<string, unknown>) {
@@ -520,9 +597,9 @@ class ApiClient {
         }
       });
     }
-    
+
     const queryString = queryParams.toString();
-    const url = `/admin/leave/requests${queryString ? `?${queryString}` : ''}`;
+    const url = `/admin/leave/requests${queryString ? `?${queryString}` : ""}`;
     return this.request(url);
   }
 
@@ -531,12 +608,12 @@ class ApiClient {
   }
 
   async getAdminCompanyStats() {
-    return this.request('/admin/company/stats');
+    return this.request("/admin/company/stats");
   }
 
   async getLeaveStatusToday() {
-    return this.request('/admin/leave/status/today');
+    return this.request("/admin/leave/status/today");
   }
 }
 
-export const apiClient = new ApiClient(); 
+export const apiClient = new ApiClient();

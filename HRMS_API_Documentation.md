@@ -53,18 +53,18 @@ Authorization: Bearer <token>
 - **Body:**
 ```json
 {
-  "companyName": "Test Company",
-  "companyCode": "TC001",
-  "companyEmail": "info@testcompany.com",
+  "companyName": "Your Company Name",
+  "companyCode": "COMP001",
+  "companyEmail": "info@yourcompany.com",
   "companyPhone": "9876543210",
   "companyAddress": {
-    "street": "123 Test Street",
-    "city": "Test City",
-    "state": "Test State",
+    "street": "123 Business Street",
+    "city": "Your City",
+    "state": "Your State",
     "zipCode": "123456"
   },
-  "adminName": "Test Admin",
-  "adminEmail": "admin@testcompany.com",
+  "adminName": "Admin User",
+  "adminEmail": "admin@yourcompany.com",
   "adminPassword": "admin123",
   "adminPhone": "9876543210"
 }
@@ -113,7 +113,7 @@ Authorization: Bearer <token>
   "dateOfBirth": "1990-01-01",
   "email": "john.doe@company.com",
   "phone": "9876543210",
-  "companyName": "Test Company",
+  "companyName": "Your Company Name",
   "password": "password123"
 }
 ```

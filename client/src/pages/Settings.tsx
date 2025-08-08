@@ -30,8 +30,8 @@ export default function Settings() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "company" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "theme-primary text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "theme-primary-hover hover:text-white"
           )}
           onClick={() => setActiveTab("company")}
         >
@@ -43,8 +43,8 @@ export default function Settings() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "notifications" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "theme-primary text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "theme-primary-hover hover:text-white"
           )}
           onClick={() => setActiveTab("notifications")}
         >
@@ -56,8 +56,8 @@ export default function Settings() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "security" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "theme-primary text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "theme-primary-hover hover:text-white"
           )}
           onClick={() => setActiveTab("security")}
         >
@@ -69,8 +69,8 @@ export default function Settings() {
           className={cn(
             "gap-2 transition-all duration-200",
             activeTab === "data" 
-              ? "bg-[#843C6D] text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
-              : "hover:bg-[#521149] hover:text-white"
+              ? "theme-primary text-white shadow-sm hover:bg-[#d4a81a] hover:text-black" 
+              : "theme-primary-hover hover:text-white"
           )}
           onClick={() => setActiveTab("data")}
         >

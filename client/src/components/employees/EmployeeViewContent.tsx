@@ -172,7 +172,7 @@ export const EmployeeViewContent = ({
   return (
     <div className="space-y-8">
       {/* View Header */}
-      <div className="relative bg-gradient-to-r from-[#521138] to-[#843C6D] rounded-lg px-4 py-3 text-white">
+              <div className="relative theme-gradient rounded-lg px-4 py-3 text-white">
         <h3 className="text-lg font-bold">Employee Details</h3>
         <p className="text-white/80 text-xs">
           View detailed information about the employee
@@ -410,7 +410,7 @@ export const EmployeeViewContent = ({
         {onEdit && (
           <Button
             onClick={onEdit}
-            className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90"
+            className="theme-gradient theme-gradient-hover text-white"
           >
             <Eye className="w-4 h-4 mr-2" />
             Edit Employee

@@ -9,7 +9,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+
 import {
   BarChart3,
   TrendingUp,
@@ -192,15 +193,15 @@ export default function Analytics() {
   };
 
   const getGrowthIcon = (rate: number) => {
-    if (rate > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (rate < 0) return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <Minus className="h-4 w-4 text-gray-500" />;
+    if (rate > 0) return <TrendingUp className="h-4 w-4 text-[var(--primary)]" />;
+    if (rate < 0) return <TrendingDown className="h-4 w-4 text-destructive" />;
+    return <Minus className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getHealthColor = (value: number) => {
-    if (value >= 80) return "text-red-500";
-    if (value >= 60) return "text-yellow-500";
-    return "text-green-500";
+    if (value >= 80) return "text-destructive";
+    if (value >= 60) return "text-warning";
+    return "text-[var(--primary)]";
   };
 
   const getStatusColor = (status: string) => {
@@ -215,11 +216,11 @@ export default function Analytics() {
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'excellent': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'good': return <CheckCircle className="h-4 w-4 text-blue-500" />;
-      case 'fair': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'poor': return <XCircle className="h-4 w-4 text-red-500" />;
-      default: return <Info className="h-4 w-4 text-gray-500" />;
+      case 'excellent': return <CheckCircle className="h-4 w-4 text-[var(--primary)]" />;
+      case 'good': return <CheckCircle className="h-4 w-4 text-[var(--secondary)]" />;
+      case 'fair': return <AlertTriangle className="h-4 w-4 text-warning" />;
+      case 'poor': return <XCircle className="h-4 w-4 text-destructive" />;
+      default: return <Info className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -243,8 +244,8 @@ export default function Analytics() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center max-w-md">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-red-600">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-destructive">
             {isPermissionError ? 'Access Restricted' : 'Error Loading Analytics'}
           </h3>
           <p className="text-sm text-gray-600 mt-2">
@@ -376,529 +377,608 @@ export default function Analytics() {
         </Card>
       </div>
 
-      {/* Detailed Analytics Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="trends">Trends</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="geographic">Geographic</TabsTrigger>
-        </TabsList>
+      {/* Navigation Tabs */}
+      <div className="flex flex-wrap gap-2 border-b border-border">
+        <Button
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "overview" 
+              ? "theme-primary text-white shadow-sm hover:theme-secondary-hover hover:text-black" 
+              : "theme-primary-hover hover:text-white"
+          )}
+          onClick={() => setActiveTab("overview")}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Overview
+        </Button>
+        <Button
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "trends" 
+              ? "theme-primary text-white shadow-sm hover:theme-secondary-hover hover:text-black" 
+              : "theme-primary-hover hover:text-white"
+          )}
+          onClick={() => setActiveTab("trends")}
+        >
+          <TrendingUp className="w-4 h-4" />
+          Trends
+        </Button>
+        <Button
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "performance" 
+              ? "theme-primary text-white shadow-sm hover:theme-secondary-hover hover:text-black" 
+              : "theme-primary-hover hover:text-white"
+          )}
+          onClick={() => setActiveTab("performance")}
+        >
+          <Activity className="w-4 h-4" />
+          Performance
+        </Button>
+        <Button
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "revenue" 
+              ? "theme-primary text-white shadow-sm hover:theme-secondary-hover hover:text-black" 
+              : "theme-primary-hover hover:text-white"
+          )}
+          onClick={() => setActiveTab("revenue")}
+        >
+          <DollarSign className="w-4 h-4" />
+          Revenue
+        </Button>
+        <Button
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "security" 
+              ? "theme-primary text-white shadow-sm hover:theme-secondary-hover hover:text-black" 
+              : "theme-primary-hover hover:text-white"
+          )}
+          onClick={() => setActiveTab("security")}
+        >
+          <Shield className="w-4 h-4" />
+          Security
+        </Button>
+        <Button
+          variant="ghost"
+          className={cn(
+            "gap-2 transition-all duration-200",
+            activeTab === "geographic" 
+              ? "theme-primary text-white shadow-sm hover:theme-secondary-hover hover:text-black" 
+              : "theme-primary-hover hover:text-white"
+          )}
+          onClick={() => setActiveTab("geographic")}
+        >
+          <Globe className="w-4 h-4" />
+          Geographic
+        </Button>
+      </div>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* User Engagement */}
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* User Engagement */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    User Engagement
+                  </CardTitle>
+                  <CardDescription>User activity and retention metrics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">Total Users</div>
+                        <div className="text-2xl font-bold">{formatNumber(data.engagementMetrics.totalUsers)}</div>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">Active This Month</div>
+                        <div className="text-2xl font-bold">{formatNumber(data.engagementMetrics.activeUsersThisMonth)}</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">Retention Rates</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Weekly Retention</span>
+                          <Badge variant="secondary">{Math.round(data.engagementMetrics.retentionRates.weekly)}%</Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Monthly Retention</span>
+                          <Badge variant="secondary">{Math.round(data.engagementMetrics.retentionRates.monthly)}%</Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium mb-2">Feature Usage</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Leave Requests</span>
+                          <Badge variant="secondary">{formatNumber(data.engagementMetrics.featureUsage.leaveRequests)}</Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Attendance Check-ins</span>
+                          <Badge variant="secondary">{formatNumber(data.engagementMetrics.featureUsage.attendanceCheckins)}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Revenue Analytics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5" />
+                    Revenue Analytics
+                  </CardTitle>
+                  <CardDescription>Revenue breakdown and metrics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">MRR</div>
+                        <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.monthlyRecurringRevenue)}</div>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">ARPU</div>
+                        <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.averageRevenuePerUser)}</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">Revenue by Plan</h4>
+                      <div className="space-y-2">
+                        {data.revenueAnalytics.revenueByPlan.map((plan, index) => (
+                          <div key={index} className="flex items-center justify-between">
+                            <span className="text-sm capitalize">{plan.plan}</span>
+                            <div className="flex items-center space-x-2">
+                              <Badge variant="secondary">{plan.count}</Badge>
+                              <span className="text-sm font-medium">{formatCurrency(plan.revenue)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "trends" && (
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  User Engagement
+                  <TrendingUp className="h-5 w-5" />
+                  Platform Growth Trends
                 </CardTitle>
-                <CardDescription>User activity and retention metrics</CardDescription>
+                <CardDescription>30-day trend analysis of key metrics</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">Total Users</div>
-                      <div className="text-2xl font-bold">{formatNumber(data.engagementMetrics.totalUsers)}</div>
-                    </div>
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">Active This Month</div>
-                      <div className="text-2xl font-bold">{formatNumber(data.engagementMetrics.activeUsersThisMonth)}</div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Retention Rates</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Weekly Retention</span>
-                        <Badge variant="secondary">{Math.round(data.engagementMetrics.retentionRates.weekly)}%</Badge>
+                <div className="space-y-6">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">New Users</div>
+                      <div className="text-2xl font-bold">
+                        {formatNumber(data.trends.reduce((sum, day) => sum + day.newUsers, 0))}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Monthly Retention</span>
-                        <Badge variant="secondary">{Math.round(data.engagementMetrics.retentionRates.monthly)}%</Badge>
+                      <div className="text-xs text-muted-foreground">Last 30 days</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">New Companies</div>
+                      <div className="text-2xl font-bold">
+                        {formatNumber(data.trends.reduce((sum, day) => sum + day.newCompanies, 0))}
                       </div>
+                      <div className="text-xs text-muted-foreground">Last 30 days</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Total Revenue</div>
+                      <div className="text-2xl font-bold">
+                        {formatCurrency(data.trends.reduce((sum, day) => sum + day.revenue, 0))}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Last 30 days</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Active Users</div>
+                      <div className="text-2xl font-bold">
+                        {formatNumber(data.trends.reduce((sum, day) => sum + day.activeUsers, 0))}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Last 30 days</div>
                     </div>
                   </div>
 
+                  {/* Trend Chart Placeholder */}
+                  <div className="h-64 flex items-center justify-center text-muted-foreground border rounded-lg">
+                    <div className="text-center">
+                      <LineChart className="h-12 w-12 mx-auto mb-2" />
+                      <p>Interactive trend charts coming soon</p>
+                      <p className="text-sm">Real-time trend visualization will be displayed here</p>
+                    </div>
+                  </div>
+
+                  {/* Recent Activity */}
                   <div>
-                    <h4 className="font-medium mb-2">Feature Usage</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Leave Requests</span>
-                        <Badge variant="secondary">{formatNumber(data.engagementMetrics.featureUsage.leaveRequests)}</Badge>
+                    <h4 className="font-medium mb-4">Recent Activity Summary</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">Leave Requests</div>
+                        <div className="text-xl font-bold">
+                          {formatNumber(data.trends.reduce((sum, day) => sum + day.leaveRequests, 0))}
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Attendance Check-ins</span>
-                        <Badge variant="secondary">{formatNumber(data.engagementMetrics.featureUsage.attendanceCheckins)}</Badge>
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">Attendance Check-ins</div>
+                        <div className="text-xl font-bold">
+                          {formatNumber(data.trends.reduce((sum, day) => sum + day.attendanceCheckins, 0))}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </div>
+        )}
 
-            {/* Revenue Analytics */}
+        {activeTab === "performance" && (
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* System Performance */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Server className="h-5 w-5" />
+                    System Performance
+                  </CardTitle>
+                  <CardDescription>Real-time system metrics</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Resource Usage</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm">CPU Usage</span>
+                            <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.cpuUsage)}`}>
+                              {data.performanceMetrics.system.cpuUsage}%
+                            </span>
+                          </div>
+                          <Progress value={data.performanceMetrics.system.cpuUsage} className="h-2" />
+                        </div>
+                        
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm">Memory Usage</span>
+                            <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.memoryUsage)}`}>
+                              {data.performanceMetrics.system.memoryUsage}%
+                            </span>
+                          </div>
+                          <Progress value={data.performanceMetrics.system.memoryUsage} className="h-2" />
+                        </div>
+                        
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm">Disk Usage</span>
+                            <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.diskUsage)}`}>
+                              {data.performanceMetrics.system.diskUsage}%
+                            </span>
+                          </div>
+                          <Progress value={data.performanceMetrics.system.diskUsage} className="h-2" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium mb-2">Response Times</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Average</span>
+                          <span className="text-sm font-medium">{data.performanceMetrics.responseTime.average}ms</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">P95</span>
+                          <span className="text-sm font-medium">{data.performanceMetrics.responseTime.p95}ms</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">P99</span>
+                          <span className="text-sm font-medium">{data.performanceMetrics.responseTime.p99}ms</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Throughput Metrics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5" />
+                    Throughput Metrics
+                  </CardTitle>
+                  <CardDescription>Request handling and user activity</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">Requests/sec</div>
+                        <div className="text-2xl font-bold">{data.performanceMetrics.throughput.requestsPerSecond}</div>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <div className="text-sm text-muted-foreground">Concurrent Users</div>
+                        <div className="text-2xl font-bold">{data.performanceMetrics.throughput.concurrentUsers}</div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">Session Metrics</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Peak Concurrent</span>
+                          <span className="text-sm font-medium">{data.performanceMetrics.throughput.peakConcurrentUsers}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Avg Session Duration</span>
+                          <span className="text-sm font-medium">{Math.round(data.performanceMetrics.throughput.averageSessionDuration / 60)} min</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium mb-2">System Status</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Uptime</span>
+                          <span className="text-sm font-medium text-green-600">{data.performanceMetrics.system.uptime} days</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Network Usage</span>
+                          <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.networkUsage)}`}>
+                            {data.performanceMetrics.system.networkUsage}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "revenue" && (
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
                   Revenue Analytics
                 </CardTitle>
-                <CardDescription>Revenue breakdown and metrics</CardDescription>
+                <CardDescription>Detailed revenue breakdown and growth metrics</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">MRR</div>
+                <div className="space-y-6">
+                  {/* Revenue Overview */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Total Revenue</div>
+                      <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.totalRevenue)}</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Monthly Recurring</div>
                       <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.monthlyRecurringRevenue)}</div>
                     </div>
-                    <div className="p-3 border rounded-lg">
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Revenue Growth</div>
+                      <div className="text-2xl font-bold">{data.revenueAnalytics.revenueGrowth}%</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
                       <div className="text-sm text-muted-foreground">ARPU</div>
                       <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.averageRevenuePerUser)}</div>
                     </div>
                   </div>
-                  
+
+                  {/* Revenue by Plan */}
                   <div>
-                    <h4 className="font-medium mb-2">Revenue by Plan</h4>
-                    <div className="space-y-2">
-                      {data.revenueAnalytics.revenueByPlan.map((plan, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <span className="text-sm capitalize">{plan.plan}</span>
-                          <div className="flex items-center space-x-2">
-                            <Badge variant="secondary">{plan.count}</Badge>
-                            <span className="text-sm font-medium">{formatCurrency(plan.revenue)}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* Trends Tab */}
-        <TabsContent value="trends" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Platform Growth Trends
-              </CardTitle>
-              <CardDescription>30-day trend analysis of key metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Summary Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">New Users</div>
-                    <div className="text-2xl font-bold">
-                      {formatNumber(data.trends.reduce((sum, day) => sum + day.newUsers, 0))}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Last 30 days</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">New Companies</div>
-                    <div className="text-2xl font-bold">
-                      {formatNumber(data.trends.reduce((sum, day) => sum + day.newCompanies, 0))}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Last 30 days</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Revenue</div>
-                    <div className="text-2xl font-bold">
-                      {formatCurrency(data.trends.reduce((sum, day) => sum + day.revenue, 0))}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Last 30 days</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Active Users</div>
-                    <div className="text-2xl font-bold">
-                      {formatNumber(data.trends.reduce((sum, day) => sum + day.activeUsers, 0))}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Last 30 days</div>
-                  </div>
-                </div>
-
-                {/* Trend Chart Placeholder */}
-                <div className="h-64 flex items-center justify-center text-muted-foreground border rounded-lg">
-                  <div className="text-center">
-                    <LineChart className="h-12 w-12 mx-auto mb-2" />
-                    <p>Interactive trend charts coming soon</p>
-                    <p className="text-sm">Real-time trend visualization will be displayed here</p>
-                  </div>
-                </div>
-
-                {/* Recent Activity */}
-                <div>
-                  <h4 className="font-medium mb-4">Recent Activity Summary</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">Leave Requests</div>
-                      <div className="text-xl font-bold">
-                        {formatNumber(data.trends.reduce((sum, day) => sum + day.leaveRequests, 0))}
-                      </div>
-                    </div>
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">Attendance Check-ins</div>
-                      <div className="text-xl font-bold">
-                        {formatNumber(data.trends.reduce((sum, day) => sum + day.attendanceCheckins, 0))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Performance Tab */}
-        <TabsContent value="performance" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* System Performance */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Server className="h-5 w-5" />
-                  System Performance
-                </CardTitle>
-                <CardDescription>Real-time system metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Resource Usage</h4>
+                    <h4 className="font-medium mb-4">Revenue by Subscription Plan</h4>
                     <div className="space-y-3">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm">CPU Usage</span>
-                          <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.cpuUsage)}`}>
-                            {data.performanceMetrics.system.cpuUsage}%
-                          </span>
-                        </div>
-                        <Progress value={data.performanceMetrics.system.cpuUsage} className="h-2" />
-                      </div>
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm">Memory Usage</span>
-                          <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.memoryUsage)}`}>
-                            {data.performanceMetrics.system.memoryUsage}%
-                          </span>
-                        </div>
-                        <Progress value={data.performanceMetrics.system.memoryUsage} className="h-2" />
-                      </div>
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm">Disk Usage</span>
-                          <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.diskUsage)}`}>
-                            {data.performanceMetrics.system.diskUsage}%
-                          </span>
-                        </div>
-                        <Progress value={data.performanceMetrics.system.diskUsage} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium mb-2">Response Times</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Average</span>
-                        <span className="text-sm font-medium">{data.performanceMetrics.responseTime.average}ms</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">P95</span>
-                        <span className="text-sm font-medium">{data.performanceMetrics.responseTime.p95}ms</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">P99</span>
-                        <span className="text-sm font-medium">{data.performanceMetrics.responseTime.p99}ms</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Throughput Metrics */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
-                  Throughput Metrics
-                </CardTitle>
-                <CardDescription>Request handling and user activity</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">Requests/sec</div>
-                      <div className="text-2xl font-bold">{data.performanceMetrics.throughput.requestsPerSecond}</div>
-                    </div>
-                    <div className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground">Concurrent Users</div>
-                      <div className="text-2xl font-bold">{data.performanceMetrics.throughput.concurrentUsers}</div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Session Metrics</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Peak Concurrent</span>
-                        <span className="text-sm font-medium">{data.performanceMetrics.throughput.peakConcurrentUsers}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Avg Session Duration</span>
-                        <span className="text-sm font-medium">{Math.round(data.performanceMetrics.throughput.averageSessionDuration / 60)} min</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium mb-2">System Status</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Uptime</span>
-                        <span className="text-sm font-medium text-green-600">{data.performanceMetrics.system.uptime} days</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Network Usage</span>
-                        <span className={`text-sm font-medium ${getHealthColor(data.performanceMetrics.system.networkUsage)}`}>
-                          {data.performanceMetrics.system.networkUsage}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* Revenue Tab */}
-        <TabsContent value="revenue" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Revenue Analytics
-              </CardTitle>
-              <CardDescription>Detailed revenue breakdown and growth metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Revenue Overview */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Revenue</div>
-                    <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.totalRevenue)}</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Monthly Recurring</div>
-                    <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.monthlyRecurringRevenue)}</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Revenue Growth</div>
-                    <div className="text-2xl font-bold">{data.revenueAnalytics.revenueGrowth}%</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">ARPU</div>
-                    <div className="text-2xl font-bold">{formatCurrency(data.revenueAnalytics.averageRevenuePerUser)}</div>
-                  </div>
-                </div>
-
-                {/* Revenue by Plan */}
-                <div>
-                  <h4 className="font-medium mb-4">Revenue by Subscription Plan</h4>
-                  <div className="space-y-3">
-                    {data.revenueAnalytics.revenueByPlan.map((plan, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 rounded-full bg-primary"></div>
-                          <div>
-                            <div className="font-medium capitalize">{plan.plan}</div>
-                            <div className="text-sm text-muted-foreground">{plan.count} companies</div>
+                      {data.revenueAnalytics.revenueByPlan.map((plan, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 rounded-full bg-primary"></div>
+                            <div>
+                              <div className="font-medium capitalize">{plan.plan}</div>
+                              <div className="text-sm text-muted-foreground">{plan.count} companies</div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">{formatCurrency(plan.revenue)}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {formatCurrency(data.revenueAnalytics.planPricing[plan.plan] || 0)}/company
+                          <div className="text-right">
+                            <div className="font-medium">{formatCurrency(plan.revenue)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {formatCurrency(data.revenueAnalytics.planPricing[plan.plan] || 0)}/company
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Revenue Chart Placeholder */}
-                <div className="h-64 flex items-center justify-center text-muted-foreground border rounded-lg">
-                  <div className="text-center">
-                    <BarChart className="h-12 w-12 mx-auto mb-2" />
-                    <p>Revenue trend charts coming soon</p>
-                    <p className="text-sm">Interactive revenue visualization will be displayed here</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Security Tab */}
-        <TabsContent value="security" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Security Overview */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Security Overview
-                </CardTitle>
-                <CardDescription>Security metrics and threat analysis</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Security Score</span>
-                      <span className="text-2xl font-bold">{data.securityAnalytics.securityScore}%</span>
-                    </div>
-                    <Progress value={data.securityAnalytics.securityScore} className="h-2" />
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium mb-2">Security Metrics</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Failed Login Attempts</span>
-                        <Badge variant="secondary">{data.securityAnalytics.failedLogins}</Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Last Security Scan</span>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(data.securityAnalytics.lastSecurityScan).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium mb-2">Suspicious Activities</h4>
-                    <div className="space-y-2">
-                      {data.securityAnalytics.suspiciousActivities.map((activity, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <span className="text-sm">{activity.type}</span>
-                          <Badge variant="outline">{activity.count}</Badge>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Security Recommendations */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Security Recommendations
-                </CardTitle>
-                <CardDescription>Actionable security improvements</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {data.securityAnalytics.recommendations.map((recommendation, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-3 border rounded-lg">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm">{recommendation}</p>
-                      </div>
+                  {/* Revenue Chart Placeholder */}
+                  <div className="h-64 flex items-center justify-center text-muted-foreground border rounded-lg">
+                    <div className="text-center">
+                      <BarChart className="h-12 w-12 mx-auto mb-2" />
+                      <p>Revenue trend charts coming soon</p>
+                      <p className="text-sm">Interactive revenue visualization will be displayed here</p>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        )}
 
-        {/* Geographic Tab */}
-        <TabsContent value="geographic" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                Geographic Distribution
-              </CardTitle>
-              <CardDescription>User and company distribution by location</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Locations</div>
-                    <div className="text-2xl font-bold">{data.geographicData.totalLocations}</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Users</div>
-                    <div className="text-2xl font-bold">
-                      {formatNumber(data.geographicData.usersByLocation.reduce((sum, loc) => sum + loc.userCount, 0))}
+        {activeTab === "security" && (
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Security Overview */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Security Overview
+                  </CardTitle>
+                  <CardDescription>Security metrics and threat analysis</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Security Score</span>
+                        <span className="text-2xl font-bold">{data.securityAnalytics.securityScore}%</span>
+                      </div>
+                      <Progress value={data.securityAnalytics.securityScore} className="h-2" />
                     </div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Companies</div>
-                    <div className="text-2xl font-bold">
-                      {formatNumber(data.geographicData.usersByLocation.reduce((sum, loc) => sum + loc.companyCount, 0))}
-                    </div>
-                  </div>
-                </div>
 
-                <div>
-                  <h4 className="font-medium mb-4">Users by Location</h4>
-                  <div className="space-y-3">
-                    {data.geographicData.usersByLocation.map((location, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <div className="font-medium">{location.location || 'Unknown'}</div>
-                            <div className="text-sm text-muted-foreground">{location.companyCount} companies</div>
-                          </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Security Metrics</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Failed Login Attempts</span>
+                          <Badge variant="secondary">{data.securityAnalytics.failedLogins}</Badge>
                         </div>
-                        <div className="text-right">
-                          <div className="font-medium">{formatNumber(location.userCount)} users</div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Last Security Scan</span>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(data.securityAnalytics.lastSecurityScan).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium mb-2">Suspicious Activities</h4>
+                      <div className="space-y-2">
+                        {data.securityAnalytics.suspiciousActivities.map((activity, index) => (
+                          <div key={index} className="flex items-center justify-between">
+                            <span className="text-sm">{activity.type}</span>
+                            <Badge variant="outline">{activity.count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Security Recommendations */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Security Recommendations
+                  </CardTitle>
+                  <CardDescription>Actionable security improvements</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {data.securityAnalytics.recommendations.map((recommendation, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-3 border rounded-lg">
+                        <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm">{recommendation}</p>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
-                {/* Geographic Chart Placeholder */}
-                <div className="h-64 flex items-center justify-center text-muted-foreground border rounded-lg">
-                  <div className="text-center">
-                    <Globe className="h-12 w-12 mx-auto mb-2" />
-                    <p>Geographic visualization coming soon</p>
-                    <p className="text-sm">Interactive map and location charts will be displayed here</p>
+        {activeTab === "geographic" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Geographic Distribution
+                </CardTitle>
+                <CardDescription>User and company distribution by location</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Total Locations</div>
+                      <div className="text-2xl font-bold">{data.geographicData.totalLocations}</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Total Users</div>
+                      <div className="text-2xl font-bold">
+                        {formatNumber(data.geographicData.usersByLocation.reduce((sum, loc) => sum + loc.userCount, 0))}
+                      </div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">Total Companies</div>
+                      <div className="text-2xl font-bold">
+                        {formatNumber(data.geographicData.usersByLocation.reduce((sum, loc) => sum + loc.companyCount, 0))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium mb-4">Users by Location</h4>
+                    <div className="space-y-3">
+                      {data.geographicData.usersByLocation.map((location, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <div className="font-medium">{location.location || 'Unknown'}</div>
+                              <div className="text-sm text-muted-foreground">{location.companyCount} companies</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium">{formatNumber(location.userCount)} users</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Geographic Chart Placeholder */}
+                  <div className="h-64 flex items-center justify-center text-muted-foreground border rounded-lg">
+                    <div className="text-center">
+                      <Globe className="h-12 w-12 mx-auto mb-2" />
+                      <p>Geographic visualization coming soon</p>
+                      <p className="text-sm">Interactive map and location charts will be displayed here</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
     </div>
   );
-} 
+}

@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const attendanceService = require("../services/attendance.service");
+const activityService = require("../services/activity.service");
 
 class AttendanceController {
   // Check in an employee
@@ -67,6 +68,24 @@ class AttendanceController {
         companyId,
         checkInLocation
       );
+
+      // Log activity for check-in
+      if (attendance) {
+        const Employee = require("../models/employee.model");
+        const employee = await Employee.findById(employeeId);
+        if (employee) {
+          await activityService.logAttendanceActivity(
+            `Employee checked in: ${employee.firstName} ${employee.lastName}`,
+            employeeId,
+            companyId,
+            req.user?.id,
+            { 
+              status: attendance.status,
+              location: checkInLocation ? "with location" : "without location"
+            }
+          );
+        }
+      }
 
       res.status(201).json({
         success: true,
@@ -146,6 +165,25 @@ class AttendanceController {
         companyId,
         checkOutLocation
       );
+
+      // Log activity for check-out
+      if (attendance) {
+        const Employee = require("../models/employee.model");
+        const employee = await Employee.findById(employeeId);
+        if (employee) {
+          await activityService.logAttendanceActivity(
+            `Employee checked out: ${employee.firstName} ${employee.lastName}`,
+            employeeId,
+            companyId,
+            req.user?.id,
+            { 
+              status: attendance.status,
+              workingHours: attendance.workingHours,
+              location: checkOutLocation ? "with location" : "without location"
+            }
+          );
+        }
+      }
 
       res.status(200).json({
         success: true,

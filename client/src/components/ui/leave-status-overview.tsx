@@ -23,9 +23,9 @@ export const LeaveStatusOverview = ({
   className
 }: LeaveStatusOverviewProps) => {
   const getLeaveColor = (rate: number) => {
-    if (rate <= 10) return 'bg-green-500';
-    if (rate <= 20) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (rate <= 10) return 'bg-[var(--primary)]';
+    if (rate <= 20) return 'bg-warning';
+    return 'bg-destructive';
   };
 
   return (
@@ -58,19 +58,19 @@ export const LeaveStatusOverview = ({
             />
 
             <div className="grid grid-cols-3 gap-4 mt-6">
-              <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-950/20">
-                <Calendar className="w-6 h-6 text-red-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-red-600">{onLeaveCount}</p>
+              <div className="text-center p-4 rounded-lg bg-destructive/10 dark:bg-destructive/20">
+                <Calendar className="w-6 h-6 text-destructive mx-auto mb-2" />
+                <p className="text-2xl font-bold text-destructive">{onLeaveCount}</p>
                 <p className="text-xs text-muted-foreground">On Leave</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-yellow-50 dark:bg-yellow-950/20">
-                <Clock className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-yellow-600">{halfDayCount}</p>
+              <div className="text-center p-4 rounded-lg bg-warning/10 dark:bg-warning/20">
+                <Clock className="w-6 h-6 text-warning mx-auto mb-2" />
+                <p className="text-2xl font-bold text-warning">{halfDayCount}</p>
                 <p className="text-xs text-muted-foreground">Half Day</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-orange-50 dark:bg-orange-950/20">
-                <UserMinus className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-orange-600">{shortLeaveCount}</p>
+              <div className="text-center p-4 rounded-lg bg-orange-500/10 dark:bg-orange-500/20">
+                <UserMinus className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-orange-500">{shortLeaveCount}</p>
                 <p className="text-xs text-muted-foreground">Short Leave</p>
               </div>
             </div>

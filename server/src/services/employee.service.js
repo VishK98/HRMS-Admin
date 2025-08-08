@@ -3,39 +3,58 @@ const Company = require("../models/company.model");
 const { generateToken } = require("../utils/token.util");
 
 class EmployeeService {
+  // Check if email already exists
+  async checkEmailExists(email) {
+    try {
+      const existingEmployee = await Employee.findOne({
+        email: email.toLowerCase(),
+      });
+      return existingEmployee;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Employee self-registration
   async registerEmployee(employeeData) {
     try {
-      // Check if company exists
-      const company = await Company.findOne({
-        name: { $regex: new RegExp(employeeData.companyName, "i") },
-        isActive: true,
-      });
+      const {
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        email,
+        phone,
+        companyId,
+        password,
+      } = employeeData;
 
+      // Check if company exists
+      const company = await Company.findById(companyId);
       if (!company) {
-        throw new Error("Company not found or inactive");
+        throw new Error("Company not found");
       }
 
       // Check if email already exists
-      const existingEmployee = await Employee.findOne({
-        email: employeeData.email,
-      });
+      const existingEmployee = await this.checkEmailExists(email);
       if (existingEmployee) {
         throw new Error("Employee with this email already exists");
       }
 
       // Create employee with basic info
       const employee = new Employee({
-        firstName: employeeData.firstName,
-        lastName: employeeData.lastName,
-        gender: employeeData.gender,
-        dateOfBirth: employeeData.dateOfBirth,
-        email: employeeData.email,
-        phone: employeeData.phone,
-        password: employeeData.password,
-        company: company._id,
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        email: email.toLowerCase(),
+        phone,
+        password,
+        company: companyId,
         employeeId: this.generateEmployeeId(),
         isProfileComplete: false,
+        status: "active",
+        role: "employee",
       });
 
       await employee.save();

@@ -34,7 +34,7 @@ export const ActivityFeed = ({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-500" />
+              <Activity className="w-5 h-5 text-[var(--primary)]" />
               {title}
             </CardTitle>
             <CardDescription>{description}</CardDescription>

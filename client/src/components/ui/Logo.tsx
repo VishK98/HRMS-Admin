@@ -47,7 +47,7 @@ export const Logo = ({
   if (collapsed) {
     return (
       <div className="flex items-center w-full">
-        <div className="w-8 h-8 bg-gradient-to-br from-[#521138] to-[#843C6D] rounded-lg flex items-center justify-center shadow-sm">
+        <div className="w-8 h-8 theme-gradient rounded-lg flex items-center justify-center shadow-sm">
           <span className="text-white font-bold text-sm">
             {config.fallback}
           </span>
@@ -59,7 +59,7 @@ export const Logo = ({
   return (
     <div className="flex items-center w-full">
       {imageError ? (
-        <div className="w-12 h-12 bg-gradient-to-br from-[#521138] to-[#843C6D] rounded-lg flex items-center justify-center shadow-sm">
+        <div className="w-12 h-12 theme-gradient rounded-lg flex items-center justify-center shadow-sm">
           <span className="text-white font-bold text-lg">
             {config.fallback}
           </span>

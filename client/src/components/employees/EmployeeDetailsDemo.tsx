@@ -287,7 +287,7 @@ export const EmployeeDetailsDemo = () => {
         <h1 className="text-3xl font-bold text-gray-900">Employee Management</h1>
         <Button
           onClick={() => setShowReportingManager(!showReportingManager)}
-          className="bg-gradient-to-r from-[#521138] to-[#843C6D] text-white hover:from-[#521138]/90 hover:to-[#843C6D]/90"
+                      className="theme-gradient theme-gradient-hover text-white"
         >
           <Users className="h-4 w-4 mr-2" />
           Manage Reporting Structure

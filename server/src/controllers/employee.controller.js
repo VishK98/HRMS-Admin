@@ -1,11 +1,13 @@
 const { validationResult } = require("express-validator");
 const employeeService = require("../services/employee.service");
+// const activityService = require("../services/activity.service");
+const Company = require("../models/company.model");
 const fs = require("fs");
 const path = require("path");
 
 class EmployeeController {
-  // Employee self-registration
   async registerEmployee(req, res) {
+    console.log("registerEmployee called", req.body);
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -16,9 +18,80 @@ class EmployeeController {
         });
       }
 
-      const result = await employeeService.registerEmployee(req.body);
+      const {
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        email,
+        phone,
+        companyId,
+        password,
+      } = req.body;
+
+      // Validate required fields
+      if (
+        !firstName ||
+        !lastName ||
+        !gender ||
+        !dateOfBirth ||
+        !email ||
+        !phone ||
+        !companyId ||
+        !password
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "All required fields must be provided",
+        });
+      }
+
+      // Check if company exists
+      const company = await Company.findById(companyId);
+      if (!company) {
+        return res.status(404).json({
+          success: false,
+          message: "Company not found",
+        });
+      }
+
+      // Check if email already exists
+      const existingEmployee = await employeeService.checkEmailExists(email);
+      if (existingEmployee) {
+        return res.status(400).json({
+          success: false,
+          message: "Employee with this email already exists",
+        });
+      }
+
+      // Create employee data object
+      const employeeData = {
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        email,
+        phone,
+        companyId,
+        password,
+      };
+
+      const result = await employeeService.registerEmployee(employeeData);
+
+      // Log activity for employee registration (temporarily disabled for testing)
+      // if (result.success && result.data) {
+      //   await activityService.logEmployeeActivity(
+      //     `New employee registered: ${result.data.employee.firstName} ${result.data.employee.lastName}`,
+      //     result.data.employee._id,
+      //     companyId,
+      //     req.user?.id,
+      //     { employeeId: result.data.employee.employeeId }
+      //   );
+      // }
+
       res.status(201).json(result);
     } catch (error) {
+      console.error("Registration error:", error);
       res.status(400).json({
         success: false,
         message: error.message,
@@ -40,6 +113,17 @@ class EmployeeController {
 
       const { email, password } = req.body;
       const result = await employeeService.loginEmployee(email, password);
+
+      // Log activity for employee login
+      if (result.success && result.data) {
+        await activityService.logUserActivity(
+          `Employee logged in: ${result.data.firstName} ${result.data.lastName}`,
+          result.data._id,
+          result.data.company._id || result.data.company,
+          { email: email }
+        );
+      }
+
       res.status(200).json(result);
     } catch (error) {
       res.status(401).json({
@@ -283,11 +367,7 @@ class EmployeeController {
 
       let filePath;
       if (
-        [
-          "intermediate",
-          "undergraduate",
-          "postgraduate",
-        ].includes(documentType)
+        ["intermediate", "undergraduate", "postgraduate"].includes(documentType)
       ) {
         filePath = employee.education?.[documentType];
       } else {
@@ -305,11 +385,7 @@ class EmployeeController {
       // Update employee to remove document URL
       const updateData = {};
       if (
-        [
-          "intermediate",
-          "undergraduate",
-          "postgraduate",
-        ].includes(documentType)
+        ["intermediate", "undergraduate", "postgraduate"].includes(documentType)
       ) {
         updateData.education = { [documentType]: null };
       } else {

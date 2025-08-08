@@ -299,7 +299,7 @@ export const SecuritySettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 <span>Strong password</span>
               </div>
               <Badge variant="default">Secure</Badge>
@@ -308,9 +308,9 @@ export const SecuritySettings = () => {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 {securitySettings.twoFactorAuth ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <AlertTriangle className="h-5 w-5 text-warning" />
                 )}
                 <span>Two-factor authentication</span>
               </div>
@@ -321,7 +321,7 @@ export const SecuritySettings = () => {
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                 <span>Email notifications</span>
               </div>
               <Badge variant="default">Active</Badge>
@@ -329,7 +329,7 @@ export const SecuritySettings = () => {
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-[#843C6D]" />
+                <Clock className="h-5 w-5 text-[var(--primary)]" />
                 <span>Session timeout</span>
               </div>
               <Badge variant="outline">{securitySettings.sessionTimeout} minutes</Badge>

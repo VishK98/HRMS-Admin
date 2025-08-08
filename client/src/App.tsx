@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -16,7 +17,10 @@ import Settings from "./pages/Settings";
 import Payroll from "./pages/Payroll";
 import Calendar from "./pages/Calendar";
 import Analytics from "./pages/Analytics";
+import Companies from "./pages/Companies";
+import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
+import ThemeDemoPage from "./pages/ThemeDemo";
 
 const queryClient = new QueryClient();
 
@@ -55,12 +59,12 @@ const ProtectedApp = () => {
         {/* Super Admin Only Routes */}
         <Route path="/companies" element={
           <ProtectedRoute requiredRole="super_admin">
-            <div>Companies Management (Coming Soon)</div>
+            <Companies />
           </ProtectedRoute>
         } />
         <Route path="/users" element={
           <ProtectedRoute requiredRole="super_admin">
-            <div>User Management (Coming Soon)</div>
+            <Users />
           </ProtectedRoute>
         } />
         <Route path="/system" element={
@@ -83,6 +87,7 @@ const ProtectedApp = () => {
             <div>System Settings (Coming Soon)</div>
           </ProtectedRoute>
         } />
+        <Route path="/theme-demo" element={<ThemeDemoPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppLayout>
@@ -95,9 +100,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <ProtectedApp />
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <ProtectedApp />
+          </BrowserRouter>
+        </ThemeProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
